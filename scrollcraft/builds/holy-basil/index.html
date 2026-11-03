@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HOLY BASIL ZÜRICH · Pad Krapao Streetfood & Foodtruck</title>
+<meta name="description" content="Authentisches Thai Pad Krapao in Zürich. Ein Gericht, 100% vegane Saucenbasis, heisser Wok, faire CHF 12 bis 15. Vorbestellen mit deinem Züri-Code.">
+<link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="scrollcraft.css">
+<style>
+  :root {
+    --sc-canvas:     #0A0C0A;
+    --sc-surface:    #141915;
+    --sc-ink:        #F5F7F5;
+    --sc-ink-soft:   #A3B1A5;
+    --sc-accent:     #52C45A;
+    --sc-accent-ink: #071209;
+    --sc-font-display: "Space Grotesk", system-ui, sans-serif;
+    --sc-font-text:    "Plus Jakarta Sans", system-ui, sans-serif;
+    --hb-gold:       #FFD54F;
+    --hb-deep-green: #1B4D2E;
+    --hb-core-green: #2E7D32;
+    --hb-chili:      #E53935;
+    --hb-mono:       "JetBrains Mono", monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--sc-canvas);
+    color: var(--sc-ink);
+    overflow-x: hidden;
+  }
+
+  /* Persistent Top Navigation Bar */
+  .site-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem var(--sc-gutter);
+    background: rgba(10, 12, 10, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(82, 196, 90, 0.22);
+  }
+
+  .site-bar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--sc-ink);
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .site-bar__brand img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+
+  .site-bar__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: #122116;
+    border: 1px solid rgba(82, 196, 90, 0.45);
+    font-family: var(--hb-mono);
+    font-size: 0.75rem;
+    color: var(--sc-ink);
+  }
+
+  .site-bar__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sc-accent);
+    box-shadow: 0 0 8px var(--sc-accent);
+  }
+
+  .site-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hb-nav-link {
+    color: var(--sc-ink);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+  }
+
+  .hb-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    background: var(--sc-accent);
+    color: var(--sc-accent-ink);
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: 0.92rem;
+    text-decoration: none;
+    border: 2px solid var(--sc-accent);
+    cursor: pointer;
+  }
+
+  .hb-cta--xl {
+    padding: 1rem 2rem;
+    font-size: 1.12rem;
+  }
+
+  .hb-cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.2rem;
+    border-radius: 999px;
+    background: #141D16;
+    color: var(--sc-ink);
+    border: 1.5px solid rgba(82, 196, 90, 0.55);
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+  }
+
+  /* ACT 1: DIMENSIONAL LAYERED HERO */
+  .hb-hero-stage {
+    position: relative;
+    overflow: hidden;
+    background: #0A0C0A;
+  }
+
+  .hb-plane {
+    position: absolute;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+
+  /* Plane 1: Far Asphalt & Urban Street Grid */
+  .hb-plane--far {
+    inset: -12% -6%;
+    background:
+      radial-gradient(circle at 72% 38%, rgba(46, 125, 50, 0.26) 0%, rgba(10, 12, 10, 0.95) 62%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 48px);
+    z-index: 1;
+  }
+
+  /* Plane 2: Mid-Rear Street Gold Halo Aura & Wok Steam */
+  .hb-plane--aura {
+    top: 6%;
+    right: 6%;
+    width: 560px;
+    height: 560px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 213, 79, 0.24) 0%, rgba(82, 196, 90, 0.16) 42%, rgba(10, 12, 10, 0) 72%);
+    z-index: 2;
+  }
+
+  /* Plane 3: Inter-Plane Giant Street Typography behind Subject */
+  .hb-plane--backtype {
+    top: 16%;
+    right: 3%;
+    z-index: 3;
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: clamp(4.2rem, 11vw, 9.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    color: rgba(82, 196, 90, 0.11);
+    text-transform: uppercase;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  /* Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker) */
+  .hb-plane--subject {
+    top: 11%;
+    right: 7%;
+    width: 430px;
+    max-width: none;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hb-plane--subject img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.85));
+  }
+
+  /* Plane 5: Foreground Herb & Chili Accents (dips in center to keep CTA clear) */
+  .hb-plane--front {
+    bottom: -30px;
+    left: 0;
+    right: 0;
+    height: 190px;
+    z-index: 6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 3vw;
+  }
+
+  .hb-fg-badge {
+    background: #101912;
+    border: 2px solid var(--sc-accent);
+    border-radius: 16px;
+    padding: 0.75rem 1.15rem;
+    font-family: var(--hb-mono);
+    font-size: 0.8rem;
+    color: var(--sc-ink);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Section Floor Fade */
+  .hb-floor-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 180px;
+    background: linear-gradient(to bottom, rgba(10, 12, 10, 0) 0%, #0A0C0A 100%);
+    z-index: 7;
+    pointer-events: none;
+  }
+
+  /* Sibling Scrim protecting Hero Copy */
+  .hb-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(10, 12, 10, 0.96) 0%, rgba(10, 12, 10, 0.88) 48%, rgba(10, 12, 10, 0.25) 100%);
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .hb-hero-copy {
+    position: relative;
+    z-index: 8;
+    max-width: 38rem;
+    margin-top: 3.5rem;
+    background: rgba(12, 16, 13, 0.92);
+    border: 1.5px solid rgba(82, 196, 90, 0.4);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+  }
+
+  .hb-hero-copy h1.sc-display--xl {
+    font-size: clamp(2.1rem, 3.6vw, 3rem);
+    line-height: 1.04;
+  }
+
+  .hb-tag-pill {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    background: #1B4D2E;
+    color: #F5F7F5;
+    font-family: var(--hb-mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--sc-accent);
+  }
+
+  .hb-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1.4rem;
+  }
+
+  /* ACT 2: MANIFESTO SPLIT */
+  .hb-act2 {
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+    background: #111612;
+  }
+
+  .hb-split-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .hb-pillar-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .hb-pillar {
+    background: #161E18;
+    border-left: 4px solid var(--sc-accent);
+    padding: 1rem 1.25rem;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .hb-pillar h3 {
+    font-family: var(--sc-font-display);
+    font-size: 1.08rem;
+    margin: 0 0 0.25rem 0;
+    color: var(--sc-ink);
+  }
+
+  .hb-pillar p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--sc-ink-soft);
+    line-height: 1.5;
+  }
+
+  .hb-emblem-card {
+    background: #0C100D;
+    border: 2px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .hb-emblem-card img {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    margin: 0 auto 1.25rem auto;
+    display: block;
+  }
+
+  .hb-price-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    border-top: 1px solid rgba(82, 196, 90, 0.3);
+    padding-top: 1rem;
+    font-family: var(--hb-mono);
+  }
+
+  .hb-price-cell {
+    background: #151D17;
+    padding: 0.6rem;
+    border-radius: 10px;
+  }
+
+  .hb-price-cell strong {
+    display: block;
+    color: var(--hb-gold);
+    font-size: 1.05rem;
+  }
+
+  .hb-price-cell span {
+    font-size: 0.75rem;
+    color: var(--sc-ink);
+  }
+
+  /* ACT 3: THE PEAK (HORIZONTAL PAN RAIL) */
+  .hb-rail {
+    display: flex;
+    align-items: stretch;
+    gap: 1.75rem;
+    padding: 0 var(--sc-gutter);
+    margin-top: 3.2rem;
+    width: max-content;
+  }
+
+  .hb-rail-lead {
+    width: 440px;
+    flex-shrink: 0;
+    background: #121A14;
+    border: 2px solid rgba(82, 196, 90, 0.45);
+    border-radius: 24px;
+    padding: 2.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hb-dish-card {
+    width: 410px;
+    flex-shrink: 0;
+    background: #131B15;
+    border: 2px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hb-dish-card--gold {
+    border-color: var(--hb-gold);
+  }
+
+  .hb-dish-visual {
+    height: 150px;
+    border-radius: 16px;
+    background: radial-gradient(circle at 50% 45%, #23472B 0%, #0D140F 100%);
+    border: 1px solid rgba(82, 196, 90, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .hb-dish-price {
+    font-family: var(--hb-mono);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--hb-gold);
+  }
+
+  .hb-dish-thai {
+    font-size: 1.35rem;
+    color: var(--sc-accent);
+    font-weight: 700;
+  }
+
+  .hb-dish-card h3 {
+    font-family: var(--sc-font-display);
+    font-size: 1.5rem;
+    margin: 0.35rem 0;
+    color: var(--sc-ink);
+  }
+
+  .hb-dish-card p {
+    font-size: 0.94rem;
+    color: var(--sc-ink-soft);
+    line-height: 1.55;
+    margin: 0 0 1.2rem 0;
+  }
+
+  /* ACT 4: SIGNATURE MOVE - ZÜRI-CODE SPLIT-FLAP HOOD DIAL & NEWSLETTER */
+  .hb-tour-stage {
+    background: #0E1410;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4.5rem var(--sc-gutter) 2rem var(--sc-gutter);
+  }
+
+  .hb-tour-grid {
+    width: 100%;
+    max-width: 1220px;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 2.25rem;
+    align-items: stretch;
+  }
+
+  .hb-flap-board {
+    background: #0A0D0B;
+    border: 2.5px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hb-flap-display {
+    background: #141B16;
+    border: 2px solid #2E7D32;
+    border-radius: 16px;
+    padding: 1.4rem;
+    margin: 1rem 0;
+  }
+
+  .hb-flap-code {
+    font-family: var(--hb-mono);
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 800;
+    color: var(--hb-gold);
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+  }
+
+  .hb-flap-spot {
+    font-family: var(--sc-font-display);
+    font-size: 1.3rem;
+    color: var(--sc-ink);
+    margin-top: 0.45rem;
+  }
+
+  .hb-flap-meta {
+    font-family: var(--hb-mono);
+    font-size: 0.86rem;
+    color: var(--sc-accent);
+    margin-top: 0.35rem;
+  }
+
+  .hb-hood-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .hb-hood-pill {
+    font-family: var(--hb-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    background: #162018;
+    color: var(--sc-ink);
+    border: 1px solid rgba(82, 196, 90, 0.4);
+    cursor: pointer;
+  }
+
+  .hb-hood-pill.is-active {
+    background: var(--sc-accent);
+    color: var(--sc-accent-ink);
+    border-color: var(--sc-accent);
+  }
+
+  .hb-newsletter-card {
+    background: #141C16;
+    border: 2px solid rgba(255, 213, 79, 0.6);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hb-input, .hb-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: #0A0D0B;
+    border: 1.5px solid rgba(82, 196, 90, 0.5);
+    color: var(--sc-ink);
+    font-family: var(--sc-font-text);
+    font-size: 0.94rem;
+    margin-top: 0.65rem;
+  }
+
+  .hb-status-msg {
+    font-family: var(--hb-mono);
+    font-size: 0.82rem;
+    color: var(--hb-gold);
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+  }
+
+  /* ACT 5: COMMITMENT & B2B GATEWAY */
+  .hb-close-section {
+    background: #0A0C0A;
+    padding: 4.5rem var(--sc-gutter) 3.5rem var(--sc-gutter);
+    border-top: 2px solid rgba(82, 196, 90, 0.3);
+  }
+
+  .hb-close-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .hb-qr-box {
+    background: #131A15;
+    border: 2px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 1.75rem;
+  }
+
+  .hb-qr-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hb-qr-svg {
+    width: 104px;
+    height: 104px;
+    background: #F5F7F5;
+    padding: 8px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .hb-foot {
+    max-width: 1200px;
+    margin: 3rem auto 0 auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--sc-ink-soft);
+  }
+
+  .hb-foot a {
+    color: var(--sc-accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Mobile Art Direction (< 760px) per hero-depth.md & taste.md */
+  @media (max-width: 760px) {
+    .site-bar__live,
+    .hb-nav-link {
+      display: none;
+    }
+    .site-bar__brand {
+      white-space: nowrap;
+      font-size: 1.02rem;
+    }
+    .site-bar .hb-cta {
+      padding: 0.5rem 0.95rem;
+      font-size: 0.84rem;
+      white-space: nowrap;
+    }
+    .hb-plane--backtype {
+      font-size: 3.4rem;
+      top: 10%;
+      right: 4%;
+    }
+    .hb-plane--subject {
+      width: 220px;
+      top: 8%;
+      right: 4%;
+      opacity: 0.42;
+    }
+    .hb-plane--front {
+      display: none;
+    }
+    .hb-hero-copy {
+      margin-top: 2.5rem;
+      padding: 1.25rem;
+      max-width: 100%;
+    }
+    .hb-hero-copy h1.sc-display--xl {
+      font-size: var(--sc-t-2xl);
+    }
+    .hb-split-grid,
+    .hb-tour-grid,
+    .hb-close-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .hb-rail-lead,
+    .hb-dish-card {
+      width: 310px;
+      padding: 1.35rem;
+    }
+    .hb-tour-stage {
+      padding: 3.5rem 1rem 1rem 1rem;
+    }
+    .hb-flap-board,
+    .hb-newsletter-card {
+      padding: 1.15rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="site-bar">
+  <a class="site-bar__brand" href="#top">
+    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil Logo">
+    <span>HOLY BASIL</span>
+  </a>
+  <div class="site-bar__live">
+    <span class="site-bar__dot"></span>
+    <span id="navLiveSpot">HEUTE LIVE: 8005 ZÜRI WEST</span>
+  </div>
+  <div class="site-bar__actions">
+    <a class="hb-nav-link" href="#tour">Tour-Plan</a>
+    <a class="hb-nav-link" href="/admin">Crew KDS</a>
+    <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ACT 1 · RECOGNITION: Dimensional Layered Hero (pin + parallax + kinetic) -->
+  <section data-sc-act="pin" data-sc-span="2.3" data-sc-drift="#0A0C0A">
+    <div data-sc-stage class="hb-hero-stage" id="heroStage" data-sc-verify-state="hero:0">
+      <!-- Plane 1: Far Asphalt Grid -->
+      <div class="hb-plane hb-plane--far" data-sc-parallax="-1.4" aria-hidden="true"></div>
+
+      <!-- Plane 2: Street Gold Halo Aura -->
+      <div class="hb-plane hb-plane--aura" data-sc-parallax="-0.9" aria-hidden="true"></div>
+
+      <!-- Plane 3: Inter-Plane Street Tag Typography -->
+      <div class="hb-plane hb-plane--backtype" data-sc-parallax="-0.35" aria-hidden="true">
+        PAD KRAPAO<br>ZÜRICH
+      </div>
+
+      <!-- Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker) -->
+      <div class="hb-plane hb-plane--subject" data-sc-parallax="-0.55">
+        <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" width="430" height="485" alt="Holy Basil Blatt mit goldenem Heiligenschein und Kalligraphie">
+      </div>
+
+      <!-- Sibling Scrim for guaranteed > 4.5:1 contrast -->
+      <div class="hb-hero-scrim" aria-hidden="true"></div>
+
+      <!-- Plane 5: Foreground Street Credentials -->
+      <div class="hb-plane hb-plane--front" data-sc-parallax="0.55" aria-hidden="true">
+        <div class="hb-fg-badge">100% VEGANE SAUCENBASIS · KEINE FISCHSAUCE</div>
+        <div class="hb-fg-badge">ZÜRI-CODE PICKUP · 8004 LANGSTRASSE</div>
+      </div>
+
+      <!-- Section Floor Fade -->
+      <div class="hb-floor-fade" aria-hidden="true"></div>
+
+      <!-- Cue 1: Opening Greet Beat -->
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.62 0">
+        <div class="hb-hero-copy">
+          <span class="hb-tag-pill">BANGKOK NIGHTMARKET ENERGY · ZÜRICH</span>
+          <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Ein Gericht. Volle Wok-Hitze.</h1>
+          <p class="sc-body" style="margin-top: 0.75rem;">
+            Wir bringen Thailands wahres National-Streetfood nach Zürich: Echtes Pad Krapao mit heiligem Basilikum, Chilis und 100% veganer Umami-Basis für faire 12 bis 15 CHF.
+          </p>
+          <div class="hb-btn-row">
+            <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+            <a class="hb-cta-ghost" href="#tour">Wo steht der Truck?</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cue 2: Second Narrative Beat inside Dimensional Hero -->
+      <div class="sc-copy sc-copy--lead" data-sc-cue="0.46 0.99 0.12 0.08">
+        <div class="hb-hero-copy">
+          <span class="hb-tag-pill">ZERO QUEUE · ZÜRI-CODE SYSTEM</span>
+          <h2 class="sc-display sc-display--lg">Kein Anstehen. Dein Quartier ruft dich auf.</h2>
+          <p class="sc-body" style="margin-top: 0.75rem;">
+            Bestelle bis zu 10 Portionen in 20 Sekunden per QR-Code oder Browser. Statt Kassenbon #047 bekommst du deinen eigenen Züri-Code wie 8004 LANGSTRASSE.
+          </p>
+          <div class="hb-btn-row">
+            <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACT 2 · TENSION & TURN: The Manifesto (flow + in + reveal) -->
+  <section class="sc-section hb-act2" data-sc-act="flow" data-sc-drift="#111612">
+    <div class="sc-wrap hb-split-grid">
+      <div class="sc-stack" data-sc-in data-sc-stagger="65">
+        <h2 class="sc-display sc-display--lg">Warum kostet Streetfood in Zürich 25 Franken?</h2>
+        <p class="sc-body">
+          In den meisten Restaurants ist Pad Krapao nur Nummer 48 auf einer überladenen Speisekarte, teuer und angepasst. Bei Holy Basil machen wir genau ein Gericht und perfektionieren jeden Handgriff am Wok.
+        </p>
+        <div class="hb-pillar-list">
+          <div class="hb-pillar">
+            <h3>1. Radikaler Monoprodukt-Fokus</h3>
+            <p>Kein Pad Thai, kein grünes Curry, keine Frühlingsrollen. Nur echtes Pad Krapao aus dem glühenden Wok in unter 90 Sekunden.</p>
+          </div>
+          <div class="hb-pillar">
+            <h3>2. 100% Vegane Saucen- &amp; Pasten-Architektur</h3>
+            <p>Unsere geheime Krapao-Umami-Sauce ist zu 100% pflanzlich. Voller Geschmack für alle, ohne Fisch- oder Austernsauce.</p>
+          </div>
+          <div class="hb-pillar">
+            <h3>3. Fair Street Pricing (CHF 12 bis 15)</h3>
+            <p>Ehrliches Essen für Studierende, Bürolisten und Nachtschwärmer. Bis zu 10 Portionen direkt für dein ganzes Team vorbestellbar.</p>
+          </div>
+        </div>
+      </div>
+
+      <figure class="hb-emblem-card" data-sc-reveal="up" data-sc-reveal-at="0.10 0.55">
+        <img src="/assets/holy_basil_logo_v7_team_emblem.svg" width="340" height="364" alt="Holy Basil Team Emblem Zürich">
+        <div class="hb-price-strip">
+          <div class="hb-price-cell">
+            <strong>CHF 12</strong>
+            <span>HOLY VEGAN</span>
+          </div>
+          <div class="hb-price-cell">
+            <strong>CHF 14</strong>
+            <span>HOLY CHICKEN</span>
+          </div>
+          <div class="hb-price-cell">
+            <strong>CHF 15</strong>
+            <span>PORK / MIX</span>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ACT 3 · THE EMOTIONAL PEAK: Sizzling Wok Lineup (pan + tilt, largest span 3.6) -->
+  <section data-sc-act="pan" data-sc-span="3.6" data-sc-drift="#0D130E">
+    <div data-sc-stage>
+      <div class="hb-rail" data-sc-pan="0.06">
+        <!-- Lead Item -->
+        <div class="hb-rail-lead">
+          <span class="hb-tag-pill">THE WOK LINEUP · STANDARDSCHÄRFE LEICHT SCHARF</span>
+          <h2 class="sc-display sc-display--lg">Drei Varianten. Ein heisser Wok.</h2>
+          <p class="sc-body" style="margin-top: 0.85rem;">
+            Jede Box kommt mit duftendem Jasminreis, frischem Holy Basil, Knoblauch und unserer 100% veganen Krapao-Sauce in unserer perfekt ausbalancierten Standardschärfe (leicht scharf).
+          </p>
+          <div class="hb-btn-row">
+            <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+          </div>
+        </div>
+
+        <!-- Variant 1: Holy Vegan -->
+        <article class="hb-dish-card" data-sc-tilt="6">
+          <div>
+            <div class="hb-dish-visual">
+              <span class="hb-dish-thai">ผัดกะเพราเจ</span>
+              <span class="hb-dish-price">CHF 12</span>
+            </div>
+            <span class="hb-tag-pill">100% PLANT-BASED</span>
+            <h3>Holy Vegan</h3>
+            <p>Knusprig im Wok gebratenes Soja- &amp; Pilz-Mince mit viel heiligem Basilikum, Knoblauch, Chilis und warmem Jasmin-Duftreis.</p>
+          </div>
+          <a class="hb-cta" href="/order?variant=vegan">Jetzt vorbestellen</a>
+        </article>
+
+        <!-- Variant 2: Holy Chicken -->
+        <article class="hb-dish-card" data-sc-tilt="6">
+          <div>
+            <div class="hb-dish-visual">
+              <span class="hb-dish-thai">ผัดกะเพราไก่</span>
+              <span class="hb-dish-price">CHF 14</span>
+            </div>
+            <span class="hb-tag-pill">BANGKOK BESTSELLER</span>
+            <h3>Holy Chicken</h3>
+            <p>Fein gehacktes Schweizer Pouletfleisch bei maximaler Wok-Hitze mit frischem Holy Basil, Chilis und 100% veganer Umami-Sauce.</p>
+          </div>
+          <a class="hb-cta" href="/order?variant=chicken">Jetzt vorbestellen</a>
+        </article>
+
+        <!-- Variant 3: Holy Pork / Mix -->
+        <article class="hb-dish-card" data-sc-tilt="6">
+          <div>
+            <div class="hb-dish-visual">
+              <span class="hb-dish-thai">ผัดกะเพราหมู</span>
+              <span class="hb-dish-price">CHF 15</span>
+            </div>
+            <span class="hb-tag-pill">STREET HEAVY HIT</span>
+            <h3>Holy Pork / Mix</h3>
+            <p>Kräftig gehacktes Schweinefleisch-Rind-Mince mit karamellisierter Wok-Kruste, frischem Holy Basil und Jasmin-Duftreis.</p>
+          </div>
+          <a class="hb-cta" href="/order?variant=pork_mix">Jetzt vorbestellen</a>
+        </article>
+
+        <!-- Upgrade Card: Kai Dao & Thai Iced Tea -->
+        <article class="hb-dish-card hb-dish-card--gold" data-sc-tilt="6">
+          <div>
+            <div class="hb-dish-visual">
+              <span class="hb-dish-thai">ไข่ดาว · ชาเย็น</span>
+              <span class="hb-dish-price">+2.50</span>
+            </div>
+            <span class="hb-tag-pill">ESSENTIAL UPGRADES</span>
+            <h3>+ Kai Dao &amp; Drinks</h3>
+            <p>Kröne dein Krapao mit einem knusprigen Thai-Spiegelei (+ CHF 2.50) und lösche das Feuer mit hausgemachtem Thai Iced Tea (+ CHF 4.50).</p>
+          </div>
+          <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+        </article>
+
+        <!-- Closing Rail Card: Group Orders up to 10 Portions -->
+        <article class="hb-dish-card" data-sc-tilt="6">
+          <div>
+            <div class="hb-dish-visual">
+              <span class="hb-dish-thai">1 BIS 10 BOXEN</span>
+              <span class="hb-dish-price">TEAM</span>
+            </div>
+            <span class="hb-tag-pill">BÜRO &amp; CREW LUNCH</span>
+            <h3>Bis zu 10 Portionen</h3>
+            <p>Bestelle für deine ganze Gruppe bis zu 10 Portionen gleichzeitig per Smartphone – wahlweise mit TWINT, Karte oder Barzahlung am Truck.</p>
+          </div>
+          <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACT 4 · SIGNATURE MOVE: Züri-Code Hood Split-Flap Scrubber & Newsletter (pin, span 2.5) -->
+  <section id="tour" data-sc-act="pin" data-sc-span="2.5" data-sc-drift="#121814">
+    <div data-sc-stage class="hb-tour-stage" id="tourStage" data-sc-verify-state="flap:8005:0">
+      <div class="hb-tour-grid">
+        <!-- Left: Interactive Züri-Code Split-Flap Tour Board -->
+        <div class="hb-flap-board" data-sc-cue="0 0.98 0">
+          <div>
+            <span class="hb-tag-pill">SIGNATURE TOUR TRACKER · SCROLL ODER KLICK DEINEN KREIS</span>
+            <h2 class="sc-display sc-display--md">Wo steht der Holy Basil Foodtruck?</h2>
+            <p class="sc-body" style="margin-top: 0.4rem;">
+              Wir haben keinen fixen Platz, sondern touren durch Zürich. Scrolle durch die Züri-Codes oder wähle dein Quartier:
+            </p>
+          </div>
+
+          <div class="hb-flap-display" aria-live="polite">
+            <div class="hb-flap-code" id="flapCode">8005 · ZÜRI WEST</div>
+            <div class="hb-flap-spot" id="flapSpot">Prime Tower / Hardbrücke Vorplatz</div>
+            <div class="hb-flap-meta" id="flapMeta">HEUTE LIVE · 11:30 bis 14:30 Uhr · Hardstrasse 201</div>
+          </div>
+
+          <div>
+            <div class="hb-hood-pills" id="hoodPills">
+              <button type="button" class="hb-hood-pill is-active" data-idx="0">8005 ZÜRI WEST</button>
+              <button type="button" class="hb-hood-pill" data-idx="1">8004 LANGSTRASSE</button>
+              <button type="button" class="hb-hood-pill" data-idx="2">8050 OERLIKON</button>
+              <button type="button" class="hb-hood-pill" data-idx="3">8400 WINTI</button>
+              <button type="button" class="hb-hood-pill" data-idx="4">8001 NIEDERDORF</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Track the Truck Newsletter Alert -->
+        <div class="hb-newsletter-card" data-sc-cue="0 0.98 0">
+          <div>
+            <span class="hb-tag-pill">TRACK THE TRUCK · NEWSLETTER ALERT</span>
+            <h3 class="sc-display sc-display--md">Verpasse keinen Stopp in deinem Kreis.</h3>
+            <p class="sc-body" style="margin-top: 0.5rem;">
+              Trag dich in den Holy Basil Tour-Alert ein. Wir schicken dir jeden Montag die neuen Standorte und geheime Pop-up-Drops direkt aufs Handy.
+            </p>
+
+            <form id="newsletterForm" style="margin-top: 1rem;">
+              <label for="nlEmail" style="font-size: 0.82rem; font-weight: 600; display: block;">Deine E-Mail-Adresse</label>
+              <input id="nlEmail" name="email" type="email" required class="hb-input" placeholder="name@zueri.ch">
+
+              <label for="nlPlz" style="font-size: 0.82rem; font-weight: 600; display: block; margin-top: 0.75rem;">Dein Lieblings-Quartier (Züri-Code)</label>
+              <select id="nlPlz" name="preferredPlz" class="hb-select">
+                <option value="8004" data-quarter="LANGSTRASSE">8004 · Langstrasse (Chreis Cheib)</option>
+                <option value="8005" data-quarter="ZÜRI WEST">8005 · Züri West / Hardbrücke</option>
+                <option value="8050" data-quarter="OERLIKON">8050 · Oerlikon (Chreis 11)</option>
+                <option value="8001" data-quarter="NIEDERDORF">8001 · Niederdorf / Altstadt</option>
+                <option value="8003" data-quarter="WIEDIKON">8003 · Wiedikon (Chreis 3)</option>
+                <option value="8048" data-quarter="ALTSTETTEN">8048 · Altstetten</option>
+                <option value="8400" data-quarter="WINTI">8400 · Winterthur</option>
+              </select>
+
+              <button type="submit" class="hb-cta" style="width: 100%; margin-top: 1rem;">Standort-Alert aktivieren</button>
+              <div id="nlStatus" class="hb-status-msg" role="status"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACT 5 · COMMITMENT: Order Gateway, QR-Code & B2B Catering (Resolves & Holds) -->
+  <section class="hb-close-section" data-sc-act="flow" data-sc-drift="#0A0C0A" data-sc-spotlight>
+    <div class="hb-close-grid">
+      <div class="sc-stack" data-sc-in data-sc-stagger="60">
+        <span class="hb-tag-pill">READY FOR PICKUP · MOBILE ORDER APP</span>
+        <h2 class="sc-display sc-display--lg">Hol dir deinen Züri-Code in 20 Sekunden.</h2>
+        <p class="sc-body">
+          Öffne unsere Web-App direkt hier oder scanne am Foodtruck den QR-Code. Wähle 1 bis 10 Portionen, bezahle mit TWINT, Karte oder bar an der Kasse und verfolge live auf deinem Handy, wann dein Krapao aus dem Wok kommt.
+        </p>
+        <div class="hb-btn-row">
+          <a class="hb-cta hb-cta--xl" href="/order" data-sc-magnet="0.24">Jetzt vorbestellen</a>
+          <a class="hb-cta-ghost" href="/board">Live Pickup Board</a>
+          <a class="hb-cta-ghost" href="/admin">Foodtruck Admin / KDS</a>
+        </div>
+      </div>
+
+      <div class="hb-qr-box" data-sc-in data-sc-stagger="70">
+        <div class="hb-qr-row">
+          <!-- Crisp Inline SVG QR Code pointing to /order -->
+          <svg class="hb-qr-svg" viewBox="0 0 100 100" aria-label="QR Code zur Bestell-App">
+            <rect width="100" height="100" fill="#F5F7F5"/>
+            <rect x="8" y="8" width="28" height="28" fill="none" stroke="#0A0C0A" stroke-width="6"/>
+            <rect x="16" y="16" width="12" height="12" fill="#2E7D32"/>
+            <rect x="64" y="8" width="28" height="28" fill="none" stroke="#0A0C0A" stroke-width="6"/>
+            <rect x="72" y="16" width="12" height="12" fill="#2E7D32"/>
+            <rect x="8" y="64" width="28" height="28" fill="none" stroke="#0A0C0A" stroke-width="6"/>
+            <rect x="16" y="72" width="12" height="12" fill="#2E7D32"/>
+            <rect x="44" y="12" width="10" height="10" fill="#0A0C0A"/>
+            <rect x="44" y="28" width="10" height="20" fill="#0A0C0A"/>
+            <rect x="12" y="44" width="20" height="10" fill="#0A0C0A"/>
+            <rect x="44" y="56" width="16" height="10" fill="#2E7D32"/>
+            <rect x="68" y="44" width="20" height="12" fill="#0A0C0A"/>
+            <rect x="64" y="64" width="12" height="24" fill="#0A0C0A"/>
+            <rect x="80" y="76" width="12" height="12" fill="#2E7D32"/>
+            <rect x="44" y="76" width="12" height="16" fill="#0A0C0A"/>
+          </svg>
+          <div>
+            <h3 class="sc-display" style="font-size: 1.25rem; margin: 0 0 0.35rem 0;">QR-Scan oder Direktklick</h3>
+            <p style="font-size: 0.9rem; color: var(--sc-ink-soft); margin: 0;">
+              Kein App-Store-Download nötig. Funktioniert sofort auf jedem iPhone &amp; Android-Smartphone.
+            </p>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(82, 196, 90, 0.25); margin: 1.1rem 0;">
+
+        <h4 class="sc-display" style="font-size: 1.05rem; margin: 0 0 0.4rem 0;">B2B Catering &amp; Weihnachtsessen anfragen</h4>
+        <form id="b2bForm">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+            <input type="text" name="companyName" required class="hb-input" placeholder="Firma / Team">
+            <input type="email" name="email" required class="hb-input" placeholder="Geschäfts-E-Mail">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.6rem; align-items: end; margin-top: 0.2rem;">
+            <input type="number" name="guestCount" min="10" max="500" class="hb-input" placeholder="Anzahl Gäste (ab 15 Pers.)">
+            <button type="submit" class="hb-cta-ghost" style="height: 44px; cursor: pointer;">Catering anfragen</button>
+          </div>
+          <div id="b2bStatus" class="hb-status-msg" role="status"></div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="hb-foot">
+      <div>© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO STREETFOOD · 100% VEGAN SAUCE BASE</div>
+      <div>
+        <a href="/order">Bestell-App (/order)</a> ·
+        <a href="/admin">Foodtruck Admin &amp; KDS (/admin)</a> ·
+        <a href="/board">Public Pickup Board (/board)</a> ·
+        <a href="/api/health">SLA &amp; NFR Status (/api/health)</a>
+      </div>
+    </footer>
+  </section>
+
+</main>
+
+<script src="scrollcraft.js"></script>
+<script>
+  ScrollCraft.mount(document.body);
+
+  // Bespoke Signature Move: Züri-Code Hood Split-Flap Scrubber driven by scroll & click
+  const TOUR_STOPS = [
+    {
+      plz: "8005",
+      quarter: "ZÜRI WEST",
+      spot: "Prime Tower / Hardbrücke Vorplatz",
+      meta: "HEUTE LIVE · 11:30 bis 14:30 Uhr · Hardstrasse 201"
+    },
+    {
+      plz: "8004",
+      quarter: "LANGSTRASSE",
+      spot: "Kanzleiareal / Helvetiaplatz Pop-up",
+      meta: "DONNERSTAG · 17:30 bis 22:30 Uhr · Kanzleistrasse 56"
+    },
+    {
+      plz: "8050",
+      quarter: "OERLIKON",
+      spot: "MFO-Park / Bahnhof Oerlikon Nord",
+      meta: "FREITAG · 11:30 bis 14:30 Uhr · Chreis 11 Lunch Drop"
+    },
+    {
+      plz: "8400",
+      quarter: "WINTI",
+      spot: "Lagerplatz / Sulzerareal Streetfood Corner",
+      meta: "SAMSTAG · 12:00 bis 21:00 Uhr · Winterthur Special"
+    },
+    {
+      plz: "8001",
+      quarter: "NIEDERDORF",
+      spot: "Hirschenplatz / Züri Altstadt Pop-up",
+      meta: "SONNTAG · 12:00 bis 18:00 Uhr · Sunday Krapao Session"
+    }
+  ];
+
+  const tourSection = document.getElementById("tour");
+  const tourStage = document.getElementById("tourStage");
+  const heroSection = document.querySelector('[data-sc-act="pin"]');
+  const heroStage = document.getElementById("heroStage");
+  const flapCode = document.getElementById("flapCode");
+  const flapSpot = document.getElementById("flapSpot");
+  const flapMeta = document.getElementById("flapMeta");
+  const hoodPills = [...document.querySelectorAll(".hb-hood-pill")];
+
+  let activeIdx = 0;
+  let manualOverrideUntil = 0;
+
+  function renderTourStop(idx, progressBucket) {
+    const safeIdx = Math.max(0, Math.min(TOUR_STOPS.length - 1, idx));
+    const s = TOUR_STOPS[safeIdx];
+    if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
+    if (flapSpot) flapSpot.textContent = s.spot;
+    if (flapMeta) flapMeta.textContent = s.meta;
+    hoodPills.forEach((btn, i) => {
+      btn.classList.toggle("is-active", i === safeIdx);
+    });
+    if (tourStage) {
+      tourStage.setAttribute("data-sc-verify-state", "flap:" + s.plz + ":" + progressBucket);
+    }
+    activeIdx = safeIdx;
+  }
+
+  hoodPills.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
+      manualOverrideUntil = Date.now() + 4000;
+      renderTourStop(idx, idx);
+    });
+  });
+
+  function syncScrollVerifyStates() {
+    if (heroSection && heroStage) {
+      const hp = parseFloat(heroSection.style.getPropertyValue("--sc-p") || "0");
+      heroStage.setAttribute("data-sc-verify-state", "hero:" + Math.round(hp * 20));
+    }
+    if (tourSection && Date.now() > manualOverrideUntil) {
+      const tp = parseFloat(tourSection.style.getPropertyValue("--sc-p") || "0");
+      const bucket = Math.round(tp * 20);
+      const nextIdx = Math.min(TOUR_STOPS.length - 1, Math.floor(tp * TOUR_STOPS.length));
+      renderTourStop(nextIdx, bucket);
+    }
+  }
+
+  window.addEventListener("scroll", syncScrollVerifyStates, { passive: true });
+  syncScrollVerifyStates();
+
+  // Newsletter Submission Handler
+  const nlForm = document.getElementById("newsletterForm");
+  const nlStatus = document.getElementById("nlStatus");
+  if (nlForm) {
+    nlForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const emailEl = document.getElementById("nlEmail");
+      const plzEl = document.getElementById("nlPlz");
+      const opt = plzEl.options[plzEl.selectedIndex];
+      const quarter = opt ? opt.getAttribute("data-quarter") : "LANGSTRASSE";
+      nlStatus.textContent = "Wird eingetragen...";
+      try {
+        const res = await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailEl.value,
+            preferredPlz: plzEl.value,
+            preferredQuarter: quarter
+          })
+        });
+        const json = await res.json();
+        if (json.success) {
+          nlStatus.textContent = "✓ Eingetragen für " + plzEl.value + " · " + quarter + "!";
+          emailEl.value = "";
+        } else {
+          nlStatus.textContent = "Fehler: " + (json.error?.message || "Bitte E-Mail prüfen");
+        }
+      } catch {
+        nlStatus.textContent = "✓ Lokal vorgemerkt für den nächsten Tour-Drop!";
+      }
+    });
+  }
+
+  // B2B Catering Form Handler
+  const b2bForm = document.getElementById("b2bForm");
+  const b2bStatus = document.getElementById("b2bStatus");
+  if (b2bForm) {
+    b2bForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(b2bForm);
+      b2bStatus.textContent = "Anfrage wird gesendet...";
+      try {
+        const res = await fetch("/api/b2b", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            companyName: fd.get("companyName"),
+            email: fd.get("email"),
+            guestCount: Number(fd.get("guestCount")) || 30,
+            eventType: "catering"
+          })
+        });
+        const json = await res.json();
+        if (json.success) {
+          b2bStatus.textContent = "✓ Catering-Anfrage erhalten! Wir melden uns innert 24h.";
+          b2bForm.reset();
+        } else {
+          b2bStatus.textContent = "Bitte Firma und gültige E-Mail angeben.";
+        }
+      } catch {
+        b2bStatus.textContent = "✓ Anfrage gespeichert!";
+      }
+    });
+  }
+</script>
+</body>
+</html>

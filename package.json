@@ -1,0 +1,23 @@
+{
+  "name": "holy-basil-zurich",
+  "version": "1.0.0",
+  "description": "Holy Basil Zürich – Pad Krapao Streetfood Webauftritt (Scroll-Craft), Mobile QR-Bestell-App, Züri-Code System & Foodtruck KDS",
+  "type": "module",
+  "scripts": {
+    "dev": "npx tsx src/server.ts",
+    "start": "npx tsx src/server.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "verify:scrollcraft": "node C:/Users/arthu/.gemini/config/skills/scroll-craft/scripts/shoot.mjs --url http://localhost:3000 --out scrollcraft/builds/holy-basil/lab/shots"
+  },
+  "dependencies": {
+    "playwright-core": "^1.51.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@vitest/coverage-v8": "^3.0.7",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}

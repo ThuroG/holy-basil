@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 680" width="100%" height="100%">
+  <defs>
+    <filter id="goldHaloGlowV3" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="crispShadowV3" x="-15%" y="-15%" width="140%" height="140%">
+      <feDropShadow dx="6" dy="8" stdDeviation="0" flood-color="#000000" flood-opacity="1" />
+    </filter>
+    <linearGradient id="streetGoldGradV3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB300" />
+      <stop offset="50%" stop-color="#FFE082" />
+      <stop offset="100%" stop-color="#FFD54F" />
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded App Icon / Sticker Background -->
+  <rect width="650" height="680" rx="95" fill="#0A0A0A" />
+  <rect x="22" y="22" width="606" height="636" rx="78" fill="#0F1511" stroke="#1B4D2E" stroke-width="6" />
+  <rect x="38" y="38" width="574" height="604" rx="66" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-dasharray="18 10" opacity="0.65" />
+
+  <g transform="translate(-85, -15)">
+    <!-- STREET GOLD HALO + 7 RAYS + SPRAY DRIPS -->
+    <g filter="url(#goldHaloGlowV3)" transform="translate(412, 112)">
+      <g stroke="#FFD54F" stroke-width="7" stroke-linecap="round">
+        <line x1="-122" y1="-16" x2="-96" y2="-2" />
+        <line x1="-88" y1="-44" x2="-70" y2="-20" />
+        <line x1="-46" y1="-60" x2="-36" y2="-32" />
+        <line x1="0" y1="-65" x2="0" y2="-35" />
+        <line x1="46" y1="-60" x2="36" y2="-32" />
+        <line x1="88" y1="-44" x2="70" y2="-20" />
+        <line x1="122" y1="-16" x2="96" y2="-2" />
+      </g>
+      <ellipse cx="0" cy="4" rx="98" ry="26" fill="none" stroke="#0A0A0A" stroke-width="24" />
+      <ellipse cx="0" cy="4" rx="98" ry="26" fill="none" stroke="url(#streetGoldGradV3)" stroke-width="14" />
+      <ellipse cx="0" cy="4" rx="88" ry="17" fill="none" stroke="#0A0A0A" stroke-width="4" />
+      <path d="M -68 -6 Q 0 -20 68 -6" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.92" />
+      <path d="M -56 22 L -56 48" stroke="#FFD54F" stroke-width="6.5" stroke-linecap="round" />
+      <circle cx="-56" cy="59" r="4" fill="#FFD54F" />
+      <path d="M 48 22 L 48 42" stroke="#FFB300" stroke-width="5.5" stroke-linecap="round" />
+      <circle cx="48" cy="52" r="3.5" fill="#FFD54F" />
+    </g>
+
+    <!-- UPRIGHT, SLIGHTLY DOMED BASIL LEAF -->
+    <g filter="url(#crispShadowV3)" transform="translate(0, -18)">
+      <path d="
+        M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+        C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 C 392 595, 392 625, 396 648 C 400 660, 412 668, 420 668
+        C 414 652, 408 632, 412 608 C 415 590, 422 578, 432 570 C 485 552, 535 512, 558 460 L 546 462
+        C 562 422, 560 380, 544 344 L 532 348 C 535 308, 520 268, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+        fill="#0A0A0A" stroke="#2E7D32" stroke-width="12" stroke-linejoin="round" />
+      <path d="
+        M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+        C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 C 392 595, 392 625, 396 648 C 400 660, 412 668, 420 668
+        C 414 652, 408 632, 412 608 C 415 590, 422 578, 432 570 C 485 552, 535 512, 558 460 L 546 462
+        C 562 422, 560 380, 544 344 L 532 348 C 535 308, 520 268, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+        fill="#2E7D32" />
+      <path d="
+        M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+        C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 L 402 572 C 395 470, 396 365, 422 205 Z"
+        fill="#1B4D2E" />
+      <path d="M 392 315 C 365 280, 355 245, 356 214 C 332 238, 314 268, 304 300 C 330 330, 362 365, 390 402 Z" fill="#2E7D32" />
+      <path d="M 388 430 C 355 390, 326 350, 290 308 C 276 336, 268 368, 270 398 C 304 442, 345 485, 388 520 Z" fill="#2E7D32" />
+      <path d="M 386 535 C 345 505, 305 462, 262 408 C 258 448, 278 494, 322 524 C 348 542, 370 552, 388 562 Z" fill="#256638" />
+      <path d="M 342 252 C 325 275, 320 302, 345 335 C 338 302, 342 276, 356 252 Z" fill="#52C45A" opacity="0.65" />
+      <path d="M 288 345 C 276 375, 282 412, 315 452 C 298 412, 294 378, 302 348 Z" fill="#52C45A" opacity="0.55" />
+
+      <path d="M 420 184 C 444 186, 466 208, 476 238 C 455 258, 435 285, 412 312 C 414 265, 418 220, 420 184 Z" fill="#52C45A" />
+      <path d="M 432 202 C 446 208, 458 222, 462 238 C 446 255, 432 272, 420 288 C 422 255, 426 225, 432 202 Z" fill="#69F0AE" opacity="0.7" />
+      <path d="M 410 355 C 442 315, 472 280, 494 246 C 514 274, 526 308, 524 342 C 490 380, 448 420, 404 458 Z" fill="#52C45A" />
+      <path d="M 424 365 C 452 332, 478 302, 496 274 C 508 294, 514 316, 512 338 C 482 370, 450 400, 418 428 Z" fill="#69F0AE" opacity="0.65" />
+      <path d="M 404 485 C 448 442, 495 402, 540 354 C 552 386, 552 422, 538 456 C 498 492, 452 522, 412 548 Z" fill="#52C45A" />
+      <path d="M 422 492 C 460 456, 498 424, 532 388 C 538 410, 536 432, 526 452 C 492 480, 455 506, 422 526 Z" fill="#69F0AE" opacity="0.6" />
+      <path d="M 416 558 C 458 532, 502 504, 546 468 C 524 512, 478 546, 430 564 Z" fill="#52C45A" opacity="0.85" />
+
+      <path d="M 418 182 C 402 285, 396 395, 404 568 L 418 565 C 408 420, 412 300, 426 195 Z" fill="#1B4D2E" />
+      <path d="M 404 378 C 438 335, 468 294, 492 246 L 484 242 C 460 286, 430 326, 402 362 Z" fill="#1B4D2E" />
+      <path d="M 402 478 C 445 435, 492 398, 536 352 L 530 346 C 486 388, 440 425, 400 464 Z" fill="#1B4D2E" />
+      <path d="M 412 554 C 450 526, 490 500, 530 468 L 522 462 C 484 492, 445 518, 410 542 Z" fill="#1B4D2E" />
+
+      <path d="
+        M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+        C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 C 392 595, 392 625, 396 648 C 400 660, 412 668, 420 668
+        C 414 652, 408 632, 412 608 C 415 590, 422 578, 432 570 C 485 552, 535 512, 558 460 L 546 462
+        C 562 422, 560 380, 544 344 L 532 348 C 535 308, 520 268, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+        fill="none" stroke="#0A0A0A" stroke-width="8.5" stroke-linejoin="round" />
+      <path d="
+        M 414 662 C 404 632, 400 598, 400 562 C 396 465, 394 365, 424 205
+        C 402 355, 404 462, 410 562 C 410 598, 410 632, 418 664 Z"
+        fill="#52C45A" stroke="#0A0A0A" stroke-width="5.5" stroke-linejoin="round" />
+      <path d="M 408 292 C 428 260, 444 232, 456 208" fill="none" stroke="#0A0A0A" stroke-width="5" stroke-linecap="round" />
+      <path d="M 402 375 C 436 334, 466 294, 488 250" fill="none" stroke="#0A0A0A" stroke-width="6" stroke-linecap="round" />
+      <path d="M 402 478 C 446 435, 492 396, 534 352" fill="none" stroke="#0A0A0A" stroke-width="6" stroke-linecap="round" />
+      <path d="M 412 552 C 448 526, 488 500, 524 470" fill="none" stroke="#0A0A0A" stroke-width="5.5" stroke-linecap="round" />
+      <path d="M 402 318 C 392 282, 386 248, 384 220" fill="none" stroke="#0A0A0A" stroke-width="4.5" stroke-linecap="round" />
+      <path d="M 396 425 C 368 385, 345 344, 326 298" fill="none" stroke="#0A0A0A" stroke-width="5" stroke-linecap="round" />
+      <path d="M 398 532 C 365 502, 335 465, 305 420" fill="none" stroke="#0A0A0A" stroke-width="5" stroke-linecap="round" />
+      <path d="M 340 548 L 340 578" stroke="#52C45A" stroke-width="5.5" stroke-linecap="round" />
+      <circle cx="340" cy="590" r="3.5" fill="#52C45A" />
+    </g>
+  </g>
+</svg>
