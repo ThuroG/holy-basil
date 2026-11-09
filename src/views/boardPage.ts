@@ -120,10 +120,7 @@ export function renderBoardPageHtml(): string {
       <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil">
       <span>HOLY BASIL · ZÜRI-CODE PICKUP MONITOR</span>
     </a>
-    <div style="display: flex; gap: 0.75rem;">
-      <a href="/order" style="color: var(--gold); font-family: var(--font-mono); text-decoration: none; font-size: 0.9rem; padding: 0.5rem 0.9rem; border: 1.5px solid var(--gold); border-radius: 10px;">QR-Bestellung (/order)</a>
-      <a href="/admin" style="color: var(--green-neon); font-family: var(--font-mono); text-decoration: none; font-size: 0.9rem; padding: 0.5rem 0.9rem; border: 1.5px solid var(--green-neon); border-radius: 10px;">Crew KDS (/admin)</a>
-    </div>
+    <a href="/order" style="color: var(--gold); font-family: var(--font-mono); text-decoration: none; font-size: 0.9rem; padding: 0.5rem 0.9rem; border: 1.5px solid var(--gold); border-radius: 10px;">Jetzt bestellen</a>
   </header>
 
   <main class="board-grid">
@@ -145,41 +142,55 @@ export function renderBoardPageHtml(): string {
   </main>
 
   <script>
+    function esc(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    let lastPrep = null;
+    let lastReady = null;
+
+    function card(entry, ready) {
+      return '<div class="flap-card' + (ready ? ' flap-card--ready' : '') + '">' +
+        '<span class="plz-big">' + esc(entry.plz) + '</span>' +
+        '<span class="quarter-big">' + esc(entry.quarter) + (ready ? ' 🔔' : '') + '</span>' +
+      '</div>';
+    }
+
     async function pollBoard() {
       try {
-        const res = await fetch("/api/orders");
+        const res = await fetch("/api/board");
         const json = await res.json();
         if (!json.success) return;
-        const orders = json.data.orders || [];
+        const entries = json.data.entries || [];
 
-        const inPrep = orders.filter((o) => ["received", "in_wok", "plating"].includes(o.status));
-        const ready = orders.filter((o) => o.status === "ready");
+        const inPrep = entries.filter((e) => e.phase === "preparing");
+        const ready = entries.filter((e) => e.phase === "ready");
 
         document.getElementById("inWokCount").textContent = String(inPrep.length);
         document.getElementById("readyCount").textContent = String(ready.length);
 
-        document.getElementById("inWokList").innerHTML = inPrep.length === 0
+        const prepHtml = inPrep.length === 0
           ? '<div style="color:var(--muted);font-size:1.1rem;">Wok ist bereit für deine Bestellung...</div>'
-          : inPrep.map((o) => \`
-            <div class="flap-card">
-              <span class="plz-big">\${o.zueriCode.plz}</span>
-              <span class="quarter-big">\${o.zueriCode.quarter}</span>
-            </div>
-          \`).join("");
+          : inPrep.map((e) => card(e, false)).join("");
+        if (prepHtml !== lastPrep) {
+          lastPrep = prepHtml;
+          document.getElementById("inWokList").innerHTML = prepHtml;
+        }
 
-        document.getElementById("readyList").innerHTML = ready.length === 0
+        const readyHtml = ready.length === 0
           ? '<div style="color:var(--muted);font-size:1.1rem;">Sobald dein Code hier grün aufleuchtet, kannst du deine Box abholen!</div>'
-          : ready.map((o) => \`
-            <div class="flap-card flap-card--ready">
-              <span class="plz-big">\${o.zueriCode.plz}</span>
-              <span class="quarter-big">\${o.zueriCode.quarter} 🔔</span>
-            </div>
-          \`).join("");
+          : ready.map((e) => card(e, true)).join("");
+        if (readyHtml !== lastReady) {
+          lastReady = readyHtml;
+          document.getElementById("readyList").innerHTML = readyHtml;
+        }
       } catch {}
     }
 
     pollBoard();
-    setInterval(pollBoard, 1500);
+    setInterval(pollBoard, 2000);
   </script>
 </body>
 </html>`;

@@ -19,3 +19,9 @@ data/*.json
 Thumbs.db
 .vscode/
 .idea/
+
+# Local review notes and working documents
+OUTPUTS/
+
+# Local environment (crew PIN etc.)
+.env

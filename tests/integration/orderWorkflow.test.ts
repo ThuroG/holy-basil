@@ -1,13 +1,18 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { handleApiRequest } from '../../src/lib/apiHandler.js';
+import { handleApiRequest as rawHandleApiRequest, ApiRequestInput } from '../../src/lib/apiHandler.js';
 import { resetOrderStore, calculateOrderTotal } from '../../src/lib/orderStore.js';
-import { resetFeatureFlags } from '../../src/config/features.js';
+import { resetFeatureFlags, setDemoPaymentsEnabled } from '../../src/config/features.js';
 import { resetSlaMetrics } from '../../src/lib/response.js';
 import { processOrderPayment } from '../../src/lib/paymentService.js';
+
+// This suite walks the crew workflow, so every request carries a crew session.
+// Access control for guests is covered in tests/integration/security.test.ts.
+const handleApiRequest = (req: ApiRequestInput) => rawHandleApiRequest({ isCrew: true, ...req });
 
 describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & NFRs', () => {
   beforeEach(() => {
     resetFeatureFlags();
+    setDemoPaymentsEnabled(true); // TWINT / card are simulated and only exist in demo mode
     resetOrderStore();
     resetSlaMetrics();
   });
@@ -43,7 +48,7 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
     expect(order.totalPortions).toBe(10);
     expect(order.zueriCode.plz).toBe('8004');
     expect(order.status).toBe('pending_cash');
-    expect(order.totalChf).toBe(161.5);
+    expect(order.totalChf).toBe(166.5);
 
     // Idempotent replay of the exact same order returns the existing order
     const replayRes = await handleApiRequest({
@@ -84,7 +89,7 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
       pathname: `/api/orders/${order.id}`,
       body: {
         action: 'confirm_cash',
-        note: 'CHF 161.50 bar erhalten',
+        note: 'CHF 166.50 bar erhalten',
       },
     });
     expect(cashConfirmRes.statusCode).toBe(200);
@@ -356,6 +361,6 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
     expect(healthRes.statusCode).toBe(200);
     const healthData = (healthRes.body as any).data;
     expect(healthData.metrics.availabilityRate).toBeGreaterThanOrEqual(99.5);
-    expect(healthData.metrics.paymentReliabilityRate).toBeGreaterThanOrEqual(99.99);
+    expect(healthData.metrics.paymentReliabilityRate).toBe(100); // no digital payment attempted
   });
 });

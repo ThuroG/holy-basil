@@ -232,6 +232,15 @@ export function renderAdminPageHtml(): string {
       .wok-grid { grid-template-columns: repeat(2, 1fr); }
       .stations-grid, .admin-panel-grid { grid-template-columns: 1fr; }
     }
+    .action-btn--ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.5rem;
+    }
+    .action-btn:disabled { opacity: 0.5; cursor: wait; }
   </style>
 </head>
 <body>
@@ -249,10 +258,15 @@ export function renderAdminPageHtml(): string {
       <button type="button" class="tab-btn" data-filter="qc">4. QC &amp; Drinks</button>
       <a href="/order" class="tab-btn" style="text-decoration: none; color: var(--gold);">+ Gast-Bestellung</a>
       <a href="/board" class="tab-btn" style="text-decoration: none; color: var(--green-neon);">TV Pickup Board</a>
+      <button type="button" class="tab-btn" id="btnLogout">Abmelden</button>
     </div>
   </header>
 
   <main class="main-wrap">
+    <div id="connectionState" style="color: #FF8A80; font-family: var(--font-mono); font-size: 0.85rem;"></div>
+    <div id="demoBanner" style="display: none; margin-bottom: 0.9rem; padding: 0.6rem 0.9rem; border-radius: 10px; border: 1.5px solid var(--gold); color: var(--gold); font-size: 0.85rem;">
+      DEMO-MODUS: TWINT und Karte sind simuliert. Es fliesst kein Geld.
+    </div>
 
     <!-- STATION 2: ZERO-CLICK WOK DEMAND COCKPIT FOR THE COOK -->
     <section class="wok-cockpit-bar" id="wokCockpitSection">
@@ -265,7 +279,7 @@ export function renderAdminPageHtml(): string {
             Aktueller Pfannen-Bedarf (Nur bezahlte, noch nicht geschöpfte Portionen)
           </h2>
         </div>
-        <div style="display: flex; gap: 0.65rem; align-items: center;">
+        <div id="demoTools" style="display: none; gap: 0.65rem; align-items: center;">
           <button type="button" class="tab-btn" id="btnSeedDemoOrder" style="border-color: var(--gold); color: var(--gold);">
             ⚡ Test-Bestellung erzeugen
           </button>
@@ -358,6 +372,12 @@ export function renderAdminPageHtml(): string {
             Toggle umschalten
           </button>
         </div>
+
+        <div style="margin-top: 1rem; font-weight: 700;">Truck-Standort heute</div>
+        <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">
+          Steuert «Heute live» auf der Landingpage.
+        </div>
+        <div id="locationButtons" style="display: flex; flex-wrap: wrap; gap: 0.45rem;"></div>
       </div>
 
       <div class="station-col" style="min-height: auto;">
@@ -365,20 +385,20 @@ export function renderAdminPageHtml(): string {
           <span>🛡️ Non-Functional Requirements (SLA &amp; Health)</span>
         </div>
         <div class="station-col__sub">
-          Echtzeit-Überwachung: 99.99% Payment Reliability · &lt; 1000ms Latenz · 99.5% API Uptime
+          Messwerte seit Serverstart. Ziele: &lt; 1000ms Latenz · 99.5% beantwortete Anfragen
         </div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
           <div class="metric-box">
-            <div style="font-size: 0.75rem; color: var(--muted);">Payment Zero-Loss</div>
-            <div class="metric-val" id="slaPayment">100%</div>
+            <div style="font-size: 0.75rem; color: var(--muted);">Digitale Zahlungen OK</div>
+            <div class="metric-val" id="slaPayment">–</div>
           </div>
           <div class="metric-box">
             <div style="font-size: 0.75rem; color: var(--muted);">Ø API Latenz (&lt;1s)</div>
-            <div class="metric-val" id="slaLatency">4 ms</div>
+            <div class="metric-val" id="slaLatency">–</div>
           </div>
           <div class="metric-box">
             <div style="font-size: 0.75rem; color: var(--muted);">API Availability</div>
-            <div class="metric-val" id="slaAvail">100%</div>
+            <div class="metric-val" id="slaAvail">–</div>
           </div>
         </div>
       </div>
@@ -386,11 +406,66 @@ export function renderAdminPageHtml(): string {
 
   </main>
 
+  <div id="toast" role="alert" style="display: none; position: fixed; left: 50%; bottom: 1.5rem; transform: translateX(-50%); background: #3A1412; border: 2px solid var(--chili); color: #FFCDD2; padding: 0.8rem 1.2rem; border-radius: 12px; font-weight: 700; z-index: 100; max-width: 90vw;"></div>
+
   <script>
     const VARIANT_LABELS = { vegan: "🌱 Holy Vegan", chicken: "🍗 Holy Chicken", pork_mix: "🥩 Holy Pork/Mix" };
     const DRINK_LABELS = { thai_iced_tea: "🧋 Thai Iced Tea", coconut_water: "🥥 Kokoswasser", zueri_mate: "⚡ Züri Mate" };
+    const SPICE_TEXT = { mild: "mild", leicht_scharf: "leicht scharf", original_thai_spicy: "Thai Spicy", extra_hot: "Extra Hot" };
 
     let currentCustomSpice = false;
+    let busy = false;
+    const lastHtml = {};
+
+    // Every value that comes from the server goes through esc() before it lands in innerHTML.
+    function esc(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    function chf(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n.toFixed(2) : "?";
+    }
+
+    // Only touch the DOM when something changed, so a tap is never lost to a re-render.
+    function setHtml(id, html) {
+      if (lastHtml[id] === html) return;
+      lastHtml[id] = html;
+      document.getElementById(id).innerHTML = html;
+    }
+
+    function setText(id, text) {
+      const el = document.getElementById(id);
+      if (el.textContent !== text) el.textContent = text;
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      const el = document.getElementById("toast");
+      el.textContent = message;
+      el.style.display = "block";
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, 5000);
+    }
+
+    async function api(path, method, body) {
+      const res = await fetch(path, {
+        method: method || "GET",
+        headers: body ? { "Content-Type": "application/json" } : undefined,
+        body: body ? JSON.stringify(body) : undefined
+      });
+      if (res.status === 401) {
+        window.location.reload(); // session expired -> back to the PIN screen
+        throw new Error("Sitzung abgelaufen");
+      }
+      const json = await res.json();
+      if (!json.success) {
+        throw new Error((json.error && json.error.message) || "Aktion fehlgeschlagen");
+      }
+      return json.data;
+    }
 
     function formatSpiceBreakdown(batch, customEnabled) {
       if (batch.totalPortions === 0) return "Pfanne frei";
@@ -405,11 +480,10 @@ export function renderAdminPageHtml(): string {
 
     function renderPortionSummary(order) {
       return order.portions.map((p) =>
-        \`<div style="font-size: 0.85rem; margin-top: 0.25rem;">
-          • Box #\${p.portionIndex}: <strong>\${VARIANT_LABELS[p.variant] || p.variant}</strong>
-          \${p.addKaiDao ? '<span style="color:var(--gold);font-weight:700;"> + Kai Dao 🍳</span>' : ''}
-          <span style="color:var(--muted);font-size:0.76rem;">(\${p.spiceLevel.replace(/_/g, " ")})</span>
-        </div>\`
+        '<div style="font-size: 0.85rem; margin-top: 0.25rem;">• Box #' + esc(p.portionIndex) + ': <strong>' +
+        esc(VARIANT_LABELS[p.variant] || p.variant) + '</strong>' +
+        (p.addKaiDao ? '<span style="color:var(--gold);font-weight:700;"> + Kai Dao 🍳</span>' : '') +
+        ' <span style="color:var(--muted);font-size:0.76rem;">(' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + ')</span></div>'
       ).join("");
     }
 
@@ -418,180 +492,193 @@ export function renderAdminPageHtml(): string {
         return '<div style="font-size: 0.78rem; color: var(--muted); margin-top: 0.4rem;">Keine Getränke</div>';
       }
       return '<div style="margin-top: 0.5rem; padding: 0.45rem 0.65rem; border-radius: 8px; background: rgba(255, 213, 79, 0.15); border: 1px solid var(--gold); color: var(--gold); font-size: 0.82rem; font-weight: 700;">' +
-        '🥤 GETRÄNKE RICHTEN: ' + order.drinks.map((d) => d.quantity + "x " + (DRINK_LABELS[d.drinkId] || d.drinkId)).join(", ") +
+        '🥤 GETRÄNKE RICHTEN: ' + order.drinks.map((d) => esc(d.quantity) + "x " + esc(DRINK_LABELS[d.drinkId] || d.drinkId)).join(", ") +
         '</div>';
     }
 
+    function actionBtn(cls, action, id, label, status) {
+      return '<button type="button" class="action-btn ' + cls + '" data-action="' + action + '" data-id="' + esc(id) + '"' +
+        (status ? ' data-status="' + status + '"' : '') + '>' + label + '</button>';
+    }
+
+    function renderKasse(orders) {
+      if (orders.length === 0) return '<div style="color:var(--muted);font-size:0.85rem;">Keine offenen Zahlungen an der Kasse.</div>';
+      return orders.map((o) => {
+        const isError = o.status === "payment_error_fallback";
+        return '<div class="order-ticket ' + (isError ? 'order-ticket--error' : 'order-ticket--cash') + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
+            '<strong style="font-family:var(--font-mono);font-size:1.05rem;">CHF ' + chf(o.totalChf) + '</strong>' +
+          '</div>' +
+          '<div style="font-size:0.78rem;color:var(--gold);margin-top:0.2rem;">' +
+            (isError ? '⚠️ ZAHLUNG NICHT BESTÄTIGT: an der Kasse klären' : '💵 BARZAHLUNG AM TRUCK (offen)') +
+          '</div>' +
+          renderPortionSummary(o) +
+          actionBtn('action-btn--cash', 'confirm_cash', o.id, '✓ CHF ' + chf(o.totalChf) + ' kassiert · In den Wok freigeben') +
+          actionBtn('action-btn--ghost', 'cancel', o.id, 'Stornieren (nicht bezahlt)') +
+        '</div>';
+      }).join("");
+    }
+
+    function renderSchoepfer(orders) {
+      if (orders.length === 0) return '<div style="color:var(--muted);font-size:0.85rem;">Keine Boxen zum Schöpfen offen.</div>';
+      return orders.map((o) =>
+        '<div class="order-ticket">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
+            '<span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--green-neon);">' + esc(o.totalPortions) + ' Box(en) · Bezahlt</span>' +
+          '</div>' +
+          renderPortionSummary(o) +
+          actionBtn('action-btn--plate', 'advance', o.id, '🍱 Boxen geschöpft · Weiter an QC &amp; Drinks', 'plating') +
+        '</div>'
+      ).join("");
+    }
+
+    function renderQc(orders) {
+      if (orders.length === 0) return '<div style="color:var(--muted);font-size:0.85rem;">Keine Bestellungen in der QC / Ausgabe.</div>';
+      return orders.map((o) => {
+        const ready = o.status === "ready";
+        return '<div class="order-ticket" style="' + (ready ? 'border-color:var(--gold);background:#142418;' : '') + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
+            '<span style="font-family:var(--font-mono);font-size:0.78rem;color:' + (ready ? 'var(--gold)' : 'var(--ink)') + ';">' +
+              (ready ? '🔔 AUFGERUFEN' : 'QC PRÜFUNG') +
+            '</span>' +
+          '</div>' +
+          renderPortionSummary(o) +
+          renderDrinkSummary(o) +
+          (ready
+            ? actionBtn('action-btn--done', 'advance', o.id, '✓ An Gast übergeben (Abschliessen)', 'completed')
+            : actionBtn('action-btn--qc', 'advance', o.id, '🔔 QC OK &amp; Drinks bereit · JETZT AUFRUFEN', 'ready')) +
+        '</div>';
+      }).join("");
+    }
+
+    function renderLocations(data) {
+      const closed = data.liveLocationId === null;
+      return data.locations.map((l) =>
+        '<button type="button" class="tab-btn ' + (l.status === "live_now" ? 'active' : '') + '" data-location="' + esc(l.id) + '">' +
+          esc(l.plz) + ' ' + esc(l.quarter) +
+        '</button>'
+      ).join("") +
+      '<button type="button" class="tab-btn ' + (closed ? 'active' : '') + '" data-location="">Truck geschlossen</button>';
+    }
+
     async function refreshDashboard() {
+      if (busy) return;
       try {
-        const [ordRes, healthRes] = await Promise.all([
-          fetch("/api/orders"),
-          fetch("/api/health")
+        const [ordData, health, locData] = await Promise.all([
+          api("/api/orders"),
+          api("/api/health"),
+          api("/api/locations")
         ]);
-        const ordJson = await ordRes.json();
-        const healthJson = await healthRes.json();
 
-        if (ordJson.success) {
-          const { orders, wokDemand } = ordJson.data;
-          currentCustomSpice = wokDemand.customSpiceEnabled;
+        const orders = ordData.orders;
+        const wokDemand = ordData.wokDemand;
+        currentCustomSpice = wokDemand.customSpiceEnabled;
 
-          // Update Wok Cockpit
-          document.getElementById("wokChickenCount").textContent = String(wokDemand.batches.chicken.totalPortions);
-          document.getElementById("wokChickenSpice").textContent = formatSpiceBreakdown(wokDemand.batches.chicken, currentCustomSpice);
+        setText("wokChickenCount", String(wokDemand.batches.chicken.totalPortions));
+        setText("wokChickenSpice", formatSpiceBreakdown(wokDemand.batches.chicken, currentCustomSpice));
+        setText("wokVeganCount", String(wokDemand.batches.vegan.totalPortions));
+        setText("wokVeganSpice", formatSpiceBreakdown(wokDemand.batches.vegan, currentCustomSpice));
+        setText("wokPorkCount", String(wokDemand.batches.pork_mix.totalPortions));
+        setText("wokPorkSpice", formatSpiceBreakdown(wokDemand.batches.pork_mix, currentCustomSpice));
+        setText("wokEggCount", String(wokDemand.totalKaiDaoEggs));
 
-          document.getElementById("wokVeganCount").textContent = String(wokDemand.batches.vegan.totalPortions);
-          document.getElementById("wokVeganSpice").textContent = formatSpiceBreakdown(wokDemand.batches.vegan, currentCustomSpice);
+        // Oldest first: the crew works the queue top to bottom.
+        const queue = orders.slice().reverse();
+        const kasse = queue.filter((o) => o.status === "pending_cash" || o.status === "payment_error_fallback");
+        const schoepfer = queue.filter((o) => o.status === "received" || o.status === "in_wok");
+        const qc = queue.filter((o) => o.status === "plating" || o.status === "ready");
 
-          document.getElementById("wokPorkCount").textContent = String(wokDemand.batches.pork_mix.totalPortions);
-          document.getElementById("wokPorkSpice").textContent = formatSpiceBreakdown(wokDemand.batches.pork_mix, currentCustomSpice);
+        setText("countKasse", String(kasse.length));
+        setHtml("listKasse", renderKasse(kasse));
+        setText("countSchoepfer", String(schoepfer.length));
+        setHtml("listSchoepfer", renderSchoepfer(schoepfer));
+        setText("countQc", String(qc.length));
+        setHtml("listQc", renderQc(qc));
 
-          document.getElementById("wokEggCount").textContent = String(wokDemand.totalKaiDaoEggs);
+        document.getElementById("demoTools").style.display = ordData.demoPayments ? "flex" : "none";
+        document.getElementById("demoBanner").style.display = ordData.demoPayments ? "block" : "none";
 
-          // Station 1: Kasse (pending_cash or payment_error_fallback)
-          const kasseOrders = orders.filter((o) => o.status === "pending_cash" || o.status === "payment_error_fallback");
-          document.getElementById("countKasse").textContent = String(kasseOrders.length);
-          document.getElementById("listKasse").innerHTML = kasseOrders.length === 0
-            ? '<div style="color:var(--muted);font-size:0.85rem;">Keine offenen Barzahlungen an der Kasse.</div>'
-            : kasseOrders.map((o) => \`
-              <div class="order-ticket \${o.status === 'payment_error_fallback' ? 'order-ticket--error' : 'order-ticket--cash'}">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span class="order-code">\${o.zueriCode.formatted}</span>
-                  <strong style="font-family:var(--font-mono);font-size:1.05rem;">CHF \${o.totalChf.toFixed(2)}</strong>
-                </div>
-                <div style="font-size:0.78rem;color:var(--gold);margin-top:0.2rem;">
-                  \${o.status === 'payment_error_fallback' ? '⚠️ ZAHLUNGS-FALLBACK: Manuell prüfen!' : '💵 BARZAHLUNG AM TRUCK (Pending)'}
-                </div>
-                \${renderPortionSummary(o)}
-                <button type="button" class="action-btn action-btn--cash" data-action="confirm_cash" data-id="\${o.id}">
-                  ✓ CHF \${o.totalChf.toFixed(2)} verbucht · In den Wok freigeben
-                </button>
-              </div>
-            \`).join("");
+        setText("spiceToggleStatusText", currentCustomSpice
+          ? "Aktuell: AKTIV (Gäste wählen Mild / Leicht scharf / Thai Spicy / Extra Hot)"
+          : "Aktuell: AUS (Nur Standardschärfe: leicht scharf 🌶️ für maximalen Wok-Speed)");
+        setText("slaPayment", health.metrics.paymentAttempts > 0 ? health.metrics.paymentReliabilityRate.toFixed(1) + "%" : "–");
+        setText("slaLatency", health.metrics.avgLatencyMs + " ms");
+        setText("slaAvail", health.metrics.availabilityRate.toFixed(2) + "%");
 
-          // Station 3: Schöpfer (received or in_wok)
-          const schoepferOrders = orders.filter((o) => o.status === "received" || o.status === "in_wok");
-          document.getElementById("countSchoepfer").textContent = String(schoepferOrders.length);
-          document.getElementById("listSchoepfer").innerHTML = schoepferOrders.length === 0
-            ? '<div style="color:var(--muted);font-size:0.85rem;">Keine Boxen zum Schöpfen offen.</div>'
-            : schoepferOrders.map((o) => \`
-              <div class="order-ticket">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span class="order-code">\${o.zueriCode.formatted}</span>
-                  <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--green-neon);">\${o.totalPortions} Box(en) · Bezahlt</span>
-                </div>
-                \${renderPortionSummary(o)}
-                <button type="button" class="action-btn action-btn--plate" data-action="advance" data-status="plating" data-id="\${o.id}">
-                  🍱 Boxen geschöpft · Weiter an QC &amp; Drinks
-                </button>
-              </div>
-            \`).join("");
-
-          // Station 4: QC & Drinks (plating or ready)
-          const qcOrders = orders.filter((o) => o.status === "plating" || o.status === "ready");
-          document.getElementById("countQc").textContent = String(qcOrders.length);
-          document.getElementById("listQc").innerHTML = qcOrders.length === 0
-            ? '<div style="color:var(--muted);font-size:0.85rem;">Keine Bestellungen in der QC / Ausgabe.</div>'
-            : qcOrders.map((o) => \`
-              <div class="order-ticket" style="\${o.status === 'ready' ? 'border-color:var(--gold);background:#142418;' : ''}">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                  <span class="order-code">\${o.zueriCode.formatted}</span>
-                  <span style="font-family:var(--font-mono);font-size:0.78rem;color:\${o.status === 'ready' ? 'var(--gold)' : 'var(--ink)'};">
-                    \${o.status === 'ready' ? '🔔 AUFGERUFEN' : 'QC PRÜFUNG'}
-                  </span>
-                </div>
-                \${renderPortionSummary(o)}
-                \${renderDrinkSummary(o)}
-                \${o.status === "plating"
-                  ? \`<button type="button" class="action-btn action-btn--qc" data-action="advance" data-status="ready" data-id="\${o.id}">
-                      🔔 QC OK &amp; Drinks bereit · JETZT AUFRUFEN
-                    </button>\`
-                  : \`<button type="button" class="action-btn action-btn--done" data-action="advance" data-status="completed" data-id="\${o.id}">
-                      ✓ An Gast übergeben (Abschliessen)
-                    </button>\`
-                }
-              </div>
-            \`).join("");
-
-          bindOrderActionButtons();
-        }
-
-        if (healthJson.success) {
-          const { metrics, features } = healthJson.data;
-          currentCustomSpice = features.enableCustomSpiceLevels;
-          document.getElementById("spiceToggleStatusText").textContent = currentCustomSpice
-            ? "Aktuell: AKTIV (Kunden können Mild / Leicht scharf / Thai Spicy / Extra Hot wählen)"
-            : "Aktuell: AUS (Nur Standardschärfe: leicht scharf 🌶️ für maximalen Wok-Speed)";
-          document.getElementById("slaPayment").textContent = metrics.paymentReliabilityRate.toFixed(2) + "%";
-          document.getElementById("slaLatency").textContent = metrics.avgLatencyMs + " ms";
-          document.getElementById("slaAvail").textContent = metrics.availabilityRate.toFixed(2) + "%";
-        }
-      } catch {}
+        setHtml("locationButtons", renderLocations(locData));
+        setText("connectionState", "");
+      } catch (err) {
+        setText("connectionState", "⚠️ Keine Verbindung zum Server. Anzeige ist evtl. veraltet.");
+      }
     }
 
-    function bindOrderActionButtons() {
-      document.querySelectorAll("[data-action='confirm_cash']").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-id");
-          await fetch("/api/orders/" + id, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "confirm_cash", note: "An Kasse bestätigt" })
-          });
-          refreshDashboard();
-        });
-      });
-
-      document.querySelectorAll("[data-action='advance']").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-id");
-          const status = btn.getAttribute("data-status");
-          await fetch("/api/orders/" + id, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status })
-          });
-          refreshDashboard();
-        });
-      });
+    async function runAction(fn) {
+      if (busy) return;
+      busy = true;
+      try {
+        await fn();
+      } catch (err) {
+        showToast("Nicht ausgeführt: " + (err && err.message ? err.message : "Fehler"));
+      } finally {
+        busy = false;
+        refreshDashboard();
+      }
     }
 
-    document.getElementById("btnToggleSpiceFeature").addEventListener("click", async () => {
-      await fetch("/api/features", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enableCustomSpiceLevels: !currentCustomSpice })
-      });
-      refreshDashboard();
+    // One listener for all order buttons (event delegation), independent of re-renders.
+    document.getElementById("stationsGrid").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-action]");
+      if (!btn) return;
+      const id = btn.getAttribute("data-id");
+      const action = btn.getAttribute("data-action");
+      btn.disabled = true;
+
+      if (action === "confirm_cash") {
+        runAction(() => api("/api/orders/" + encodeURIComponent(id), "PATCH", { action: "confirm_cash", note: "An Kasse bestätigt" }));
+      } else if (action === "cancel") {
+        runAction(() => api("/api/orders/" + encodeURIComponent(id), "PATCH", { status: "cancelled", note: "An Kasse storniert" }));
+      } else if (action === "advance") {
+        runAction(() => api("/api/orders/" + encodeURIComponent(id), "PATCH", { status: btn.getAttribute("data-status") }));
+      }
     });
 
-    document.getElementById("btnSeedDemoOrder").addEventListener("click", async () => {
-      await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          portions: [
-            { variant: "chicken", addKaiDao: true },
-            { variant: "vegan", addKaiDao: false }
-          ],
-          drinks: [{ drinkId: "thai_iced_tea", quantity: 2 }],
-          paymentMethod: "cash"
-        })
-      });
-      refreshDashboard();
+    document.getElementById("locationButtons").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-location]");
+      if (!btn) return;
+      const id = btn.getAttribute("data-location");
+      runAction(() => api("/api/locations", "PATCH", { locationId: id || null }));
     });
 
-    document.getElementById("btnSimulatePaymentFallback").addEventListener("click", async () => {
-      await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          portions: [{ variant: "pork_mix", addKaiDao: true }],
-          drinks: [{ drinkId: "coconut_water", quantity: 1 }],
-          paymentMethod: "card",
-          simulatePaymentFailure: true
-        })
-      });
-      refreshDashboard();
+    document.getElementById("btnToggleSpiceFeature").addEventListener("click", () => {
+      runAction(() => api("/api/features", "PATCH", { enableCustomSpiceLevels: !currentCustomSpice }));
+    });
+
+    document.getElementById("btnSeedDemoOrder").addEventListener("click", () => {
+      runAction(() => api("/api/orders", "POST", {
+        portions: [
+          { variant: "chicken", addKaiDao: true },
+          { variant: "vegan", addKaiDao: false }
+        ],
+        drinks: [{ drinkId: "thai_iced_tea", quantity: 2 }],
+        paymentMethod: "cash"
+      }));
+    });
+
+    document.getElementById("btnSimulatePaymentFallback").addEventListener("click", () => {
+      runAction(() => api("/api/orders", "POST", {
+        portions: [{ variant: "pork_mix", addKaiDao: true }],
+        drinks: [{ drinkId: "coconut_water", quantity: 1 }],
+        paymentMethod: "card",
+        simulatePaymentFailure: true
+      }));
+    });
+
+    document.getElementById("btnLogout").addEventListener("click", async () => {
+      try { await api("/api/crew/logout", "POST", {}); } catch {}
+      window.location.reload();
     });
 
     // Role Filter Tabs
@@ -609,6 +696,79 @@ export function renderAdminPageHtml(): string {
 
     refreshDashboard();
     setInterval(refreshDashboard, 2000);
+  </script>
+</body>
+</html>`;
+}
+
+export function renderCrewLoginPageHtml(): string {
+  return `<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>HOLY BASIL · Crew Login</title>
+  <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: #0A0C0A; color: #F5F7F5; font-family: system-ui, sans-serif; padding: 1rem;
+    }
+    .card {
+      width: 100%; max-width: 360px; background: #121814; border: 2px solid rgba(82, 196, 90, 0.45);
+      border-radius: 20px; padding: 1.75rem; text-align: center;
+    }
+    img { width: 84px; height: 84px; }
+    h1 { font-size: 1.3rem; margin: 0.75rem 0 0.25rem 0; }
+    p { color: #9FB0A2; font-size: 0.9rem; margin: 0 0 1.1rem 0; }
+    input {
+      width: 100%; padding: 0.9rem; border-radius: 12px; border: 1.5px solid rgba(82, 196, 90, 0.5);
+      background: #0A0D0B; color: #F5F7F5; font-size: 1.4rem; text-align: center; letter-spacing: 0.3em;
+    }
+    button {
+      width: 100%; margin-top: 0.9rem; padding: 0.9rem; border-radius: 12px; border: 0;
+      background: #52C45A; color: #071209; font-weight: 800; font-size: 1rem; cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    #msg { min-height: 1.3rem; margin-top: 0.7rem; color: #FF8A80; font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+  <form class="card" id="loginForm" autocomplete="off">
+    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil">
+    <h1>Crew Login</h1>
+    <p>KDS und Admin sind nur für die Crew.</p>
+    <label for="pin" style="position:absolute;left:-9999px;">Crew-PIN</label>
+    <input id="pin" name="pin" type="password" inputmode="numeric" placeholder="PIN" required autofocus>
+    <button type="submit" id="loginBtn">Anmelden</button>
+    <div id="msg" role="alert"></div>
+  </form>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("loginBtn");
+      const msg = document.getElementById("msg");
+      btn.disabled = true;
+      msg.textContent = "";
+      try {
+        const res = await fetch("/api/crew/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pin: document.getElementById("pin").value })
+        });
+        const json = await res.json();
+        if (json.success) {
+          window.location.reload();
+          return;
+        }
+        msg.textContent = (json.error && json.error.message) || "Anmeldung fehlgeschlagen.";
+      } catch {
+        msg.textContent = "Keine Verbindung zum Server.";
+      }
+      btn.disabled = false;
+    });
   </script>
 </body>
 </html>`;

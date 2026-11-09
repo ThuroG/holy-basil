@@ -165,11 +165,11 @@ export function getSlaMetrics(): SlaMetrics {
   const availabilityRate =
     total > 0 ? Math.round((metricsState.successfulRequests / total) * 10000) / 100 : 100;
 
-  // Payment reliability measures zero-loss transactions (direct success + atomic fallback preservation)
+  // Share of digital payment attempts that actually went through.
+  // Fallbacks count as failed payments: the order is preserved, but the money was not collected.
   const pAttempts = metricsState.paymentAttempts;
-  const pZeroLoss = metricsState.paymentSuccesses + metricsState.paymentFallbacksTriggered;
   const paymentReliabilityRate =
-    pAttempts > 0 ? Math.round((pZeroLoss / pAttempts) * 10000) / 100 : 100;
+    pAttempts > 0 ? Math.round((metricsState.paymentSuccesses / pAttempts) * 10000) / 100 : 100;
 
   return {
     totalRequests: total,

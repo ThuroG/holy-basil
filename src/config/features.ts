@@ -1,4 +1,4 @@
-import { SpiceLevel, DishVariantId, DrinkId } from '../lib/types.js';
+import { SpiceLevel, DishVariantId, DrinkId, PaymentMethod } from '../lib/types.js';
 
 export interface FeatureFlags {
   /**
@@ -11,6 +11,16 @@ export interface FeatureFlags {
   maxPortionsPerOrder: number;
   latencyThresholdMs: number;
   paymentTimeoutMs: number;
+  /**
+   * Demo payments: TWINT / card are SIMULATED (no real money moves).
+   * Off by default -> only cash at the truck is accepted.
+   * Enable for demos with the env variable DEMO_PAYMENTS=1.
+   */
+  demoPayments: boolean;
+}
+
+function demoPaymentsFromEnv(): boolean {
+  return process.env.DEMO_PAYMENTS === '1' || process.env.DEMO_PAYMENTS === 'true';
 }
 
 const currentFeatures: FeatureFlags = {
@@ -19,6 +29,7 @@ const currentFeatures: FeatureFlags = {
   maxPortionsPerOrder: 10,
   latencyThresholdMs: 1000,
   paymentTimeoutMs: 800,
+  demoPayments: demoPaymentsFromEnv(),
 };
 
 export function getFeatureFlags(): FeatureFlags {
@@ -30,12 +41,27 @@ export function setCustomSpiceLevelsEnabled(enabled: boolean): FeatureFlags {
   return getFeatureFlags();
 }
 
+export function setDemoPaymentsEnabled(enabled: boolean): FeatureFlags {
+  currentFeatures.demoPayments = Boolean(enabled);
+  return getFeatureFlags();
+}
+
+/** Payment methods a guest may currently choose. */
+export function getAvailablePaymentMethods(): PaymentMethod[] {
+  return currentFeatures.demoPayments ? ['cash', 'twint', 'card'] : ['cash'];
+}
+
+export function isSpiceLevel(value: unknown): value is SpiceLevel {
+  return typeof value === 'string' && Object.prototype.hasOwnProperty.call(SPICE_LABELS, value);
+}
+
 export function resetFeatureFlags(): FeatureFlags {
   currentFeatures.enableCustomSpiceLevels = false;
   currentFeatures.defaultSpiceLevel = 'leicht_scharf';
   currentFeatures.maxPortionsPerOrder = 10;
   currentFeatures.latencyThresholdMs = 1000;
   currentFeatures.paymentTimeoutMs = 800;
+  currentFeatures.demoPayments = demoPaymentsFromEnv();
   return getFeatureFlags();
 }
 
@@ -69,9 +95,9 @@ export const MENU_DISHES: Record<DishVariantId, DishConfig> = {
     tagline: 'Der Bangkok Nightmarket Klassiker',
     description:
       'Fein gehacktes Schweizer Pouletfleisch bei voller Wok-Hitze gebraten mit frischem Holy Basil, Knoblauch, Chilis, 100% veganer Krapao-Umami-Sauce und Jasmin-Duftreis.',
-    priceChf: 14.0,
+    priceChf: 15.0,
     isVegan: false,
-    badge: 'BESTSELLER · CHF 14',
+    badge: 'BESTSELLER · CHF 15',
   },
   pork_mix: {
     id: 'pork_mix',

@@ -17,7 +17,12 @@ export interface PaymentTransactionResult {
 const idempotencyCache = new Map<string, PaymentTransactionResult>();
 
 /**
- * Processes an order payment with a 99.99% zero-loss reliability guarantee:
+ * IMPORTANT: Digital payments ('twint' | 'card') are a SIMULATION. No payment provider is
+ * connected and no money moves. They are only reachable when the feature flag `demoPayments`
+ * is on (env DEMO_PAYMENTS=1). Before going live, replace `executeGatewayWithTimeout` with a
+ * real provider call (e.g. Payrexx, Datatrans, Stripe) plus a server-side webhook confirmation.
+ *
+ * Flow:
  * - Cash ('cash'): Immediately places the order in `pending_cash` status (waiting for Cashier confirmation).
  * - Digital ('twint' | 'card'):
  *   - Enforces strict timeout (< 800ms) so the overall API stays below 1,000ms.
@@ -53,7 +58,6 @@ export async function processOrderPayment(params: {
 
   // 1. Cash flow: Immediate pending_cash assignment
   if (paymentMethod === 'cash') {
-    recordPaymentAttempt('success');
     const result: PaymentTransactionResult = {
       transactionId: txId,
       paymentMethod: 'cash',

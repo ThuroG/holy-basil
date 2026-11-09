@@ -66,7 +66,8 @@ describe('Payment Service (99.99% Reliability & Idempotency)', () => {
 
     const metrics = getSlaMetrics();
     expect(metrics.paymentFallbacksTriggered).toBe(1);
-    expect(metrics.paymentReliabilityRate).toBe(100);
+    // A fallback keeps the order, but the payment itself failed: the rate must show that.
+    expect(metrics.paymentReliabilityRate).toBe(0);
   });
 
   it('rejects invalid zero or negative payment amounts', async () => {

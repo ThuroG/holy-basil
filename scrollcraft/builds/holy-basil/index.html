@@ -696,11 +696,10 @@
   </a>
   <div class="site-bar__live">
     <span class="site-bar__dot"></span>
-    <span id="navLiveSpot">HEUTE LIVE: 8005 ZÜRI WEST</span>
+    <span id="navLiveSpot">TOUR DURCH ZÜRICH</span>
   </div>
   <div class="site-bar__actions">
     <a class="hb-nav-link" href="#tour">Tour-Plan</a>
-    <a class="hb-nav-link" href="/admin">Crew KDS</a>
     <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
   </div>
 </header>
@@ -801,7 +800,7 @@
             <span>HOLY VEGAN</span>
           </div>
           <div class="hb-price-cell">
-            <strong>CHF 14</strong>
+            <strong>CHF 15</strong>
             <span>HOLY CHICKEN</span>
           </div>
           <div class="hb-price-cell">
@@ -848,7 +847,7 @@
           <div>
             <div class="hb-dish-visual">
               <span class="hb-dish-thai">ผัดกะเพราไก่</span>
-              <span class="hb-dish-price">CHF 14</span>
+              <span class="hb-dish-price">CHF 15</span>
             </div>
             <span class="hb-tag-pill">BANGKOK BESTSELLER</span>
             <h3>Holy Chicken</h3>
@@ -894,7 +893,7 @@
             </div>
             <span class="hb-tag-pill">BÜRO &amp; CREW LUNCH</span>
             <h3>Bis zu 10 Portionen</h3>
-            <p>Bestelle für deine ganze Gruppe bis zu 10 Portionen gleichzeitig per Smartphone – wahlweise mit TWINT, Karte oder Barzahlung am Truck.</p>
+            <p>Bestelle für deine ganze Gruppe bis zu 10 Portionen gleichzeitig per Smartphone. Bezahlt wird an der Kasse am Truck.</p>
           </div>
           <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
         </article>
@@ -916,7 +915,7 @@
             </p>
           </div>
 
-          <div class="hb-flap-display" aria-live="polite">
+          <div class="hb-flap-display">
             <div class="hb-flap-code" id="flapCode">8005 · ZÜRI WEST</div>
             <div class="hb-flap-spot" id="flapSpot">Prime Tower / Hardbrücke Vorplatz</div>
             <div class="hb-flap-meta" id="flapMeta">HEUTE LIVE · 11:30 bis 14:30 Uhr · Hardstrasse 201</div>
@@ -973,35 +972,18 @@
         <span class="hb-tag-pill">READY FOR PICKUP · MOBILE ORDER APP</span>
         <h2 class="sc-display sc-display--lg">Hol dir deinen Züri-Code in 20 Sekunden.</h2>
         <p class="sc-body">
-          Öffne unsere Web-App direkt hier oder scanne am Foodtruck den QR-Code. Wähle 1 bis 10 Portionen, bezahle mit TWINT, Karte oder bar an der Kasse und verfolge live auf deinem Handy, wann dein Krapao aus dem Wok kommt.
+          Öffne unsere Web-App direkt hier oder scanne am Foodtruck den QR-Code. Wähle 1 bis 10 Portionen, bezahle an der Kasse am Truck und verfolge live auf deinem Handy, wann dein Krapao aus dem Wok kommt.
         </p>
         <div class="hb-btn-row">
           <a class="hb-cta hb-cta--xl" href="/order" data-sc-magnet="0.24">Jetzt vorbestellen</a>
           <a class="hb-cta-ghost" href="/board">Live Pickup Board</a>
-          <a class="hb-cta-ghost" href="/admin">Foodtruck Admin / KDS</a>
         </div>
       </div>
 
       <div class="hb-qr-box" data-sc-in data-sc-stagger="70">
         <div class="hb-qr-row">
           <!-- Crisp Inline SVG QR Code pointing to /order -->
-          <svg class="hb-qr-svg" viewBox="0 0 100 100" aria-label="QR Code zur Bestell-App">
-            <rect width="100" height="100" fill="#F5F7F5"/>
-            <rect x="8" y="8" width="28" height="28" fill="none" stroke="#0A0C0A" stroke-width="6"/>
-            <rect x="16" y="16" width="12" height="12" fill="#2E7D32"/>
-            <rect x="64" y="8" width="28" height="28" fill="none" stroke="#0A0C0A" stroke-width="6"/>
-            <rect x="72" y="16" width="12" height="12" fill="#2E7D32"/>
-            <rect x="8" y="64" width="28" height="28" fill="none" stroke="#0A0C0A" stroke-width="6"/>
-            <rect x="16" y="72" width="12" height="12" fill="#2E7D32"/>
-            <rect x="44" y="12" width="10" height="10" fill="#0A0C0A"/>
-            <rect x="44" y="28" width="10" height="20" fill="#0A0C0A"/>
-            <rect x="12" y="44" width="20" height="10" fill="#0A0C0A"/>
-            <rect x="44" y="56" width="16" height="10" fill="#2E7D32"/>
-            <rect x="68" y="44" width="20" height="12" fill="#0A0C0A"/>
-            <rect x="64" y="64" width="12" height="24" fill="#0A0C0A"/>
-            <rect x="80" y="76" width="12" height="12" fill="#2E7D32"/>
-            <rect x="44" y="76" width="12" height="16" fill="#0A0C0A"/>
-          </svg>
+          <img class="hb-qr-svg" id="orderQr" src="/qr.svg" width="104" height="104" alt="QR-Code zur Bestell-App" onerror="this.style.display='none'">
           <div>
             <h3 class="sc-display" style="font-size: 1.25rem; margin: 0 0 0.35rem 0;">QR-Scan oder Direktklick</h3>
             <p style="font-size: 0.9rem; color: var(--sc-ink-soft); margin: 0;">
@@ -1019,7 +1001,7 @@
             <input type="email" name="email" required class="hb-input" placeholder="Geschäfts-E-Mail">
           </div>
           <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.6rem; align-items: end; margin-top: 0.2rem;">
-            <input type="number" name="guestCount" min="10" max="500" class="hb-input" placeholder="Anzahl Gäste (ab 15 Pers.)">
+            <input type="number" name="guestCount" min="10" max="500" class="hb-input" placeholder="Anzahl Gäste (ab 10 Pers.)">
             <button type="submit" class="hb-cta-ghost" style="height: 44px; cursor: pointer;">Catering anfragen</button>
           </div>
           <div id="b2bStatus" class="hb-status-msg" role="status"></div>
@@ -1030,10 +1012,8 @@
     <footer class="hb-foot">
       <div>© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO STREETFOOD · 100% VEGAN SAUCE BASE</div>
       <div>
-        <a href="/order">Bestell-App (/order)</a> ·
-        <a href="/admin">Foodtruck Admin &amp; KDS (/admin)</a> ·
-        <a href="/board">Public Pickup Board (/board)</a> ·
-        <a href="/api/health">SLA &amp; NFR Status (/api/health)</a>
+        <a href="/order">Bestell-App</a> ·
+        <a href="/board">Pickup Board</a>
       </div>
     </footer>
   </section>
@@ -1045,37 +1025,14 @@
   ScrollCraft.mount(document.body);
 
   // Bespoke Signature Move: Züri-Code Hood Split-Flap Scrubber driven by scroll & click
-  const TOUR_STOPS = [
-    {
-      plz: "8005",
-      quarter: "ZÜRI WEST",
-      spot: "Prime Tower / Hardbrücke Vorplatz",
-      meta: "HEUTE LIVE · 11:30 bis 14:30 Uhr · Hardstrasse 201"
-    },
-    {
-      plz: "8004",
-      quarter: "LANGSTRASSE",
-      spot: "Kanzleiareal / Helvetiaplatz Pop-up",
-      meta: "DONNERSTAG · 17:30 bis 22:30 Uhr · Kanzleistrasse 56"
-    },
-    {
-      plz: "8050",
-      quarter: "OERLIKON",
-      spot: "MFO-Park / Bahnhof Oerlikon Nord",
-      meta: "FREITAG · 11:30 bis 14:30 Uhr · Chreis 11 Lunch Drop"
-    },
-    {
-      plz: "8400",
-      quarter: "WINTI",
-      spot: "Lagerplatz / Sulzerareal Streetfood Corner",
-      meta: "SAMSTAG · 12:00 bis 21:00 Uhr · Winterthur Special"
-    },
-    {
-      plz: "8001",
-      quarter: "NIEDERDORF",
-      spot: "Hirschenplatz / Züri Altstadt Pop-up",
-      meta: "SONNTAG · 12:00 bis 18:00 Uhr · Sunday Krapao Session"
-    }
+  // Tour data comes from /api/locations (one source of truth, the crew sets the live stop in /admin).
+  // The stops below are only the fallback when the API cannot be reached.
+  let TOUR_STOPS = [
+    { plz: "8005", quarter: "ZÜRI WEST", spot: "Prime Tower / Hardbrücke Vorplatz", meta: "DIENSTAG · 11:30 – 14:30 Uhr · Hardstrasse 201, 8005 Zürich" },
+    { plz: "8004", quarter: "LANGSTRASSE", spot: "Kanzleiareal / Helvetiaplatz Pop-up", meta: "DONNERSTAG · 17:30 – 22:30 Uhr · Kanzleistrasse 56, 8004 Zürich" },
+    { plz: "8050", quarter: "OERLIKON", spot: "MFO-Park / Bahnhof Oerlikon Nord", meta: "FREITAG · 11:30 – 14:30 Uhr · Sophie-Taeuber-Strasse 4, 8050 Zürich" },
+    { plz: "8400", quarter: "WINTI", spot: "Lagerplatz / Sulzerareal Streetfood Corner", meta: "SAMSTAG · 12:00 – 21:00 Uhr · Lagerplatz 18, 8400 Winterthur" },
+    { plz: "8001", quarter: "NIEDERDORF", spot: "Hirschenplatz / Züri Altstadt Pop-up", meta: "SONNTAG · 12:00 – 18:00 Uhr · Hirschenplatz, 8001 Zürich" }
   ];
 
   const tourSection = document.getElementById("tour");
@@ -1085,33 +1042,54 @@
   const flapCode = document.getElementById("flapCode");
   const flapSpot = document.getElementById("flapSpot");
   const flapMeta = document.getElementById("flapMeta");
-  const hoodPills = [...document.querySelectorAll(".hb-hood-pill")];
+  const hoodPillBox = document.getElementById("hoodPills");
+  const navLiveSpot = document.getElementById("navLiveSpot");
+  const navLiveDot = document.querySelector(".site-bar__dot");
 
-  let activeIdx = 0;
+  let activeIdx = -1;
   let manualOverrideUntil = 0;
+
+  function renderHoodPills() {
+    if (!hoodPillBox) return;
+    hoodPillBox.textContent = "";
+    TOUR_STOPS.forEach((s, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "hb-hood-pill";
+      btn.setAttribute("data-idx", String(i));
+      btn.textContent = s.plz + " " + s.quarter;
+      hoodPillBox.appendChild(btn);
+    });
+  }
 
   function renderTourStop(idx, progressBucket) {
     const safeIdx = Math.max(0, Math.min(TOUR_STOPS.length - 1, idx));
     const s = TOUR_STOPS[safeIdx];
-    if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
-    if (flapSpot) flapSpot.textContent = s.spot;
-    if (flapMeta) flapMeta.textContent = s.meta;
-    hoodPills.forEach((btn, i) => {
-      btn.classList.toggle("is-active", i === safeIdx);
-    });
     if (tourStage) {
       tourStage.setAttribute("data-sc-verify-state", "flap:" + s.plz + ":" + progressBucket);
     }
+    // Only touch the text when the stop changes: no screen-reader chatter on every scroll event.
+    if (safeIdx === activeIdx) return;
     activeIdx = safeIdx;
+    if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
+    if (flapSpot) flapSpot.textContent = s.spot;
+    if (flapMeta) flapMeta.textContent = s.meta;
+    if (hoodPillBox) {
+      [...hoodPillBox.querySelectorAll(".hb-hood-pill")].forEach((btn, i) => {
+        btn.classList.toggle("is-active", i === safeIdx);
+      });
+    }
   }
 
-  hoodPills.forEach((btn) => {
-    btn.addEventListener("click", () => {
+  if (hoodPillBox) {
+    hoodPillBox.addEventListener("click", (event) => {
+      const btn = event.target.closest(".hb-hood-pill");
+      if (!btn) return;
       const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
       manualOverrideUntil = Date.now() + 4000;
       renderTourStop(idx, idx);
     });
-  });
+  }
 
   function syncScrollVerifyStates() {
     if (heroSection && heroStage) {
@@ -1126,8 +1104,37 @@
     }
   }
 
+  async function loadTourStops() {
+    try {
+      const res = await fetch("/api/locations");
+      const json = await res.json();
+      if (!json.success || !Array.isArray(json.data.locations) || !json.data.locations.length) return;
+      const locations = json.data.locations;
+      TOUR_STOPS = locations.map((l) => ({
+        plz: l.plz,
+        quarter: l.quarter,
+        spot: l.spotName,
+        meta: (l.status === "live_now" ? "HEUTE LIVE" : l.dayLabel) + " · " + l.hours + " · " + l.address
+      }));
+      const live = locations.find((l) => l.status === "live_now");
+      if (navLiveSpot) {
+        navLiveSpot.textContent = live ? "HEUTE LIVE: " + live.plz + " " + live.quarter : "TRUCK MACHT PAUSE";
+      }
+      if (navLiveDot) navLiveDot.style.opacity = live ? "1" : "0.25";
+      renderHoodPills();
+      activeIdx = -1;
+      syncScrollVerifyStates();
+      if (activeIdx === -1) renderTourStop(0, 0);
+    } catch {
+      // API not reachable: the fallback stops stay on screen.
+    }
+  }
+
+  renderHoodPills();
+  renderTourStop(0, 0);
   window.addEventListener("scroll", syncScrollVerifyStates, { passive: true });
   syncScrollVerifyStates();
+  loadTourStops();
 
   // Newsletter Submission Handler
   const nlForm = document.getElementById("newsletterForm");
@@ -1158,7 +1165,7 @@
           nlStatus.textContent = "Fehler: " + (json.error?.message || "Bitte E-Mail prüfen");
         }
       } catch {
-        nlStatus.textContent = "✓ Lokal vorgemerkt für den nächsten Tour-Drop!";
+        nlStatus.textContent = "Keine Verbindung. Du bist noch nicht eingetragen, bitte nochmals versuchen.";
       }
     });
   }
@@ -1190,7 +1197,7 @@
           b2bStatus.textContent = "Bitte Firma und gültige E-Mail angeben.";
         }
       } catch {
-        b2bStatus.textContent = "✓ Anfrage gespeichert!";
+        b2bStatus.textContent = "Keine Verbindung. Die Anfrage wurde nicht gesendet, bitte nochmals versuchen.";
       }
     });
   }

@@ -6,11 +6,12 @@ import {
   getWokDemand,
   resetOrderStore,
 } from '../../src/lib/orderStore.js';
-import { setCustomSpiceLevelsEnabled, resetFeatureFlags } from '../../src/config/features.js';
+import { setCustomSpiceLevelsEnabled, setDemoPaymentsEnabled, resetFeatureFlags } from '../../src/config/features.js';
 
 describe('Zero-Click Wok Demand Aggregator (Cook Cockpit)', () => {
   beforeEach(() => {
     resetFeatureFlags();
+    setDemoPaymentsEnabled(true);
     resetOrderStore();
   });
 
@@ -29,7 +30,7 @@ describe('Zero-Click Wok Demand Aggregator (Cook Cockpit)', () => {
     expect(demand.totalKaiDaoEggs).toBe(0);
 
     // Cashier confirms cash payment
-    confirmOrderPaymentAtCashier(cashOrder.id, 'CHF 28.50 bar kassiert');
+    confirmOrderPaymentAtCashier(cashOrder.id, 'CHF 29.50 bar kassiert');
 
     demand = getWokDemand();
     expect(demand.totalActivePortions).toBe(2);

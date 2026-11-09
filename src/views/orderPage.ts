@@ -1,4 +1,22 @@
+import { MENU_DISHES, MENU_DRINKS, KAI_DAO_PRICE_CHF, getFeatureFlags } from '../config/features.js';
+
+function chf(value: number): string {
+  return value.toFixed(2);
+}
+
 export function renderOrderPageHtml(): string {
+  // Menu data for the client script, taken from the one server-side config.
+  const menuJson = JSON.stringify({
+    dishes: {
+      vegan: MENU_DISHES.vegan.priceChf,
+      chicken: MENU_DISHES.chicken.priceChf,
+      pork_mix: MENU_DISHES.pork_mix.priceChf,
+    },
+    drinks: Object.fromEntries(Object.values(MENU_DRINKS).map((d) => [d.id, d.priceChf])),
+    kaiDao: KAI_DAO_PRICE_CHF,
+    maxPortions: getFeatureFlags().maxPortionsPerOrder,
+  }).replace(/</g, '\\u003c');
+
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -280,7 +298,7 @@ export function renderOrderPageHtml(): string {
     .drink-row:last-child { border-bottom: 0; }
     .pay-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
       gap: 0.6rem;
     }
     .pay-btn {
@@ -392,7 +410,6 @@ export function renderOrderPageHtml(): string {
     </a>
     <div class="topbar__links">
       <a class="pill-link" href="/board">Pickup Board</a>
-      <a class="pill-link" href="/admin">Crew KDS</a>
     </div>
   </header>
 
@@ -446,27 +463,27 @@ export function renderOrderPageHtml(): string {
                 <div class="variant-name">🍗 HOLY CHICKEN</div>
                 <div class="variant-sub">Fein gehacktes Schweizer Poulet · Bestseller</div>
               </div>
-              <div class="variant-price">CHF 14.00</div>
+              <div class="variant-price">CHF ${chf(MENU_DISHES.chicken.priceChf)}</div>
             </button>
             <button type="button" class="variant-btn" data-variant="vegan">
               <div>
                 <div class="variant-name">🌱 HOLY VEGAN</div>
                 <div class="variant-sub">100% Plant-Based Soja- &amp; Pilz-Mince</div>
               </div>
-              <div class="variant-price">CHF 12.00</div>
+              <div class="variant-price">CHF ${chf(MENU_DISHES.vegan.priceChf)}</div>
             </button>
             <button type="button" class="variant-btn" data-variant="pork_mix">
               <div>
                 <div class="variant-name">🥩 HOLY PORK / MIX</div>
                 <div class="variant-sub">Kräftiger Schwein-Rind-Mix aus dem Wok</div>
               </div>
-              <div class="variant-price">CHF 15.00</div>
+              <div class="variant-price">CHF ${chf(MENU_DISHES.pork_mix.priceChf)}</div>
             </button>
           </div>
 
-          <button type="button" class="kaidao-toggle checked" id="expressKaiDaoBtn">
+          <button type="button" class="kaidao-toggle" id="expressKaiDaoBtn" aria-pressed="false">
             <span>🍳 + Original Kai Dao (Knuspriges Thai-Spiegelei)</span>
-            <span style="font-family: var(--font-mono); color: var(--gold);">+ CHF 2.50</span>
+            <span style="font-family: var(--font-mono); color: var(--gold);">+ CHF ${chf(KAI_DAO_PRICE_CHF)}</span>
           </button>
         </div>
 
@@ -500,7 +517,7 @@ export function renderOrderPageHtml(): string {
         <div class="drink-row">
           <div>
             <div style="font-weight: 700;">🧋 Hausgemachter Thai Iced Tea</div>
-            <div style="font-size: 0.78rem; color: var(--muted);">100% vegan mit Hafer-Kokos-Creme · CHF 4.50</div>
+            <div style="font-size: 0.78rem; color: var(--muted);">100% vegan mit Hafer-Kokos-Creme · CHF ${chf(MENU_DRINKS.thai_iced_tea.priceChf)}</div>
           </div>
           <div class="stepper-controls">
             <button type="button" class="step-btn drink-dec" data-drink="thai_iced_tea">−</button>
@@ -511,7 +528,7 @@ export function renderOrderPageHtml(): string {
         <div class="drink-row">
           <div>
             <div style="font-weight: 700;">🥥 Junges Thai Kokoswasser</div>
-            <div style="font-size: 0.78rem; color: var(--muted);">100% Nam Hom Kokoswasser eiskalt · CHF 4.00</div>
+            <div style="font-size: 0.78rem; color: var(--muted);">100% Nam Hom Kokoswasser eiskalt · CHF ${chf(MENU_DRINKS.coconut_water.priceChf)}</div>
           </div>
           <div class="stepper-controls">
             <button type="button" class="step-btn drink-dec" data-drink="coconut_water">−</button>
@@ -543,17 +560,19 @@ export function renderOrderPageHtml(): string {
         </div>
 
         <div class="pay-grid" id="paymentGrid">
-          <button type="button" class="pay-btn selected" data-pay="twint">📱 TWINT</button>
-          <button type="button" class="pay-btn" data-pay="card">💳 Karte / Apple Pay</button>
-          <button type="button" class="pay-btn" data-pay="cash">💵 Bar am Truck</button>
+          <button type="button" class="pay-btn selected" data-pay="cash">💵 Bar am Truck</button>
         </div>
 
-        <div id="cashInfoNote" style="display: none; margin-top: 0.75rem; padding: 0.7rem; border-radius: 10px; background: rgba(255, 213, 79, 0.12); border: 1px solid var(--gold); font-size: 0.82rem; color: var(--gold);">
-          💡 <strong>Hinweis bei Barzahlung (Cash):</strong> Deine Bestellung erhält sofort einen Züri-Code im Status <em>Pending</em>. Bitte zahle kurz an der Foodtruck-Kasse, damit der Kassierer deine Bestellung für den Wok freigibt!
+        <div id="demoPayNote" style="display: none; margin-top: 0.6rem; font-size: 0.78rem; color: var(--muted);">
+          Demo-Modus: TWINT und Karte sind simuliert, es fliesst kein Geld.
+        </div>
+
+        <div id="cashInfoNote" style="margin-top: 0.75rem; padding: 0.7rem; border-radius: 10px; background: rgba(255, 213, 79, 0.12); border: 1px solid var(--gold); font-size: 0.82rem; color: var(--gold);">
+          💡 <strong>So läuft Barzahlung:</strong> Du bekommst sofort deinen Züri-Code. Zahle damit an der Foodtruck-Kasse, dann geht deine Bestellung in den Wok. Unbezahlte Bestellungen verfallen nach 20 Minuten.
         </div>
 
         <button type="button" class="submit-btn" id="submitOrderBtn">
-          Jetzt bestellen · <span id="totalPriceDisplay">CHF 16.50</span>
+          Jetzt bestellen · <span id="totalPriceDisplay">CHF ${chf(MENU_DISHES.chicken.priceChf)}</span>
         </button>
         <div id="orderErrorMsg" style="color: #FF8A80; font-size: 0.85rem; margin-top: 0.5rem; text-align: center;"></div>
       </section>
@@ -569,6 +588,7 @@ export function renderOrderPageHtml(): string {
           Bestellung #ord_123 · CHF 16.50
         </div>
 
+        <div id="ticketConnection" style="color: #FF8A80; font-size: 0.8rem; min-height: 1rem; margin-top: 0.3rem;"></div>
         <div id="ticketAlertBanner" style="margin-top: 1rem; padding: 0.85rem; border-radius: 12px; display: none;"></div>
 
         <div class="status-steps">
@@ -594,26 +614,56 @@ export function renderOrderPageHtml(): string {
 
         <div style="display: flex; gap: 0.6rem; margin-top: 1.2rem;">
           <button type="button" class="mode-btn active" id="newOrderBtn" style="padding: 0.8rem;">+ Weitere Bestellung aufgeben</button>
-          <a href="/admin" class="mode-btn" style="padding: 0.8rem; text-align: center; text-decoration: none; color: var(--ink);">Crew KDS öffnen</a>
+          <a href="/board" class="mode-btn" style="padding: 0.8rem; text-align: center; text-decoration: none; color: var(--ink);">Pickup Board</a>
         </div>
       </div>
     </div>
   </main>
 
   <script>
-    const PRICES = { vegan: 12.0, chicken: 14.0, pork_mix: 15.0, kaiDao: 2.5, thai_iced_tea: 4.5, coconut_water: 4.0 };
+    // Prices and names come from the server config (src/config/features.ts): one source of truth.
+    const MENU = ${menuJson};
+    const PRICES = { vegan: MENU.dishes.vegan, chicken: MENU.dishes.chicken, pork_mix: MENU.dishes.pork_mix, kaiDao: MENU.kaiDao };
     const NAMES = { vegan: "Holy Vegan", chicken: "Holy Chicken", pork_mix: "Holy Pork / Mix" };
+    const DRINK_NAMES = { thai_iced_tea: "Thai Iced Tea", coconut_water: "Kokoswasser", zueri_mate: "Züri Mate" };
+    const SPICE_TEXT = { mild: "mild", leicht_scharf: "leicht scharf", original_thai_spicy: "Thai Spicy", extra_hot: "Extra Hot" };
+    const PAY_LABELS = { cash: "💵 Bar am Truck", twint: "📱 TWINT (Demo)", card: "💳 Karte (Demo)" };
+    const STORAGE_KEY = "hb_active_order";
 
     let portionCount = 1;
     let builderMode = "express"; // 'express' | 'custom'
     let expressVariant = "chicken";
-    let expressKaiDao = true;
-    let customPortions = [{ variant: "chicken", addKaiDao: true }];
+    let expressKaiDao = false;
+    let customPortions = [{ variant: "chicken", addKaiDao: false }];
     let drinks = { thai_iced_tea: 0, coconut_water: 0 };
-    let paymentMethod = "twint";
+    let paymentMethods = ["cash"];
+    let paymentMethod = "cash";
     let customSpiceEnabled = false;
     let activeOrderId = null;
     let pollTimer = null;
+    let submitting = false;
+    // One key per order attempt: a double tap or a retry after a network error never creates a second order.
+    let draftKey = newDraftKey();
+
+    function newDraftKey() {
+      const rand = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now();
+      return "ord_" + rand;
+    }
+
+    function esc(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+
+    function chf(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n.toFixed(2) : "?";
+    }
+
+    function storeGet() { try { return localStorage.getItem(STORAGE_KEY); } catch { return null; } }
+    function storeSet(v) { try { localStorage.setItem(STORAGE_KEY, v); } catch {} }
+    function storeClear() { try { localStorage.removeItem(STORAGE_KEY); } catch {} }
 
     // Check URL query params for preselected variant
     const urlParams = new URLSearchParams(window.location.search);
@@ -631,6 +681,12 @@ export function renderOrderPageHtml(): string {
           customSpiceEnabled = Boolean(json.data.features.enableCustomSpiceLevels);
           document.getElementById("standardSpiceBanner").style.display = customSpiceEnabled ? "none" : "flex";
           document.getElementById("customSpiceContainer").style.display = customSpiceEnabled ? "block" : "none";
+          if (Array.isArray(json.data.paymentMethods) && json.data.paymentMethods.length) {
+            paymentMethods = json.data.paymentMethods;
+            if (!paymentMethods.includes(paymentMethod)) paymentMethod = paymentMethods[0];
+          }
+          document.getElementById("demoPayNote").style.display = json.data.features.demoPayments ? "block" : "none";
+          renderUI();
         }
       } catch {}
     }
@@ -653,8 +709,7 @@ export function renderOrderPageHtml(): string {
           sum += PRICES[p.variant] + (p.addKaiDao ? PRICES.kaiDao : 0);
         });
       }
-      sum += drinks.thai_iced_tea * PRICES.thai_iced_tea;
-      sum += drinks.coconut_water * PRICES.coconut_water;
+      Object.keys(drinks).forEach((d) => { sum += drinks[d] * (MENU.drinks[d] || 0); });
       return sum;
     }
 
@@ -667,47 +722,44 @@ export function renderOrderPageHtml(): string {
       }
       document.getElementById("expressBuilder").style.display = "none";
       container.style.display = "block";
-      container.innerHTML = customPortions.map((p, idx) => \`
-        <div class="portion-box-card">
-          <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold); margin-bottom: 0.45rem;">
-            BOX #\${idx + 1} VON \${portionCount}
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">
-            \${["vegan", "chicken", "pork_mix"].map((v) => \`
-              <button type="button" class="mode-btn \${p.variant === v ? 'active' : ''}" data-cidx="\${idx}" data-cvar="\${v}">
-                \${NAMES[v]} (CHF \${PRICES[v]})
-              </button>
-            \`).join("")}
-          </div>
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem; font-size: 0.84rem; cursor: pointer;">
-            <input type="checkbox" \${p.addKaiDao ? "checked" : ""} data-cidx="\${idx}" class="custom-kaidao-cb">
-            <span>🍳 + Kai Dao Spiegelei (+ CHF 2.50)</span>
-          </label>
-        </div>
-      \`).join("");
-
-      container.querySelectorAll("[data-cvar]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const i = Number(btn.getAttribute("data-cidx"));
-          customPortions[i].variant = btn.getAttribute("data-cvar");
-          renderUI();
-        });
-      });
-      container.querySelectorAll(".custom-kaidao-cb").forEach((cb) => {
-        cb.addEventListener("change", () => {
-          const i = Number(cb.getAttribute("data-cidx"));
-          customPortions[i].addKaiDao = cb.checked;
-          renderUI();
-        });
-      });
+      container.innerHTML = customPortions.map((p, idx) =>
+        '<div class="portion-box-card">' +
+          '<div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold); margin-bottom: 0.45rem;">BOX #' + (idx + 1) + ' VON ' + portionCount + '</div>' +
+          '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">' +
+            ["vegan", "chicken", "pork_mix"].map((v) =>
+              '<button type="button" class="mode-btn ' + (p.variant === v ? 'active' : '') + '" data-cidx="' + idx + '" data-cvar="' + v + '">' +
+                esc(NAMES[v]) + ' (CHF ' + PRICES[v] + ')' +
+              '</button>'
+            ).join("") +
+          '</div>' +
+          '<label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem; font-size: 0.84rem; cursor: pointer;">' +
+            '<input type="checkbox" ' + (p.addKaiDao ? "checked" : "") + ' data-cidx="' + idx + '" class="custom-kaidao-cb">' +
+            '<span>🍳 + Kai Dao Spiegelei (+ CHF ' + chf(PRICES.kaiDao) + ')</span>' +
+          '</label>' +
+        '</div>'
+      ).join("");
     }
+
+    // Event delegation: listeners survive every re-render of the box list.
+    document.getElementById("customBuilder").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-cvar]");
+      if (!btn) return;
+      customPortions[Number(btn.getAttribute("data-cidx"))].variant = btn.getAttribute("data-cvar");
+      renderUI();
+    });
+    document.getElementById("customBuilder").addEventListener("change", (event) => {
+      const cb = event.target.closest(".custom-kaidao-cb");
+      if (!cb) return;
+      customPortions[Number(cb.getAttribute("data-cidx"))].addKaiDao = cb.checked;
+      renderUI();
+    });
 
     function renderUI() {
       syncCustomPortionsArray();
       document.getElementById("portionCountDisplay").textContent = String(portionCount);
       document.getElementById("portionBadge").textContent = portionCount + (portionCount === 1 ? " Portion" : " Portionen");
       document.getElementById("btnDecPortion").disabled = portionCount <= 1;
-      document.getElementById("btnIncPortion").disabled = portionCount >= 10;
+      document.getElementById("btnIncPortion").disabled = portionCount >= MENU.maxPortions;
 
       document.getElementById("groupModeSwitch").style.display = portionCount > 1 ? "flex" : "none";
       if (portionCount === 1) builderMode = "express";
@@ -719,26 +771,31 @@ export function renderOrderPageHtml(): string {
         b.classList.toggle("selected", b.getAttribute("data-variant") === expressVariant);
       });
       document.getElementById("expressKaiDaoBtn").classList.toggle("checked", expressKaiDao);
+      document.getElementById("expressKaiDaoBtn").setAttribute("aria-pressed", String(expressKaiDao));
 
       renderCustomBuilder();
 
       document.getElementById("drink_thai_iced_tea").textContent = String(drinks.thai_iced_tea);
       document.getElementById("drink_coconut_water").textContent = String(drinks.coconut_water);
 
-      document.querySelectorAll("#paymentGrid .pay-btn").forEach((b) => {
-        b.classList.toggle("selected", b.getAttribute("data-pay") === paymentMethod);
-      });
+      const payGrid = document.getElementById("paymentGrid");
+      const payHtml = paymentMethods.map((m) =>
+        '<button type="button" class="pay-btn ' + (m === paymentMethod ? 'selected' : '') + '" data-pay="' + esc(m) + '">' + esc(PAY_LABELS[m] || m) + '</button>'
+      ).join("");
+      if (payGrid.dataset.html !== payHtml) {
+        payGrid.dataset.html = payHtml;
+        payGrid.innerHTML = payHtml;
+      }
       document.getElementById("cashInfoNote").style.display = paymentMethod === "cash" ? "block" : "none";
 
-      const total = computeTotal();
-      document.getElementById("totalPriceDisplay").textContent = "CHF " + total.toFixed(2);
+      document.getElementById("totalPriceDisplay").textContent = "CHF " + computeTotal().toFixed(2);
     }
 
     document.getElementById("btnDecPortion").addEventListener("click", () => {
       if (portionCount > 1) { portionCount--; renderUI(); }
     });
     document.getElementById("btnIncPortion").addEventListener("click", () => {
-      if (portionCount < 10) { portionCount++; renderUI(); }
+      if (portionCount < MENU.maxPortions) { portionCount++; renderUI(); }
     });
     document.getElementById("modeExpressBtn").addEventListener("click", () => { builderMode = "express"; renderUI(); });
     document.getElementById("modeCustomBtn").addEventListener("click", () => { builderMode = "custom"; renderUI(); });
@@ -770,14 +827,16 @@ export function renderOrderPageHtml(): string {
       });
     });
 
-    document.querySelectorAll("#paymentGrid .pay-btn").forEach((b) => {
-      b.addEventListener("click", () => {
-        paymentMethod = b.getAttribute("data-pay");
-        renderUI();
-      });
+    document.getElementById("paymentGrid").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-pay]");
+      if (!btn) return;
+      paymentMethod = btn.getAttribute("data-pay");
+      renderUI();
     });
 
     document.getElementById("submitOrderBtn").addEventListener("click", async () => {
+      if (submitting) return;
+      const submitBtn = document.getElementById("submitOrderBtn");
       const errEl = document.getElementById("orderErrorMsg");
       errEl.textContent = "";
       const selectedSpice = customSpiceEnabled
@@ -802,12 +861,15 @@ export function renderOrderPageHtml(): string {
 
       const preferredPlz = document.getElementById("prefPlzSelect").value || undefined;
 
+      submitting = true;
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = "0.6";
       try {
         const res = await fetch("/api/orders", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Idempotency-Key": "ord_" + Date.now() + "_" + Math.random().toString(36).slice(2)
+            "Idempotency-Key": draftKey
           },
           body: JSON.stringify({
             portions: portionsPayload,
@@ -818,64 +880,89 @@ export function renderOrderPageHtml(): string {
         });
         const json = await res.json();
         if (!json.success) {
-          errEl.textContent = json.error?.message || "Bestellung konnte nicht gesendet werden.";
+          errEl.textContent = (json.error && json.error.message) || "Bestellung konnte nicht gesendet werden.";
           return;
         }
+        draftKey = newDraftKey();
         showLiveTicket(json.data.order);
       } catch (e) {
-        errEl.textContent = "Netzwerkfehler – bitte kurz an der Foodtruck-Kasse melden.";
+        errEl.textContent = "Keine Verbindung. Tippe nochmals auf Bestellen: Es wird nichts doppelt gebucht.";
+      } finally {
+        submitting = false;
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "";
       }
     });
 
+    function stopPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = null;
+    }
+
+    async function pollTicket() {
+      if (!activeOrderId) return;
+      try {
+        const r = await fetch("/api/orders/" + encodeURIComponent(activeOrderId));
+        const j = await r.json();
+        document.getElementById("ticketConnection").textContent = "";
+        if (j.success && j.data.order) {
+          renderTicketState(j.data.order);
+        }
+      } catch {
+        document.getElementById("ticketConnection").textContent = "Keine Verbindung. Dein Code bleibt gültig.";
+      }
+    }
+
     function showLiveTicket(order) {
       activeOrderId = order.id;
+      // The ticket lives in the URL and in localStorage: a reload or a locked phone does not lose it.
+      storeSet(order.id);
+      try { history.replaceState(null, "", "/order/" + encodeURIComponent(order.id)); } catch {}
       document.getElementById("orderBuilderView").style.display = "none";
       document.getElementById("liveTicketView").style.display = "block";
+      window.scrollTo(0, 0);
+      stopPolling();
+      pollTimer = setInterval(pollTicket, 2000);
       renderTicketState(order);
+    }
 
-      if (pollTimer) clearInterval(pollTimer);
-      pollTimer = setInterval(async () => {
-        if (!activeOrderId) return;
-        try {
-          const r = await fetch("/api/orders/" + activeOrderId);
-          const j = await r.json();
-          if (j.success && j.data.order) {
-            renderTicketState(j.data.order);
-          }
-        } catch {}
-      }, 1500);
+    function setBanner(kind, html) {
+      const el = document.getElementById("ticketAlertBanner");
+      if (!kind) { el.style.display = "none"; return; }
+      const styles = {
+        gold: ["rgba(255, 213, 79, 0.16)", "1.5px solid var(--gold)", "var(--gold)"],
+        red: ["rgba(229, 57, 53, 0.2)", "1.5px solid var(--chili)", "#FFCDD2"],
+        green: ["rgba(82, 196, 90, 0.25)", "2px solid var(--green-neon)", "#F5F7F5"]
+      }[kind];
+      el.style.display = "block";
+      el.style.background = styles[0];
+      el.style.border = styles[1];
+      el.style.color = styles[2];
+      el.innerHTML = html;
     }
 
     function renderTicketState(order) {
+      const code = esc(order.zueriCode.formatted);
       document.getElementById("ticketPlz").textContent = order.zueriCode.plz;
       document.getElementById("ticketQuarter").textContent = order.zueriCode.quarter;
       document.getElementById("ticketMeta").textContent =
-        order.totalPortions + " Portion(en) · Total CHF " + order.totalChf.toFixed(2) + " · " + order.paymentMethod.toUpperCase();
+        order.totalPortions + " Portion(en) · Total CHF " + chf(order.totalChf) + " · " +
+        (order.paymentMethod === "cash" ? "BAR" : String(order.paymentMethod).toUpperCase());
 
-      const alertBanner = document.getElementById("ticketAlertBanner");
-      const cardBox = document.getElementById("ticketCardBox");
-      cardBox.classList.toggle("is-ready", order.status === "ready");
+      document.getElementById("ticketCardBox").classList.toggle("is-ready", order.status === "ready");
 
       if (order.status === "pending_cash") {
-        alertBanner.style.display = "block";
-        alertBanner.style.background = "rgba(255, 213, 79, 0.16)";
-        alertBanner.style.border = "1.5px solid var(--gold)";
-        alertBanner.style.color = "var(--gold)";
-        alertBanner.innerHTML = "💵 <strong>Wartet auf Barzahlung (Pending):</strong> Bitte nenne an der Foodtruck-Kasse deinen Code <strong>" + order.zueriCode.formatted + "</strong> und bezahle <strong>CHF " + order.totalChf.toFixed(2) + "</strong>.";
+        setBanner("gold", "💵 <strong>Jetzt an der Kasse bezahlen:</strong> Nenne deinen Code <strong>" + code + "</strong> und zahle <strong>CHF " + chf(order.totalChf) + "</strong>. Erst dann geht deine Bestellung in den Wok.");
       } else if (order.status === "payment_error_fallback") {
-        alertBanner.style.display = "block";
-        alertBanner.style.background = "rgba(229, 57, 53, 0.2)";
-        alertBanner.style.border = "1.5px solid var(--chili)";
-        alertBanner.style.color = "#FFCDD2";
-        alertBanner.innerHTML = "⚠️ <strong>Manuelle Kassen-Freigabe:</strong> Dein Code <strong>" + order.zueriCode.formatted + "</strong> ist reserviert! Bitte kurz an der Kasse bestätigen.";
+        setBanner("red", "⚠️ <strong>Zahlung nicht bestätigt.</strong> Dein Code <strong>" + code + "</strong> ist reserviert. Bitte kurz an der Kasse melden.");
       } else if (order.status === "ready") {
-        alertBanner.style.display = "block";
-        alertBanner.style.background = "rgba(82, 196, 90, 0.25)";
-        alertBanner.style.border = "2px solid var(--green-neon)";
-        alertBanner.style.color = "#F5F7F5";
-        alertBanner.innerHTML = "🔔 <strong>DEIN PAD KRAPAO IST ABHOLBEREIT!</strong> Komm jetzt mit deinem Code <strong>" + order.zueriCode.formatted + "</strong> zur Ausgabe!";
+        setBanner("green", "🔔 <strong>DEIN PAD KRAPAO IST ABHOLBEREIT!</strong> Komm jetzt mit deinem Code <strong>" + code + "</strong> zur Ausgabe!");
+      } else if (order.status === "completed") {
+        setBanner("green", "✓ <strong>Abgeholt.</strong> En Guete!");
+      } else if (order.status === "cancelled") {
+        setBanner("red", "<strong>Diese Bestellung wurde storniert.</strong> Fragen? Melde dich an der Kasse.");
       } else {
-        alertBanner.style.display = "none";
+        setBanner(null);
       }
 
       const stepCash = document.getElementById("stepCash");
@@ -900,21 +987,53 @@ export function renderOrderPageHtml(): string {
       }
 
       const itemsHtml = order.portions.map((p) =>
-        \`<div>• Box #\${p.portionIndex}: <strong>\${NAMES[p.variant]}</strong> \${p.addKaiDao ? "(+ Kai Dao Spiegelei 🍳)" : ""} · <em>\${p.spiceLevel.replace(/_/g, " ")}</em></div>\`
-      ).join("") + (order.drinks.length ? "<div style='margin-top:0.4rem;color:var(--gold);'>Drinks: " + order.drinks.map((d) => d.quantity + "x " + d.drinkId.replace(/_/g, " ")).join(", ") + "</div>" : "");
+        '<div>• Box #' + esc(p.portionIndex) + ': <strong>' + esc(NAMES[p.variant] || p.variant) + '</strong> ' +
+        (p.addKaiDao ? "(+ Kai Dao Spiegelei 🍳)" : "") + ' · <em>' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + '</em></div>'
+      ).join("") + (order.drinks.length
+        ? "<div style='margin-top:0.4rem;color:var(--gold);'>Drinks: " + order.drinks.map((d) => esc(d.quantity) + "x " + esc(DRINK_NAMES[d.drinkId] || d.drinkId)).join(", ") + "</div>"
+        : "");
 
       document.getElementById("ticketItemsList").innerHTML = itemsHtml;
+
+      // Finished orders need no more polling.
+      if (order.status === "completed" || order.status === "cancelled") {
+        stopPolling();
+        storeClear();
+      }
     }
 
-    document.getElementById("newOrderBtn").addEventListener("click", () => {
+    function showBuilder() {
       activeOrderId = null;
-      if (pollTimer) clearInterval(pollTimer);
+      stopPolling();
+      storeClear();
+      try { history.replaceState(null, "", "/order"); } catch {}
       document.getElementById("liveTicketView").style.display = "none";
       document.getElementById("orderBuilderView").style.display = "block";
-    });
+    }
+
+    document.getElementById("newOrderBtn").addEventListener("click", showBuilder);
+
+    // Restore a ticket from /order/<id> or from the last order on this phone.
+    async function restoreTicket() {
+      const match = window.location.pathname.match(/^\\/order\\/([A-Za-z0-9_-]+)$/);
+      const id = match ? match[1] : storeGet();
+      if (!id) return;
+      try {
+        const r = await fetch("/api/orders/" + encodeURIComponent(id));
+        const j = await r.json();
+        if (j.success && j.data.order) {
+          const finished = j.data.order.status === "completed" || j.data.order.status === "cancelled";
+          if (finished && !match) { storeClear(); return; }
+          showLiveTicket(j.data.order);
+          return;
+        }
+        if (r.status === 404) showBuilder();
+      } catch {}
+    }
 
     loadFeatureFlags();
     renderUI();
+    restoreTicket();
   </script>
 </body>
 </html>`;

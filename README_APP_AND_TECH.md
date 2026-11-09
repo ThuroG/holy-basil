@@ -50,11 +50,11 @@ Damit es während der Stosszeiten am Foodtruck **niemals zwei aktive Bestellunge
 
 ## 3. User Flow in der Bestell-App (3-Step Express Checkout)
 
-Das UI folgt strikt dem Design aus [`README_DESIGN.md`](file:///c:/Users/arthu/OneDrive/Dokumente/Holy%20Basil/README_DESIGN.md) (Schwarz `#0A0A0A`, zweistufiges Blattgrün `#1B4D2E` / `#52C45A`, Graffiti-Headlines, fette Konturen).
+Das UI folgt strikt dem Design aus [`README_DESIGN.md`](README_DESIGN.md) (Schwarz `#0A0A0A`, zweistufiges Blattgrün `#1B4D2E` / `#52C45A`, Graffiti-Headlines, fette Konturen).
 
 ```mermaid
 flowchart TD
-    A["1. QR-Code Scan / App öffnen"] --> B["2. Variante wählen (1 Tap)<br/>• Holy Vegan (CHF 12)<br/>• Holy Chicken (CHF 14–15)<br/>• Holy Pork/Mix (CHF 14–15)"]
+    A["1. QR-Code Scan / App öffnen"] --> B["2. Variante wählen (1 Tap)<br/>• Holy Vegan (CHF 12)<br/>• Holy Chicken (CHF 15)<br/>• Holy Pork/Mix (CHF 15)"]
     B --> C["3. Quick-Upgrades (1 Tap)<br/>• + Kai Dao (Knuspriges Spiegelei, +CHF 2–3)<br/>• + Drink-Kombi (Thai Iced Tea / Local Drink)"]
     C --> D["4. One-Tap Payment<br/>(TWINT / Apple Pay / Google Pay)"]
     D --> E["5. Live Züri-Code Ticket<br/>z.B. '8004 – LANGSTRASSE'<br/>Status: Im Wok 🔥 -> Abholbereit 🔔"]
@@ -63,8 +63,8 @@ flowchart TD
 ### Schritt 1: Hauptgericht wählen (Monoprodukt – 3 Cards)
 Auf dem Startscreen gibt es kein langes Scrollen, sondern direkt die **3 Hero-Cards** mit dem gut sichtbaren Badge **„100% Vegane Saucen- & Pastenbasis"**:
 - **Card 1: HOLY VEGAN** – `CHF 12.00` *(100% Plant-Based)*
-- **Card 2: HOLY CHICKEN** – `CHF 14.00 / 15.00`
-- **Card 3: HOLY PORK / MIX** – `CHF 14.00 / 15.00` *(Schwein oder Schwein-Rind gemischt)*
+- **Card 2: HOLY CHICKEN** – `CHF 15.00`
+- **Card 3: HOLY PORK / MIX** – `CHF 15.00` *(Schwein oder Schwein-Rind gemischt)*
 
 ### Schritt 2: Das „No-Friction" Upgrade-Drawer (Bottom Sheet)
 Sobald eine Variante angetippt wird, öffnet sich ein kurzes Bottom-Sheet mit maximal zwei schnellen Entscheidungen (um den Bestellprozess extrem schnell zu halten und den Durchschnittsbon zu steigern):
@@ -77,7 +77,7 @@ Sobald eine Variante angetippt wird, öffnet sich ein kurzes Bottom-Sheet mit ma
 ### Schritt 3: Checkout & Live-Status-Screen (Das digitale Abhol-Ticket)
 Nach der Zahlung verwandelt sich der Handy-Bildschirm in ein plakativen **Graffiti-Boarding-Pass**:
 - Zeigt riesig den zugewiesenen Code: **`8004 – LANGSTRASSE`**
-- Zeigt den Live-Status in Echtzeit (via WebSockets / Server-Sent Events):
+- Zeigt den Live-Status (aktuell per Polling alle 2 Sekunden; WebSockets / Server-Sent Events sind eine spätere Ausbaustufe):
   1. `BESTELLUNG EINGEGANGEN` (In der Warteschlange)
   2. `IM WOK 🔥` (Wird gerade frisch gebraten)
   3. `READY TO PICK UP 🔔` (Bildschirm pulsiert in leuchtendem Blattgrün `#52C45A` + Push-/Vibrations-Alert)
@@ -146,8 +146,9 @@ Für **Phase 2 (Weihnachtsessen, Teamevents, Firmen-Lunches)** kann die App in e
 
 ## 8. Non-Functional Requirements (NFRs) & Qualitätsstandards
 
-- **99.99 % Zahlungszuverlässigkeit (Zero-Loss Payment):** Idempotency-Keys verhindern Doppelbelastungen. Bei Timeouts (> 800 ms) oder Gateway-Fehlern greift automatisch der Status `payment_error_fallback`, der den Züri-Code schützt und die Kasse zur manuellen Bestätigung alarmiert.
+- **Zahlung (Stand heute):** Nur Barzahlung an der Kasse. TWINT/Karte sind eine Simulation hinter `DEMO_PAYMENTS=1`, ein Zahlungsanbieter ist noch nicht angebunden. Ziel für die echte Anbindung: Idempotency-Keys gegen Doppelbelastungen; bei Timeouts (> 800 ms) oder Gateway-Fehlern greift der Status `payment_error_fallback`, der den Züri-Code schützt und die Kasse zur manuellen Klärung alarmiert.
+- **Zugriffsschutz:** `/admin` und alle Crew-Routen der API nur mit Crew-PIN (`CREW_PIN`). Gäste sehen nur die eigene Bestellung, das Board nur Code und Status.
 - **Latenz-Threshold < 1.000 ms:** Alle API-Endpunkte antworten im Sub-Sekunden-Bereich (Ø < 15 ms) und liefern Echtzeit-Metriken im `meta`-Block.
-- **99.5 % API-Verfügbarkeit & RFC-Response-Codes:** Deterministische JSON-Antworten mit HTTP-Statuscodes (`200`, `201`, `400`, `404`, `422`, `500`) und eindeutiger `correlationId`.
-- **> 80 % Testabdeckung:** Automatisierte Unit- und Integrationstests via Vitest (`npm run test:coverage`, aktuell **> 97 % Line & Statement Coverage**).
+- **99.5 % API-Verfügbarkeit & RFC-Response-Codes:** Deterministische JSON-Antworten mit HTTP-Statuscodes (`200`, `201`, `400`, `404`, `422`, `401`, `500`) und eindeutiger `correlationId`.
+- **> 80 % Testabdeckung:** Automatisierte Unit- und Integrationstests via Vitest (`npm run test:coverage`, aktuell **93.6 % Line & Statement Coverage** über den gesamten Server-Code).
 

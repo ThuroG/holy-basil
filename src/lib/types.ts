@@ -68,6 +68,27 @@ export interface Order {
   platedAt?: string;
   readyAt?: string;
   completedAt?: string;
+  cancelledAt?: string;
+}
+
+/** What a guest may see about an order: no internal notes, keys or correlation ids. */
+export interface PublicOrderView {
+  id: string;
+  zueriCode: ZueriCodeAssignment;
+  portions: OrderPortionItem[];
+  drinks: OrderDrinkItem[];
+  totalPortions: number;
+  totalChf: number;
+  paymentMethod: PaymentMethod;
+  status: OrderStatus;
+  createdAt: string;
+}
+
+/** What the public pickup board shows: code and phase only. */
+export interface BoardEntry {
+  plz: string;
+  quarter: string;
+  phase: 'preparing' | 'ready';
 }
 
 export interface CreateOrderInput {
@@ -176,7 +197,7 @@ export interface SlaMetrics {
   maxLatencyMs: number;
   subSecondComplianceRate: number; // Percentage of requests < 1000ms
   availabilityRate: number; // Target >= 99.5%
-  paymentReliabilityRate: number; // Target >= 99.99% (including atomic fallback preservation)
+  paymentReliabilityRate: number; // Share of digital payment attempts that succeeded (fallbacks count as failed)
   recentErrors: Array<{
     correlationId: string;
     code: string;
