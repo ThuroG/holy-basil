@@ -62,6 +62,31 @@ export const ZUERI_CODE_POOL: readonly ZueriCodeEntry[] = [
   { plz: '8902', quarter: 'URDORF' },
   { plz: '8952', quarter: 'SCHLIEREN' },
   { plz: '8953', quarter: 'DIETIKON', slang: 'LIMMATTAL' },
+  { plz: '8102', quarter: 'OBERENGSTRINGEN' },
+  { plz: '8103', quarter: 'UNTERENGSTRINGEN' },
+  { plz: '8104', quarter: 'WEININGEN' },
+  { plz: '8107', quarter: 'BUCHS' },
+  { plz: '8117', quarter: 'FÄLLANDEN' },
+  { plz: '8124', quarter: 'MAUR' },
+  { plz: '8126', quarter: 'ZUMIKON' },
+  { plz: '8127', quarter: 'FORCH' },
+  { plz: '8132', quarter: 'EGG' },
+  { plz: '8135', quarter: 'LANGNAU' },
+  { plz: '8142', quarter: 'UITIKON' },
+  { plz: '8143', quarter: 'STALLIKON' },
+  { plz: '8154', quarter: 'OBERGLATT' },
+  { plz: '8155', quarter: 'NIEDERHASLI' },
+  { plz: '8157', quarter: 'DIELSDORF' },
+  { plz: '8303', quarter: 'BASSERSDORF' },
+  { plz: '8306', quarter: 'BRÜTTISELLEN' },
+  { plz: '8320', quarter: 'FEHRALTORF' },
+  { plz: '8330', quarter: 'PFÄFFIKON' },
+  { plz: '8340', quarter: 'HINWIL' },
+  { plz: '8603', quarter: 'SCHWERZENBACH' },
+  { plz: '8606', quarter: 'GREIFENSEE' },
+  { plz: '8630', quarter: 'RÜTI' },
+  { plz: '8704', quarter: 'HERRLIBERG' },
+  { plz: '8708', quarter: 'MÄNNEDORF' },
 ] as const;
 
 const activeAllocations = new Set<string>();
@@ -130,7 +155,7 @@ export function allocateZueriCode(
     return formatZueriCode(chosen);
   }
 
-  // Pool exhaustion safety fallback (more than 55 simultaneously active orders)
+  // Pool exhaustion safety fallback (more active orders than codes in the pool)
   const base = ZUERI_CODE_POOL[fallbackCounter % ZUERI_CODE_POOL.length];
   const suffixPlz = `${base.plz}-${fallbackCounter}`;
   fallbackCounter += 1;
@@ -152,6 +177,17 @@ export function releaseZueriCode(plz: string, cooldownMs = 0, now: number = Date
     cooldownUntil.set(plz, now + cooldownMs);
   }
   return wasActive;
+}
+
+/**
+ * Takes a released code back for the same order (undo of a handover).
+ * Fails when another order already holds the code.
+ */
+export function reclaimZueriCode(plz: string): boolean {
+  if (activeAllocations.has(plz)) return false;
+  cooldownUntil.delete(plz);
+  activeAllocations.add(plz);
+  return true;
 }
 
 /** Marks a code as active again, e.g. when orders are restored from disk after a restart. */

@@ -12,11 +12,17 @@ export interface FeatureFlags {
   latencyThresholdMs: number;
   paymentTimeoutMs: number;
   /**
-   * Demo payments: TWINT / card are SIMULATED (no real money moves).
+   * Demo payments: TWINT / card run against the built-in TEST provider (no real money moves).
    * Off by default -> only cash at the truck is accepted.
    * Enable for demos with the env variable DEMO_PAYMENTS=1.
    */
   demoPayments: boolean;
+  /** Portions one wok batch holds. Drives the batch button and the wait estimate. */
+  wokBatchSize: number;
+  /** Minutes one wok batch takes. */
+  wokBatchMinutes: number;
+  /** Crew switch: guests cannot place new orders while this is on. */
+  ordersPaused: boolean;
 }
 
 function demoPaymentsFromEnv(): boolean {
@@ -30,6 +36,9 @@ const currentFeatures: FeatureFlags = {
   latencyThresholdMs: 1000,
   paymentTimeoutMs: 800,
   demoPayments: demoPaymentsFromEnv(),
+  wokBatchSize: 4,
+  wokBatchMinutes: 2.5,
+  ordersPaused: false,
 };
 
 export function getFeatureFlags(): FeatureFlags {
@@ -43,6 +52,11 @@ export function setCustomSpiceLevelsEnabled(enabled: boolean): FeatureFlags {
 
 export function setDemoPaymentsEnabled(enabled: boolean): FeatureFlags {
   currentFeatures.demoPayments = Boolean(enabled);
+  return getFeatureFlags();
+}
+
+export function setOrdersPaused(paused: boolean): FeatureFlags {
+  currentFeatures.ordersPaused = Boolean(paused);
   return getFeatureFlags();
 }
 
@@ -62,6 +76,9 @@ export function resetFeatureFlags(): FeatureFlags {
   currentFeatures.latencyThresholdMs = 1000;
   currentFeatures.paymentTimeoutMs = 800;
   currentFeatures.demoPayments = demoPaymentsFromEnv();
+  currentFeatures.wokBatchSize = 4;
+  currentFeatures.wokBatchMinutes = 2.5;
+  currentFeatures.ordersPaused = false;
   return getFeatureFlags();
 }
 
@@ -164,14 +181,3 @@ export const SPICE_LABELS: Record<SpiceLevel, { name: string; badge: string; des
     description: 'Kompromisslose Nachtmarkt-Schärfe für echte Chili-Heads.',
   },
 };
-
-export interface ComplianceConfig {
-  version: string; reviewedAt: string; reviewedBy: string;
-  components: Record<ComponentId, { label: string; allergens: Partial<Record<AllergenId, 'contains'|'may_contain'>>; verified: boolean; note?: string }>;
-  items: Record<ComplianceItemId, { label: string; components: ComponentId[]; meat: MeatSpecies[]; isVegan: boolean }>;
-  kitchenCrossContact: AllergenId[];
-  origin: { default: Partial<Record<MeatSpecies, MeatOrigin>>; byStop: Record<string, StopOriginOverride> };
-  eggs: { origin: CountryCode; husbandry: 'freiland'|'boden'|'kaefig'|'unknown' };
-  texts: { originLine: string; allergenShort: string; crossContact: string; /* … */ };
-  ui: { originAbovePayButton: true; blockOnMissingOrigin: true; allergenModal: 'one-tap'; recipeBinderOnTruck: true };
-}

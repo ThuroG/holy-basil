@@ -6,9 +6,7 @@
 <title>HOLY BASIL ZÜRICH · Pad Krapao Streetfood & Foodtruck</title>
 <meta name="description" content="Authentisches Thai Pad Krapao in Zürich. Ein Gericht, 100% vegane Saucenbasis, heisser Wok, faire CHF 12 bis 15. Vorbestellen mit deinem Züri-Code.">
 <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/fonts/fonts.css">
 <link rel="stylesheet" href="scrollcraft.css">
 <style>
   :root {
@@ -957,6 +955,7 @@
               </select>
 
               <button type="submit" class="hb-cta" style="width: 100%; margin-top: 1rem;">Standort-Alert aktivieren</button>
+              <p style="font-size: 0.74rem; opacity: 0.8; margin: 0.5rem 0 0 0;">Du erhältst zuerst eine E-Mail mit Bestätigungslink. Erst danach bist du angemeldet. Abmelden jederzeit über den Link in jeder E-Mail. Details: <a href="/datenschutz" style="color: inherit;">Datenschutz</a>.</p>
               <div id="nlStatus" class="hb-status-msg" role="status"></div>
             </form>
           </div>
@@ -1013,7 +1012,9 @@
       <div>© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO STREETFOOD · 100% VEGAN SAUCE BASE</div>
       <div>
         <a href="/order">Bestell-App</a> ·
-        <a href="/board">Pickup Board</a>
+        <a href="/board">Pickup Board</a> ·
+        <a href="/impressum">Impressum</a> ·
+        <a href="/datenschutz">Datenschutz</a>
       </div>
     </footer>
   </section>
@@ -1159,7 +1160,7 @@
         });
         const json = await res.json();
         if (json.success) {
-          nlStatus.textContent = "✓ Eingetragen für " + plzEl.value + " · " + quarter + "!";
+          nlStatus.textContent = "Fast geschafft: Bitte bestätige den Link in der E-Mail, die wir dir gerade geschickt haben.";
           emailEl.value = "";
         } else {
           nlStatus.textContent = "Fehler: " + (json.error?.message || "Bitte E-Mail prüfen");

@@ -41,8 +41,8 @@ Jeder Code besteht aus zwei Teilen:
 
 ### Vergabe-Logik (Pool & Kollisionsschutz)
 Damit es während der Stosszeiten am Foodtruck **niemals zwei aktive Bestellungen mit demselben Code** gibt:
-1. **Aktiver Pool:** Das System verwaltet einen Pool von ca. **60–80 bekannten Zürcher Postleitzahlen + Ortsnamen**.
-2. **Sperre während aktiver Bestellung:** Solange eine Bestellung den Status `RECEIVED`, `IN_WOK` oder `READY_FOR_PICKUP` hat, ist dieser PLZ-Code für andere neue Bestellungen gesperrt.
+1. **Aktiver Pool:** Das System verwaltet einen Pool von **80 Zürcher Postleitzahlen + Ortsnamen** (`src/lib/zueriCodes.ts`).
+2. **Sperre während aktiver Bestellung:** Von der Bestellung bis zur Übergabe (alle Status ausser `completed` und `cancelled`) ist der PLZ-Code für andere Bestellungen gesperrt. Unbezahlte Bestellungen verfallen nach 20 Minuten und geben ihren Code frei.
 3. **Freigabe (Cooldown):** Erst 5 Minuten nachdem die Bestellung als `PICKED_UP` markiert wurde, wandert die PLZ zurück in den freien Pool.
 4. **Wunsch-PLZ für Stammkunden (Loyalty-Feature):** Eingeloggte Nutzer können ihre „Homebase-PLZ" hinterlegen. Ist diese im Moment frei, bekommt der Gast automatisch seinen eigenen Heimat-Code zugewiesen!
 
@@ -60,14 +60,20 @@ flowchart TD
     D --> E["5. Live Züri-Code Ticket<br/>z.B. '8004 – LANGSTRASSE'<br/>Status: Im Wok 🔥 -> Abholbereit 🔔"]
 ```
 
+> **Umsetzung (Stand heute):** `/order` ist **ein Screen**. Ziel: Erstkunden bestellen in unter 15 Sekunden mit zwei Taps (Card antippen, Bestellen antippen).
+> - **Keine Vorauswahl.** Der Tap auf die Card ist eine bewusste Entscheidung. Ausnahme: ein Link wie `/order?variant=vegan` von der Landingpage.
+> - **Fixe Checkout-Leiste am unteren Rand:** Deklaration (Herkunft, Allergene, Kreuzkontakt) und Bestellbutton stehen immer zusammen auf dem Bildschirm. Der Button ist gesperrt, bis eine Variante gewählt ist.
+> - **Alles Weitere ist optional und im Fluss:** Kai Dao (1 Tap), Portionen (Stepper), Drinks und Wunsch-Code (aufklappbar). Kein Popup, kein Bottom-Sheet.
+> - **Wartezeit** steht vor dem Bestellen oben auf der Seite. Hat die Crew die Annahme pausiert, ist der Button gesperrt.
+
 ### Schritt 1: Hauptgericht wählen (Monoprodukt – 3 Cards)
-Auf dem Startscreen gibt es kein langes Scrollen, sondern direkt die **3 Hero-Cards** mit dem gut sichtbaren Badge **„100% Vegane Saucen- & Pastenbasis"**:
+Auf dem Startscreen gibt es kein langes Scrollen, sondern direkt die **3 Hero-Cards** mit dem gut sichtbaren Badge **„100 % vegane Saucen- & Pastenbasis"**. Jede Fleisch-Card zeigt ihre Herkunftszeile:
 - **Card 1: HOLY VEGAN** – `CHF 12.00` *(100% Plant-Based)*
 - **Card 2: HOLY CHICKEN** – `CHF 15.00`
 - **Card 3: HOLY PORK / MIX** – `CHF 15.00` *(Schwein oder Schwein-Rind gemischt)*
 
-### Schritt 2: Das „No-Friction" Upgrade-Drawer (Bottom Sheet)
-Sobald eine Variante angetippt wird, öffnet sich ein kurzes Bottom-Sheet mit maximal zwei schnellen Entscheidungen (um den Bestellprozess extrem schnell zu halten und den Durchschnittsbon zu steigern):
+### Schritt 2: Upgrades direkt im Screen (kein Bottom-Sheet)
+Die Upgrades stehen direkt unter den Cards, mit maximal zwei schnellen Entscheidungen (um den Bestellprozess extrem schnell zu halten und den Durchschnittsbon zu steigern):
 1. **Topping-Upgrade:**  
    - `[ ] + Kai Dao (Knuspriges Thai-Spiegelei) (+ CHF 2.50)` *(Bei „Holy Vegan" dezent mit Hinweis „Vegetarisches Extra" versehen)*
 2. **Drink-Kombi (Durstlöscher zum Special-Preis):**  
@@ -77,7 +83,7 @@ Sobald eine Variante angetippt wird, öffnet sich ein kurzes Bottom-Sheet mit ma
 ### Schritt 3: Checkout & Live-Status-Screen (Das digitale Abhol-Ticket)
 Nach der Zahlung verwandelt sich der Handy-Bildschirm in ein plakativen **Graffiti-Boarding-Pass**:
 - Zeigt riesig den zugewiesenen Code: **`8004 – LANGSTRASSE`**
-- Zeigt den Live-Status (aktuell per Polling alle 2 Sekunden; WebSockets / Server-Sent Events sind eine spätere Ausbaustufe):
+- Zeigt den Live-Status (per Polling alle 3 Sekunden, pausiert bei gesperrtem Handy; WebSockets / Server-Sent Events sind eine spätere Ausbaustufe), die aktuelle Wartezeit und die Deklaration der Bestellung:
   1. `BESTELLUNG EINGEGANGEN` (In der Warteschlange)
   2. `IM WOK 🔥` (Wird gerade frisch gebraten)
   3. `READY TO PICK UP 🔔` (Bildschirm pulsiert in leuchtendem Blattgrün `#52C45A` + Push-/Vibrations-Alert)
@@ -129,37 +135,58 @@ Für **Phase 2 (Weihnachtsessen, Teamevents, Firmen-Lunches)** kann die App in e
 - Wählt ein Kunde **Barzahlung am Truck**, erhält die Bestellung sofort einen reservierten Züri-Code im Status `pending_cash`.
 - Erst wenn der Kunde an der Foodtruck-Kasse bezahlt und der Kassierer auf `[CHF verbucht · In den Wok freigeben]` tippt, wechselt die Bestellung auf `received` (`paid`) und fliesst in den Wok-Bedarf des Kochs ein.
 
+### D. Digitale Zahlung (`PENDING_PAYMENT`, Details in Kapitel 10)
+- Bei TWINT/Karte wartet die Bestellung in `pending_payment`, bis der **signierte Webhook** des Zahlungsanbieters die Zahlung bestätigt. Erst dann wird sie `received`.
+- Kann die Zahlung nicht gestartet werden oder schlägt sie fehl, greift `payment_error_fallback`: Der Züri-Code bleibt reserviert, die Kasse klärt manuell.
+
 ---
 
 ## 7. Der 4-Stationen Foodtruck-Workflow & Wok Demand Management (`/admin`)
 
 1. **Station 1 – Kasse (Cashier):**
-   - Bestätigt Barzahlungen (`pending_cash`) sowie manuelle Klärungsfälle (`payment_error_fallback`) mit 1 Tap.
-2. **Station 2 – Wok Cockpit (Zero-Click Demand Management für den Koch):**
+   - Bestätigt Barzahlungen (`pending_cash`), offene Online-Zahlungen (`pending_payment`) sowie manuelle Klärungsfälle (`payment_error_fallback`) mit 1 Tap.
+   - **Code-Suche:** Ziffernfeld filtert die Liste nach PLZ (Gast sagt «8004», Kasse tippt `80…`).
+   - **Rückerstattungen:** Erscheinen als rote Tickets, bis die Kasse sie abhakt (siehe Kapitel 10).
+2. **Station 2 – Wok Cockpit (Demand Management für den Koch):**
    - Der Koch muss **nichts abtippen**. Das Display summiert alle bezahlten, noch nicht geschöpften Portionen automatisch in Echtzeit nach Sorte (`HOLY CHICKEN`, `HOLY VEGAN`, `PORK / MIX`) sowie die Gesamtanzahl an `KAI DAO` Spiegeleiern.
+   - **Wok-Batches (1 Tap pro Wok-Ladung):** Pro Sorte zeigt das Cockpit «noch zu braten» und «im Wok». `[Batch starten (4)]` nimmt die ältesten wartenden Portionen dieser Sorte (höchstens eine Wok-Ladung, `wokBatchSize`) und markiert sie als gestartet. Die Sorte mit der am längsten wartenden Portion trägt die Marke **«Als Nächstes»**.
+   - Der Tap ist freiwillig: Ohne ihn funktioniert der Ablauf wie bisher, nur sieht der Schöpfer dann nicht, was schon gebraten wird.
 3. **Station 3 – Schöpfer (Assembly / Plating):**
    - Sieht die exakte Box-Zusammenstellung pro Züri-Code, richtet Duftreis, Krapao und Spiegelei an und schaltet mit 1 Tap weiter an die Qualitätskontrolle (`plating`).
+   - Jede Box zeigt «im Wok» oder «wartet». Bestellungen, deren Boxen alle gestartet sind, stehen grün umrandet zuoberst.
 4. **Station 4 – Qualitätskontrolle & Drinks (QC & Handout):**
    - Kontrolliert die Boxen, stellt die bestellten Getränke (`Thai Iced Tea`, `Kokoswasser`) bereit und ruft den Züri-Code mit 1 Tap auf (`ready`), wodurch das Kunden-Smartphone und das Public Pickup Board (`/board`) aufleuchten.
+   - Aufgerufene Bestellungen, die nach 5 Minuten nicht abgeholt sind, werden rot als «Nicht abgeholt» markiert.
+
+### Stosszeiten (z. B. 40 Bestellungen in 15 Minuten)
+
+- **Ticket-Alter:** Jedes Ticket zeigt, wie lange es an seiner Station wartet (gelb ab 5, rot ab 10 Minuten). Die Zeit kommt vom Server, nicht von der Tablet-Uhr.
+- **Taps gehen nie verloren:** Jedes Ticket sperrt nur sich selbst, solange seine Aktion läuft. Andere Tickets bleiben bedienbar.
+- **Rückgängig:** Nach «geschöpft», «aufgerufen» und «übergeben» erscheint 8 Sekunden lang ein Rückgängig-Knopf (serverseitig bis 60 Sekunden möglich). Stornieren verlangt eine Bestätigung.
+- **Annahme pausieren:** Ein Schalter im Cockpit stoppt neue Gast-Bestellungen (`ordersPaused`). `/order` und `/board` zeigen das an. Die Crew kann weiter Bestellungen erfassen.
+- **Wartezeit:** `offene Portionen / wokBatchSize × wokBatchMinutes`, mindestens 3 Minuten. Sichtbar in `/order` vor dem Bestellen, auf dem Ticket, im Cockpit und auf dem Board.
+- **Board:** Zeigt so viele Codes, wie ohne Scrollen auf den Bildschirm passen, dazu «+ N weitere». Ein neu aufgerufener Code steht zuoberst, blinkt 20 Sekunden und löst einen Ton aus (einmal pro Bildschirm mit «Ton einschalten» aktivieren).
+- **Grenze der Software:** Die Annahme von 4 Portionen pro 2,5 Minuten ergibt rund 24 Portionen in 15 Minuten. 40 Bestellungen sind 60 bis 70 Portionen. Die App macht diese Lücke sichtbar (Wartezeit, Pausieren), schliessen lässt sie sich nur mit mehr Wok-Kapazität.
 
 ---
 
 ## 8. Non-Functional Requirements (NFRs) & Qualitätsstandards
 
-- **Zahlung (Stand heute):** Nur Barzahlung an der Kasse. TWINT/Karte sind eine Simulation hinter `DEMO_PAYMENTS=1`, ein Zahlungsanbieter ist noch nicht angebunden. Ziel für die echte Anbindung: Idempotency-Keys gegen Doppelbelastungen; bei Timeouts (> 800 ms) oder Gateway-Fehlern greift der Status `payment_error_fallback`, der den Züri-Code schützt und die Kasse zur manuellen Klärung alarmiert.
+- **Zahlung (Stand heute):** Nur Barzahlung an der Kasse. TWINT/Karte laufen hinter `DEMO_PAYMENTS=1` über einen **Test-Provider** (es fliesst kein Geld), ein echter Zahlungsanbieter ist noch nicht angebunden. Die Architektur dafür steht (Kapitel 10): Provider-Schnittstelle, signierter Webhook, Idempotency-Keys, `payment_error_fallback` bei Timeouts (> 800 ms) oder Fehlern.
+- **Schutz vor Überlastung:** Gäste sind pro Adresse begrenzt (Bestellungen: 30 in 5 Minuten, Formulare: 5 in 10 Minuten). Die Crew ist ausgenommen.
 - **Zugriffsschutz:** `/admin` und alle Crew-Routen der API nur mit Crew-PIN (`CREW_PIN`). Gäste sehen nur die eigene Bestellung, das Board nur Code und Status.
 - **Latenz-Threshold < 1.000 ms:** Alle API-Endpunkte antworten im Sub-Sekunden-Bereich (Ø < 15 ms) und liefern Echtzeit-Metriken im `meta`-Block.
 - **99.5 % API-Verfügbarkeit & RFC-Response-Codes:** Deterministische JSON-Antworten mit HTTP-Statuscodes (`200`, `201`, `400`, `404`, `422`, `401`, `500`) und eindeutiger `correlationId`.
-- **> 80 % Testabdeckung:** Automatisierte Unit- und Integrationstests via Vitest (`npm run test:coverage`, aktuell **93.6 % Line & Statement Coverage** über den gesamten Server-Code).
+- **> 80 % Testabdeckung:** Automatisierte Unit- und Integrationstests via Vitest (`npm run test:coverage`, aktuell **95.6 % Line & Statement Coverage** über den gesamten Server-Code).
 
 ---
 
 ## 9. Lebensmittelrecht & Deklaration (LGV / LIV, Kantonales Labor Zürich)
 
-> **Status:** verbindlich für `/order`, Truck-Aushang und Rezepturordner. Alle Texte und Daten leben zentral in `complianceConfig` (`src/config/features.ts`). Kein Compliance-Text darf im Frontend hartkodiert werden.
+> **Status:** verbindlich für `/order`, Truck-Aushang und Rezepturordner. Alle Texte und Daten leben zentral in `complianceConfig` (`src/config/compliance.ts`). Kein Compliance-Text darf im Frontend hartkodiert werden.
 > **Rechtsgrundlagen:** LGV (SR 817.02), LIV (SR 817.022.16) inkl. Anhang 6 (Allergene). Vor Go-Live Artikelverweise gegen die aktuelle Fassung prüfen und durch das Kantonale Labor Zürich gegenlesen lassen.
 
-**Leitprinzip:** Die Pflichtangaben sind *passiv, aber nicht überspringbar*. Es gibt keine Checkbox und keinen Extra-Tap. Der 20-Sekunden-Flow bleibt, weil alles bereits im Checkout-Screen steht.
+**Leitprinzip:** Die Pflichtangaben sind *passiv, aber nicht überspringbar*. Es gibt keine Checkbox, keinen Extra-Tap und **kein Popup**. Der schnelle Flow bleibt, weil alles bereits in der fixen Checkout-Leiste über dem Bestellbutton steht.
 
 ### 9.1 Schriftliche Fleischherkunft (vor Kaufabschluss)
 
@@ -183,7 +210,7 @@ Pflicht: Die Herkunft jeder Fleischart im Warenkorb steht **schriftlich und vor 
 | :-: | :--- | :--- | :--- |
 | 1 | **Hero-Card** (Schritt 1) | Kurzzeile unter dem Preis, z. B. `Poulet: Schweiz` | Empfohlen. Die Angabe steht so schon bei der Auswahl. |
 | 2 | **Upgrade-Drawer** (Schritt 2) | Bei Kai Dao: `Eier aus Freilandhaltung, Herkunft: Schweiz` | Empfohlen. |
-| 3 | **Checkout-Zusammenfassung**, **direkt über dem Zahlungsbutton**, ohne Aufklappen | Herkunftszeile(n) je Fleischart im Warenkorb, Allergen-Kurzhinweis, `Allergene`-Link (1-Tap-Modal), Eier-/Kreuzkontaminationshinweis | **Zwingend.** Zahlungsbutton nie ohne diesen Block rendern. |
+| 3 | **Checkout-Leiste**, **direkt über dem Zahlungsbutton**, ohne Aufklappen | Herkunftszeile(n) je Fleischart im Warenkorb, «Enthält» / «Kann Spuren enthalten» für genau diesen Warenkorb, Eier- und Kreuzkontaminationshinweis. Darunter der aufklappbare Block «Allergene & Zutaten» (inline, kein Modal). | **Zwingend.** Zahlungsbutton nie ohne diesen Block rendern. |
 | 4 | **Ticket** `/order/<id>` | Wiederholung der Herkunft und des Snapshots | Zwingend (Nachweis, Zweitzugriff). |
 
 Das gilt für alle Zahlungsarten, auch für «Bestellen & bar zahlen».
@@ -222,7 +249,7 @@ Das System berechnet diese Werte aus den Komponenten (`resolveAllergens`). Wer e
 
 > **Allergene:** Unsere Saucen und Gerichte können Soja, Gluten (Weizen), Ei und Sesam enthalten. Detaillierte Allergeninformationen finden Sie in der App unter «Allergene» sowie im Rezepturordner am Truck. Unsere Crew gibt gerne Auskunft.
 
-- **1-Tap-Modal «Allergene & Zutaten»:** Der Link steht im Checkout über dem Zahlungsbutton und jeweils auf den Hero-Cards. Das Modal zeigt pro Gericht die Zutaten und alle 14 Allergene mit Status «enthält» oder «kann Spuren enthalten», dazu Stand-Datum (`reviewedAt`).
+- **Aufklappbarer Block «Allergene & Zutaten» (1 Tap, kein Modal):** Er steht in der Checkout-Leiste direkt über dem Zahlungsbutton und öffnet sich an Ort und Stelle. Der Bestellbutton bleibt dabei sichtbar. Der Block zeigt pro Gericht die Zutaten und alle 14 Allergene mit Status «enthält» oder «kann Spuren enthalten», dazu Stand-Datum (`reviewedAt`) und Version.
 - **Rezepturordner am Truck (physisch):** Er enthält pro Rezeptur die Zutatenliste, die Spezifikationsblätter der Zukaufprodukte, die aktuelle Allergen-Matrix und die Lieferscheine der Fleischherkunft. Die Crew kennt den Ordnerstandort und liefert Auskünfte aus dem Ordner, nicht aus dem Gedächtnis.
 - **Änderungsprozess:** Neue Zutat oder neuer Lieferant → Config anpassen → `version` und `reviewedAt` erhöhen → Ordner aktualisieren. Wirksam, bevor das Produkt verkauft wird.
 
@@ -235,7 +262,8 @@ Das System berechnet diese Werte aus den Komponenten (`resolveAllergens`). Wer e
 
 ### 9.4 Konfiguration & Tests
 
-- Datenquelle: `complianceConfig` in `src/config/features.ts` (Schema siehe Code). Das Frontend rendert ausschliesslich über `buildCheckoutDeclaration()`.
+- Datenquelle: `complianceConfig` in `src/config/compliance.ts` (Schema siehe Code). Das Frontend rendert ausschliesslich über `buildCheckoutDeclaration()`: Der Server rechnet die Deklaration für jeden Warenkorb, den die Seite bauen kann, vorab aus. Der Browser schlägt die Zeilen nur nach und setzt keinen Deklarationstext selbst zusammen.
+- Der Server prüft beim Bestellen erneut (`ORIGIN_NOT_DECLARED`, HTTP 422) und speichert den Snapshot (`declaration`, `stopId`) an der Bestellung. Das Ticket zeigt ihn wieder an.
 - Pflicht-Tests (Vitest):
   1. Jedes Menü-Item hat Komponenten, und alle Komponenten existieren.
   2. Alle 14 Allergene haben ein Label.
@@ -244,3 +272,72 @@ Das System berechnet diese Werte aus den Komponenten (`resolveAllergens`). Wer e
   5. Kai Dao plus Käfig/unbekannt erzeugt den Käfig-Hinweis.
   6. Vegan plus Kai Dao zeigt den Vegetarisch-Hinweis.
   7. Release-Gate: Solange eine Komponente `verified: false` ist, schlägt der Produktions-Build/Start-Check mit einer Warnung an.
+
+Alle sieben Tests stehen in `tests/unit/compliance.test.ts`. Stand heute sind alle Komponenten `verified: false` (Soll-Stand ohne Lieferantenspezifikation): Der Server warnt bei jedem Start.
+
+---
+
+## 10. Go-Live-Bausteine: Zahlung, Newsletter, Rechtsseiten
+
+> **Status:** Architektur und Code stehen und sind getestet. Zahlung und E-Mail laufen gegen einen Test-Provider bzw. einen Mock. Die echten Anbieter und die Rechtstexte folgen.
+
+### 10.1 Zahlungsanbindung (`src/lib/paymentService.ts`)
+
+```mermaid
+sequenceDiagram
+    participant G as Gast (/order)
+    participant S as Server
+    participant P as Zahlungsanbieter
+    participant K as Kasse (/admin)
+    G->>S: POST /api/orders (twint | card, Idempotency-Key)
+    S->>P: createCheckout (Timeout 800 ms)
+    alt Checkout offen
+        S-->>G: 201 pending_payment + paymentUrl
+        G->>P: zahlt auf der Seite des Anbieters
+        P->>S: POST /api/webhooks/payment (signiert)
+        S->>S: Signatur, Betrag, Währung, Event-ID prüfen
+        S-->>K: received: in den Wok
+    else Timeout oder Fehler
+        S-->>G: 201 payment_error_fallback (Code reserviert)
+        S-->>K: Alarm: manuell klären
+    end
+```
+
+- **Schnittstelle `PaymentProvider`:** `createCheckout()` und `verifyWebhook()`. Heute gibt es nur den Test-Provider (aktiv mit `DEMO_PAYMENTS=1`, Zahlseite `/pay/test/<ref>`). Ein echter Anbieter (z. B. Stripe Checkout mit TWINT, Payrexx, Datatrans) implementiert dieselbe Schnittstelle und wird in `getPaymentProvider()` zurückgegeben.
+- **Nur der Webhook macht eine Bestellung bezahlt**, nie der Browser, der von der Zahlseite zurückkommt.
+- **Signatur über den Rohtext:** HMAC-SHA256 über `<Zeitstempel>.<Body>`, Header `x-hb-signature: t=…,v1=…`, Vergleich in konstanter Zeit, höchstens 5 Minuten alt. Geheimnis: `PAYMENT_WEBHOOK_SECRET`.
+- **Idempotenz:** Verarbeitete Event-IDs liegen in `data/payment-events.json` und überleben einen Neustart. Derselbe Idempotency-Key erzeugt nie eine zweite Bestellung.
+- **Beträge in Rappen** (Ganzzahl). Weicht Betrag oder Währung ab, wird die Bestellung nicht freigegeben.
+
+| Ereignis | Zustand der Bestellung | Ergebnis |
+| :--- | :--- | :--- |
+| `payment.succeeded` | `pending_payment` oder `payment_error_fallback` | bezahlt, `received` |
+| `payment.succeeded` | Betrag/Währung falsch | `payment_error_fallback` + Rückerstattung `AMOUNT_MISMATCH` |
+| `payment.succeeded` | storniert (z. B. nach 20 Minuten verfallen) | Rückerstattung `PAID_AFTER_CANCEL` |
+| `payment.succeeded` | von der Kasse schon bar kassiert | Rückerstattung `DOUBLE_PAYMENT`, Essen wird trotzdem gemacht |
+| `payment.failed` / `payment.expired` | `pending_payment` | `payment_error_fallback`, Code bleibt reserviert |
+| Checkout-Timeout (> 800 ms) oder Anbieter-Fehler | neu | `payment_error_fallback` |
+| gleiches Event nochmals | beliebig | ignoriert (`DUPLICATE_EVENT`) |
+| Event zu unbekannter Bestellung | – | 200 quittiert, im Log vermerkt |
+
+- **Bezahlte Bestellungen verfallen nie.** Nur unbezahlte (`pending_cash`, `pending_payment`, `payment_error_fallback`) werden nach 20 Minuten storniert.
+- **Rückerstattungen** (`refundDue`) stehen als rotes Ticket an der Kasse, bis jemand «zurückerstattet» tippt. Die Rückzahlung selbst erfolgt heute von Hand im Portal des Anbieters.
+
+**Offen für die echte Anbindung:** Adapter für den gewählten Anbieter, dessen Signaturschema, `PUBLIC_BASE_URL` für die Rücksprung-Adresse, automatische Rückerstattung über die Anbieter-API.
+
+### 10.2 Tour-Newsletter mit Double-Opt-in (`src/lib/newsletter.ts`)
+
+1. `POST /api/newsletter` speichert die Adresse als `pending` und schickt eine E-Mail mit Bestätigungslink. Die Antwort ist immer dieselbe (`202 confirmation_sent`), egal ob die Adresse neu, offen oder schon bestätigt ist.
+2. `/newsletter/confirm?token=…` zeigt eine Seite mit einem Knopf. Erst der Tap (`POST /api/newsletter/confirm`) bestätigt. So bestätigt kein Mail-Scanner, der Links vorab öffnet.
+3. Der Link gilt 48 Stunden und einmal. Gespeichert wird nur der SHA-256 des Tokens. Unbestätigte Einträge werden nach 48 Stunden gelöscht.
+4. Jede E-Mail enthält einen Abmeldelink (`/newsletter/unsubscribe`). Abmelden löscht den Eintrag.
+5. **Nachweis der Einwilligung:** Einwilligungstext samt Version (`NEWSLETTER_CONSENT` in `src/config/legal.ts`), Zeitpunkt der Anmeldung, Zeitpunkt der Bestätigung.
+
+**Versand heute:** Mock (`src/lib/mailer.ts`). Es wird nichts verschickt. Jede Nachricht landet in `data/outbox.json` und in der Server-Konsole, damit sich der Ablauf lokal durchspielen lässt. **Offen:** ein `Mailer` für den echten Anbieter (z. B. Brevo oder SMTP).
+
+### 10.3 Impressum und Datenschutz (`/impressum`, `/datenschutz`)
+
+- Stammdaten in `src/config/legal.ts`. Werte in `[ECKIGEN KLAMMERN]` sind **Platzhalter**. Solange welche offen sind, zeigen beide Seiten einen Entwurfs-Hinweis und der Server warnt beim Start.
+- Die Texte sind ein **Entwurf zur anwaltlichen Prüfung**, keine Rechtsberatung.
+- Alle Seiten verlinken Impressum und Datenschutz. Schriften liegen auf dem eigenen Server (`/fonts/*`): Keine Seite lädt etwas von Dritten.
+- Bestellungen brauchen keine Personendaten (kein Name, keine E-Mail, kein Konto).

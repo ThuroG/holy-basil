@@ -68,7 +68,7 @@ Inspiriert vom Abholkonzept von *yverdis* (wo Kunden statt einer langweiligen Ka
 Transparenz ist Teil der Marke («100 % vegane Basis, nichts Verstecktes»). Gleichzeitig sind die Pflichtangaben nach LGV/LIV (Kantonales Labor Zürich) Voraussetzung für den Verkauf. Das Konzept erfüllt sie, ohne den schnellen 20-Sekunden-Bestellflow zu bremsen:
 
 - **Fleischherkunft schriftlich vor der Zahlung:** Poulet, Schwein und Rind werden einzeln mit Land angezeigt (Standard: Schweiz). Wechselt der Lieferant, wird die Herkunft pro Tour-Stopp angepasst. Fehlt die Angabe, ist die Variante nicht bestellbar.
-- **14 Hauptallergene:** Soja und Gluten (Sojasauce) sind in unserer Basis enthalten, Ei bei Kai Dao, Hafer (Gluten) im Thai Iced Tea. Ein 1-Tap-Allergenmodal in der App und ein Rezepturordner am Truck liefern die Details.
+- **14 Hauptallergene:** Soja und Gluten (Sojasauce) sind in unserer Basis enthalten, Ei bei Kai Dao, Hafer (Gluten) im Thai Iced Tea. Ein aufklappbarer Allergen-Block direkt über dem Bestellbutton (1 Tap, kein Popup) und ein Rezepturordner am Truck liefern die Details.
 - **Eier:** Kai Dao aus Schweizer Freiland-/Bodenhaltung. Das vermeidet die Käfig-Deklaration und ist als Qualitätsargument nutzbar.
 - **Ehrlicher Umgang mit Kreuzkontakt:** «Vegan» gilt für die Saucen- und Pastenbasis sowie Holy Vegan (eigener Wok und Besteck). Mit Ei ist das Gericht vegetarisch. Spuren im gemeinsamen Wok-Betrieb werden offen kommuniziert.
 - **Marketing-Disziplin:** Herkunfts- und Qualitätsaussagen («Schweizer Poulet», «Freiland») werden nur verwendet, wenn Lieferscheine sie belegen.

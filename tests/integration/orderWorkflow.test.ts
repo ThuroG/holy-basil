@@ -3,7 +3,8 @@ import { handleApiRequest as rawHandleApiRequest, ApiRequestInput } from '../../
 import { resetOrderStore, calculateOrderTotal } from '../../src/lib/orderStore.js';
 import { resetFeatureFlags, setDemoPaymentsEnabled } from '../../src/config/features.js';
 import { resetSlaMetrics } from '../../src/lib/response.js';
-import { processOrderPayment } from '../../src/lib/paymentService.js';
+import { startCheckout } from '../../src/lib/paymentService.js';
+import { getOutbox } from '../../src/lib/mailer.js';
 
 // This suite walks the crew workflow, so every request carries a crew session.
 // Access control for guests is covered in tests/integration/security.test.ts.
@@ -199,14 +200,18 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
       calculateOrderTotal([{ variant: 'vegan' }], [{ drinkId: 'unknown' as any, quantity: 1 }])
     ).toThrow('INVALID_DRINK_ID');
 
-    // Test payment gateway timeout fallback
-    const timeoutPayment = await processOrderPayment({
-      amountChf: 14,
-      paymentMethod: 'twint',
+    // A provider that answers too slowly is cut off by the timeout guard
+    const timeoutCheckout = await startCheckout({
+      orderId: 'ord_timeout',
+      amountRappen: 1400,
+      currency: 'CHF',
+      method: 'twint',
+      idempotencyKey: 'timeout_1',
+      returnUrl: '/order/ord_timeout',
       simulatedDelayMs: 900,
     });
-    expect(timeoutPayment.fallbackTriggered).toBe(true);
-    expect(timeoutPayment.fallbackReason).toBe('PAYMENT_GATEWAY_TIMEOUT');
+    expect(timeoutCheckout.ok).toBe(false);
+    expect(timeoutCheckout.ok === false && timeoutCheckout.reason).toBe('PAYMENT_GATEWAY_TIMEOUT');
   });
 
   it('handles simulated payment gateway failure with automatic fallback and manual Cashier resolution', async () => {
@@ -257,7 +262,16 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
         preferredQuarter: 'LANGSTRASSE',
       },
     });
-    expect(subRes.statusCode).toBe(201);
+    // Double opt-in: the answer says only that a confirmation mail is on its way
+    expect(subRes.statusCode).toBe(202);
+    expect((subRes.body as any).data).toEqual({ status: 'confirmation_sent' });
+    const token = /confirm\?token=([0-9a-f]{64})/.exec(getOutbox()[0].text)![1];
+    const confirmRes = await handleApiRequest({
+      method: 'POST',
+      pathname: '/api/newsletter/confirm',
+      body: { token },
+    });
+    expect(confirmRes.statusCode).toBe(200);
 
     const subUpdateRes = await handleApiRequest({
       method: 'POST',
@@ -268,8 +282,7 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
         preferredQuarter: 'OERLIKON',
       },
     });
-    expect(subUpdateRes.statusCode).toBe(201);
-    expect((subUpdateRes.body as any).data.subscriber.preferredPlz).toBe('8050');
+    expect(subUpdateRes.statusCode).toBe(202);
 
     const badSubRes = await handleApiRequest({
       method: 'POST',
@@ -283,6 +296,11 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
       pathname: '/api/newsletter',
     });
     expect((listSubRes.body as any).data.subscribers.length).toBe(1);
+    expect((listSubRes.body as any).data.subscribers[0]).toMatchObject({
+      email: 'fan@zueri.ch',
+      status: 'confirmed',
+      preferredPlz: '8050',
+    });
 
     // B2B Inquiry valid + invalid + list
     const b2bRes = await handleApiRequest({

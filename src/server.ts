@@ -6,12 +6,23 @@ import { handleApiRequest } from './lib/apiHandler.js';
 import { renderOrderPageHtml } from './views/orderPage.js';
 import { renderAdminPageHtml, renderCrewLoginPageHtml } from './views/adminPage.js';
 import { renderBoardPageHtml } from './views/boardPage.js';
+import { renderImpressumHtml, renderDatenschutzHtml } from './views/legalPages.js';
+import { renderNewsletterActionHtml } from './views/newsletterPages.js';
+import { renderTestPaymentPageHtml } from './views/testPaymentPage.js';
 import {
   createOrder,
   getAllOrders,
   loadStoreFromDisk,
   expireStalePendingOrders,
+  archiveFinishedOrders,
+  confirmOrderPaymentAtCashier,
+  getLiveLocationId,
+  getOrderByPaymentRef,
 } from './lib/orderStore.js';
+import { purgeExpiredPendingSubscriptions } from './lib/newsletter.js';
+import { pruneRateLimits } from './lib/rateLimit.js';
+import { getUnverifiedComponents, validateComplianceConfig } from './config/compliance.js';
+import { getLegalPlaceholders } from './config/legal.js';
 import { getFeatureFlags } from './config/features.js';
 import {
   CREW_COOKIE_NAME,
@@ -25,6 +36,7 @@ const PORT = Number(process.env.PORT || 3000);
 const ROOT_DIR = process.cwd();
 const BUILD_DIR = path.join(ROOT_DIR, 'scrollcraft', 'builds', 'holy-basil');
 const ASSETS_DIR = path.join(ROOT_DIR, 'assets');
+const FONTS_DIR = path.join(ASSETS_DIR, 'fonts');
 const MAX_BODY_BYTES = 32 * 1024;
 
 const MIME_TYPES: Record<string, string> = {
@@ -37,6 +49,7 @@ const MIME_TYPES: Record<string, string> = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.woff2': 'font/woff2',
 };
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -50,17 +63,18 @@ async function seedInitialDemoOrdersIfEmpty(): Promise<void> {
   if (!getFeatureFlags().demoPayments) return;
   if (getAllOrders().length > 0) return;
   try {
-    await createOrder({
+    const paid = await createOrder({
       portions: [
         { variant: 'chicken', addKaiDao: true },
         { variant: 'chicken', addKaiDao: true },
         { variant: 'vegan', addKaiDao: false },
       ],
       drinks: [{ drinkId: 'thai_iced_tea', quantity: 2 }],
-      paymentMethod: 'twint',
+      paymentMethod: 'cash',
       preferredPlz: '8004',
-      customerNote: 'Demo-Bestellung (TWINT simuliert)',
+      customerNote: 'Demo-Bestellung (bezahlt)',
     });
+    confirmOrderPaymentAtCashier(paid.id, 'Demo');
 
     await createOrder({
       portions: [{ variant: 'pork_mix', addKaiDao: true }],
@@ -84,7 +98,8 @@ class HttpError extends Error {
   }
 }
 
-function readJsonBody(req: http.IncomingMessage): Promise<unknown> {
+/** Reads the body once and returns both the parsed JSON and the raw text (for webhook signatures). */
+function readJsonBody(req: http.IncomingMessage): Promise<{ parsed: unknown; raw: string }> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
     let size = 0;
@@ -103,9 +118,9 @@ function readJsonBody(req: http.IncomingMessage): Promise<unknown> {
     req.on('end', () => {
       if (rejected) return;
       const raw = Buffer.concat(chunks).toString('utf8');
-      if (!raw.trim()) return resolve({});
+      if (!raw.trim()) return resolve({ parsed: {}, raw });
       try {
-        resolve(JSON.parse(raw));
+        resolve({ parsed: JSON.parse(raw), raw });
       } catch {
         reject(new HttpError(400, 'INVALID_JSON_BODY', 'Anfrage enthält kein gültiges JSON.'));
       }
@@ -176,6 +191,19 @@ function publicBaseUrl(req: http.IncomingMessage): string {
   return `http://${host}`;
 }
 
+/**
+ * Address used for rate limiting. Behind a reverse proxy every request comes from the proxy,
+ * so with TRUST_PROXY=1 the first X-Forwarded-For entry is used instead.
+ */
+function clientKeyOf(req: http.IncomingMessage): string {
+  if (process.env.TRUST_PROXY === '1') {
+    const forwarded = req.headers['x-forwarded-for'];
+    const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded || '').split(',')[0].trim();
+    if (first) return first.slice(0, 64);
+  }
+  return req.socket.remoteAddress || 'unknown';
+}
+
 /** Real, scannable QR code that points to the order app. */
 async function renderOrderQrSvg(req: http.IncomingMessage): Promise<string | null> {
   try {
@@ -204,12 +232,15 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   // 1. API Routes (/api/*)
   if (pathname.startsWith('/api/')) {
     let body: unknown;
+    let rawBody: string | undefined;
     if (['POST', 'PATCH', 'PUT'].includes(method)) {
       const contentType = String(req.headers['content-type'] || '').toLowerCase();
       if (!contentType.startsWith('application/json')) {
         throw new HttpError(415, 'UNSUPPORTED_MEDIA_TYPE', 'Content-Type muss application/json sein.');
       }
-      body = await readJsonBody(req);
+      const read = await readJsonBody(req);
+      body = read.parsed;
+      rawBody = read.raw;
     }
 
     const headers: Record<string, string | undefined> = {};
@@ -224,8 +255,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
       headers,
       isCrew,
       sessionToken,
-      clientKey: req.socket.remoteAddress || 'unknown',
+      clientKey: clientKeyOf(req),
       secure: headers['x-forwarded-proto'] === 'https',
+      rawBody,
+      baseUrl: publicBaseUrl(req),
     });
 
     sendJson(res, apiResult.statusCode, apiResult.body, apiResult.headers);
@@ -255,6 +288,14 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     }
   }
 
+  // 3b. Self-hosted fonts (/fonts/*): no request to a font CDN
+  if (pathname.startsWith('/fonts/')) {
+    const name = path.basename(pathname);
+    if (/^[a-z0-9-]+\.(woff2|css)$/.test(name)) {
+      if (await sendFile(res, path.join(FONTS_DIR, name), 'public, max-age=31536000, immutable')) return;
+    }
+  }
+
   // 4. QR code to the order app
   if (pathname === '/qr.svg') {
     const svg = await renderOrderQrSvg(req);
@@ -281,8 +322,35 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
 
   if (pathname === '/order' || pathname.startsWith('/order/')) {
-    sendHtml(res, renderOrderPageHtml());
+    sendHtml(res, renderOrderPageHtml(getLiveLocationId()));
     return;
+  }
+
+  if (pathname === '/impressum') {
+    sendHtml(res, renderImpressumHtml());
+    return;
+  }
+
+  if (pathname === '/datenschutz') {
+    sendHtml(res, renderDatenschutzHtml());
+    return;
+  }
+
+  // Pages behind the links in the newsletter e-mails. The action itself needs a tap (POST),
+  // so a mail scanner that opens the link does not confirm or unsubscribe anybody.
+  if (pathname === '/newsletter/confirm' || pathname === '/newsletter/unsubscribe') {
+    const action = pathname.endsWith('confirm') ? 'confirm' : 'unsubscribe';
+    sendHtml(res, renderNewsletterActionHtml(action, urlObj.searchParams.get('token') || ''));
+    return;
+  }
+
+  // Payment page of the TEST provider (demo mode only).
+  if (pathname.startsWith('/pay/test/') && getFeatureFlags().demoPayments) {
+    const order = getOrderByPaymentRef(pathname.replace('/pay/test/', ''));
+    if (order && order.payment) {
+      sendHtml(res, renderTestPaymentPageHtml(order));
+      return;
+    }
   }
 
   if (pathname === '/admin' || pathname === '/kitchen') {
@@ -296,6 +364,26 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
 
   sendText(res, 404, '404 Not Found');
+}
+
+/** Open points that block a real launch. Printed at server start. */
+export function getReleaseGateWarnings(): string[] {
+  const warnings: string[] = [...validateComplianceConfig()];
+  const unverified = getUnverifiedComponents();
+  if (unverified.length > 0) {
+    warnings.push(
+      `Allergene von ${unverified.length} Komponenten sind nicht mit Lieferantenspezifikation bestätigt (verified: false): ${unverified.join(', ')}`
+    );
+  }
+  const placeholders = getLegalPlaceholders();
+  if (placeholders.length > 0) {
+    warnings.push(`Impressum/Datenschutz enthalten noch ${placeholders.length} Platzhalter (src/config/legal.ts).`);
+  }
+  if (getFeatureFlags().demoPayments) {
+    warnings.push('Zahlung läuft über den Test-Provider. Kein echter Zahlungsanbieter angebunden.');
+  }
+  warnings.push('E-Mail-Versand ist ein Mock (data/outbox.json). Kein Versandanbieter angebunden.');
+  return warnings;
 }
 
 export function createAppServer(): http.Server {
@@ -337,8 +425,15 @@ if (isEntryPoint()) {
   const demo = getFeatureFlags().demoPayments;
 
   seedInitialDemoOrdersIfEmpty().then(() => {
-    // Abandoned unpaid orders free their Züri-Code again.
-    setInterval(() => expireStalePendingOrders(), 30_000).unref();
+    // Housekeeping: abandoned unpaid orders free their Züri-Code, unconfirmed newsletter
+    // requests are deleted, finished orders move to the archive.
+    archiveFinishedOrders();
+    setInterval(() => {
+      expireStalePendingOrders();
+      purgeExpiredPendingSubscriptions();
+      pruneRateLimits();
+    }, 30_000).unref();
+    setInterval(() => archiveFinishedOrders(), 60 * 60 * 1000).unref();
 
     const server = createAppServer();
     server.listen(PORT, () => {
@@ -353,14 +448,22 @@ if (isEntryPoint()) {
       );
       console.log(
         demo
-          ? '  Zahlung: DEMO (TWINT/Karte simuliert, es fliesst kein Geld)'
-          : '  Zahlung: nur Bar am Truck (DEMO_PAYMENTS=1 schaltet die Simulation ein)'
+          ? '  Zahlung: DEMO (TWINT/Karte über den Test-Provider, es fliesst kein Geld)'
+          : '  Zahlung: nur Bar am Truck (DEMO_PAYMENTS=1 schaltet den Test-Provider ein)'
       );
       console.log(
         wasCrewPinGenerated()
           ? `  Crew-PIN (zufällig, nur für diesen Start): ${pin}  -> fest setzen mit CREW_PIN=...`
           : '  Crew-PIN: aus CREW_PIN gesetzt'
       );
+
+      // Release gate: open points that must be closed before real guests order.
+      const gate = getReleaseGateWarnings();
+      if (gate.length > 0) {
+        console.warn('');
+        console.warn('  ⚠ Vor dem Go-Live offen:');
+        for (const line of gate) console.warn(`    - ${line}`);
+      }
     });
   });
 }

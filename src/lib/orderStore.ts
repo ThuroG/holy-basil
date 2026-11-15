@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import crypto from 'node:crypto';
 import {
   Order,
@@ -8,41 +6,66 @@ import {
   OrderDrinkItem,
   OrderStatus,
   SpiceLevel,
-  NewsletterSubscriber,
   B2BInquiry,
   TruckLocationStop,
   WokDemandSummary,
   PublicOrderView,
   BoardEntry,
+  DishVariantId,
+  RefundReason,
 } from './types.js';
 import {
   getFeatureFlags,
   getAvailablePaymentMethods,
   setCustomSpiceLevelsEnabled,
+  setOrdersPaused,
   isSpiceLevel,
   MENU_DISHES,
   MENU_DRINKS,
   KAI_DAO_PRICE_CHF,
 } from '../config/features.js';
+import { buildCheckoutDeclaration } from '../config/compliance.js';
+import { defaultTruckLocations } from '../config/tourStops.js';
 import {
   allocateZueriCode,
   releaseZueriCode,
+  reclaimZueriCode,
   resetZueriCodeAllocations,
   restoreZueriCodeAllocation,
   ZUERI_CODE_COOLDOWN_MS,
 } from './zueriCodes.js';
-import { processOrderPayment, clearPaymentIdempotencyCache } from './paymentService.js';
+import { startCheckout, chfToRappen, PaymentEvent, resetPaymentService } from './paymentService.js';
 import { getWokDemandSummary } from './wokDemand.js';
-import { generateCorrelationId } from './response.js';
+import { generateCorrelationId, recordPaymentAttempt } from './response.js';
+import { readJson, writeJsonAtomic } from './storage.js';
+import { resetRateLimits } from './rateLimit.js';
+import { resetOutbox } from './mailer.js';
+import {
+  loadNewsletterFromDisk,
+  resetNewsletter,
+  getNewsletterSubscribers,
+} from './newsletter.js';
 
-/** Unpaid orders (cash not yet handed over) are cancelled after this time so their code is freed. */
+export { getNewsletterSubscribers };
+
+/** Unpaid orders are cancelled after this time so their code is freed. */
 export const PENDING_ORDER_TTL_MS = 20 * 60 * 1000;
+/** A crew move can be taken back for this long. */
+export const UNDO_WINDOW_MS = 60 * 1000;
+/** Finished orders leave the live file after this time. */
+export const ARCHIVE_AFTER_MS = 12 * 60 * 60 * 1000;
 const MAX_NOTE_LENGTH = 200;
 const MAX_DRINKS_PER_LINE = 20;
+const MAX_PROCESSED_EVENTS = 2000;
+
+const UNPAID_STATUSES: readonly OrderStatus[] = [
+  'pending_cash',
+  'pending_payment',
+  'payment_error_fallback',
+];
 
 const ACTIVE_STATUSES: readonly OrderStatus[] = [
-  'pending_cash',
-  'payment_error_fallback',
+  ...UNPAID_STATUSES,
   'received',
   'in_wok',
   'plating',
@@ -50,11 +73,12 @@ const ACTIVE_STATUSES: readonly OrderStatus[] = [
 ];
 
 /**
- * The only allowed moves through the truck pipeline.
- * pending_cash / payment_error_fallback -> received happens via the cashier confirmation.
+ * The only allowed forward moves through the truck pipeline.
+ * An unpaid order reaches `received` through the cashier or through the payment webhook.
  */
 const STATUS_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
   pending_cash: ['received', 'cancelled'],
+  pending_payment: ['received', 'cancelled'],
   payment_error_fallback: ['received', 'cancelled'],
   received: ['in_wok', 'plating', 'cancelled'],
   in_wok: ['plating', 'cancelled'],
@@ -64,126 +88,23 @@ const STATUS_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
   cancelled: [],
 };
 
-function dataDir(): string {
-  return process.env.HB_DATA_DIR
-    ? path.resolve(process.env.HB_DATA_DIR)
-    : path.resolve(process.cwd(), 'data');
-}
-
-type StoreFile = 'orders' | 'subscribers' | 'b2b' | 'settings';
-
-function filePath(name: StoreFile): string {
-  return path.join(dataDir(), `${name}.json`);
-}
-
 let ordersStore: Order[] = [];
-let subscribersStore: NewsletterSubscriber[] = [];
 let b2bInquiriesStore: B2BInquiry[] = [];
+let processedPaymentEvents: string[] = [];
 const inFlightByIdempotencyKey = new Map<string, Promise<Order>>();
 
-const defaultTruckLocations: TruckLocationStop[] = [
-  {
-    id: 'loc_1',
-    dayLabel: 'DIENSTAG',
-    dateStr: 'Dienstag, 11:30 – 14:30',
-    plz: '8005',
-    quarter: 'ZÜRI WEST',
-    spotName: 'Prime Tower / Hardbrücke Vorplatz',
-    address: 'Hardstrasse 201, 8005 Zürich',
-    hours: '11:30 – 14:30 Uhr',
-    status: 'live_now',
-    vibeNote: 'Mittags-Service · Heisser Wok & frischer Thai Iced Tea',
-  },
-  {
-    id: 'loc_2',
-    dayLabel: 'DONNERSTAG',
-    dateStr: 'Donnerstag, 17:30 – 22:30',
-    plz: '8004',
-    quarter: 'LANGSTRASSE',
-    spotName: 'Kanzleiareal / Helvetiaplatz Pop-up',
-    address: 'Kanzleistrasse 56, 8004 Zürich',
-    hours: '17:30 – 22:30 Uhr',
-    status: 'upcoming',
-    vibeNote: 'Afterwork & Nightmarket Session mit Boom-Bap Beats',
-  },
-  {
-    id: 'loc_3',
-    dayLabel: 'FREITAG',
-    dateStr: 'Freitag, 11:30 – 14:30',
-    plz: '8050',
-    quarter: 'OERLIKON',
-    spotName: 'MFO-Park / Bahnhof Oerlikon Nord',
-    address: 'Sophie-Taeuber-Strasse 4, 8050 Zürich',
-    hours: '11:30 – 14:30 Uhr',
-    status: 'upcoming',
-    vibeNote: 'Friday Lunch Drop im Chreis 11',
-  },
-  {
-    id: 'loc_4',
-    dayLabel: 'SAMSTAG',
-    dateStr: 'Samstag, 12:00 – 21:00',
-    plz: '8400',
-    quarter: 'WINTI',
-    spotName: 'Lagerplatz / Sulzerareal Streetfood Corner',
-    address: 'Lagerplatz 18, 8400 Winterthur',
-    hours: '12:00 – 21:00 Uhr',
-    status: 'upcoming',
-    vibeNote: 'Weekend Special in Winterthur',
-  },
-  {
-    id: 'loc_5',
-    dayLabel: 'SONNTAG',
-    dateStr: 'Sonntag, 12:00 – 18:00',
-    plz: '8001',
-    quarter: 'NIEDERDORF',
-    spotName: 'Hirschenplatz / Züri Altstadt Pop-up',
-    address: 'Hirschenplatz, 8001 Zürich',
-    hours: '12:00 – 18:00 Uhr',
-    status: 'upcoming',
-    vibeNote: 'Sunday Hangover Cure Krapao + Kai Dao',
-  },
-];
-
-
 let liveLocationId: string | null = 'loc_1';
-
-function writeJsonAtomic(name: StoreFile, data: unknown): void {
-  try {
-    const dir = dataDir();
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const target = filePath(name);
-    const tmp = `${target}.${process.pid}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
-    fs.renameSync(tmp, target);
-  } catch (err) {
-    // Keep serving from memory, but make the problem visible to the crew.
-    console.error(`[holy-basil] Konnte ${name}.json nicht speichern:`, err);
-  }
-}
-
-function readJson<T>(name: StoreFile, fallback: T): T {
-  try {
-    const target = filePath(name);
-    if (!fs.existsSync(target)) return fallback;
-    const raw = fs.readFileSync(target, 'utf8');
-    if (!raw.trim()) return fallback;
-    return JSON.parse(raw) as T;
-  } catch (err) {
-    console.error(`[holy-basil] Konnte ${name}.json nicht lesen:`, err);
-    return fallback;
-  }
-}
 
 function persistOrders(): void {
   writeJsonAtomic('orders', ordersStore);
 }
 
 function persistSettings(): void {
+  const flags = getFeatureFlags();
   writeJsonAtomic('settings', {
     liveLocationId,
-    enableCustomSpiceLevels: getFeatureFlags().enableCustomSpiceLevels,
+    enableCustomSpiceLevels: flags.enableCustomSpiceLevels,
+    ordersPaused: flags.ordersPaused,
   });
 }
 
@@ -193,16 +114,18 @@ function persistSettings(): void {
  */
 export function loadStoreFromDisk(): { orders: number; subscribers: number; inquiries: number } {
   const orders = readJson<Order[]>('orders', []);
-  const subscribers = readJson<NewsletterSubscriber[]>('subscribers', []);
   const inquiries = readJson<B2BInquiry[]>('b2b', []);
-  const settings = readJson<{ liveLocationId?: string | null; enableCustomSpiceLevels?: boolean }>(
-    'settings',
-    {}
-  );
+  const events = readJson<string[]>('payment-events', []);
+  const settings = readJson<{
+    liveLocationId?: string | null;
+    enableCustomSpiceLevels?: boolean;
+    ordersPaused?: boolean;
+  }>('settings', {});
 
   ordersStore = Array.isArray(orders) ? orders.filter((o) => o && typeof o.id === 'string') : [];
-  subscribersStore = Array.isArray(subscribers) ? subscribers : [];
   b2bInquiriesStore = Array.isArray(inquiries) ? inquiries : [];
+  processedPaymentEvents = Array.isArray(events) ? events.filter((e) => typeof e === 'string') : [];
+  const subscribers = loadNewsletterFromDisk();
 
   resetZueriCodeAllocations();
   for (const order of ordersStore) {
@@ -223,11 +146,14 @@ export function loadStoreFromDisk(): { orders: number; subscribers: number; inqu
     if (typeof settings.enableCustomSpiceLevels === 'boolean') {
       setCustomSpiceLevelsEnabled(settings.enableCustomSpiceLevels);
     }
+    if (typeof settings.ordersPaused === 'boolean') {
+      setOrdersPaused(settings.ordersPaused);
+    }
   }
 
   return {
     orders: ordersStore.length,
-    subscribers: subscribersStore.length,
+    subscribers,
     inquiries: b2bInquiriesStore.length,
   };
 }
@@ -235,6 +161,13 @@ export function loadStoreFromDisk(): { orders: number; subscribers: number; inqu
 /** Stores the spice toggle so it survives a restart. */
 export function setCustomSpiceLevelsAndPersist(enabled: boolean) {
   const flags = setCustomSpiceLevelsEnabled(enabled);
+  persistSettings();
+  return flags;
+}
+
+/** Crew switch «Annahme pausieren». Survives a restart. */
+export function setOrdersPausedAndPersist(paused: boolean) {
+  const flags = setOrdersPaused(paused);
   persistSettings();
   return flags;
 }
@@ -281,6 +214,10 @@ export function calculateOrderTotal(
 export interface CreateOrderOptions {
   /** Only the crew in demo mode may force a simulated payment failure. */
   allowSimulatedFailure?: boolean;
+  /** The crew may still enter orders while guest ordering is paused. */
+  isCrew?: boolean;
+  /** Test hook: delay of the test provider, to exercise the checkout timeout. */
+  simulatedCheckoutDelayMs?: number;
 }
 
 export async function createOrder(
@@ -389,41 +326,85 @@ async function createOrderInternal(
     });
   }
 
+  // Valid payload from here on. Guests are stopped while the crew paused ordering.
+  if (flags.ordersPaused && options.isCrew !== true) {
+    throw new Error('ORDERS_PAUSED');
+  }
+
+  // Fail closed: without a declared meat origin for this stop the cart cannot be sold.
+  const stopId = liveLocationId;
+  const declaration = buildCheckoutDeclaration(
+    { portions: normalizedPortions, drinks: normalizedDrinks },
+    stopId
+  );
+  if (declaration.blocked) {
+    throw new Error('ORIGIN_NOT_DECLARED');
+  }
+
   const totalChf = calculateOrderTotal(normalizedPortions, normalizedDrinks);
+  // Unguessable id: knowing it is what lets a guest open their own ticket.
+  const orderId = `ord_${crypto.randomBytes(12).toString('hex')}`;
+  const now = new Date().toISOString();
 
-  const paymentResult = await processOrderPayment({
-    amountChf: totalChf,
-    paymentMethod: input.paymentMethod,
-    idempotencyKey: input.idempotencyKey,
-    simulateFailure:
-      options.allowSimulatedFailure === true &&
-      flags.demoPayments &&
-      input.simulatePaymentFailure === true,
-  });
+  let status: OrderStatus = 'pending_cash';
+  let payment: Order['payment'];
+  let failureNote: string | undefined;
 
-  // The code is drawn only after validation and payment, so a rejected order never blocks one.
+  if (input.paymentMethod !== 'cash') {
+    const base = (process.env.PUBLIC_BASE_URL || '').trim().replace(/\/+$/, '');
+    const checkout = await startCheckout({
+      orderId,
+      amountRappen: chfToRappen(totalChf),
+      currency: 'CHF',
+      method: input.paymentMethod,
+      idempotencyKey: input.idempotencyKey || orderId,
+      returnUrl: `${base}/order/${orderId}`,
+      simulateFailure:
+        options.allowSimulatedFailure === true &&
+        flags.demoPayments &&
+        input.simulatePaymentFailure === true,
+      simulatedDelayMs: options.simulatedCheckoutDelayMs,
+    });
+    if (checkout.ok) {
+      status = 'pending_payment';
+      payment = {
+        provider: checkout.provider,
+        providerRef: checkout.session.providerRef,
+        redirectUrl: checkout.session.redirectUrl,
+        expiresAt: checkout.session.expiresAt,
+      };
+    } else {
+      // Zero-loss fallback: keep the order and the code, the cashier settles it by hand.
+      recordPaymentAttempt('fallback');
+      status = 'payment_error_fallback';
+      failureNote = `Zahlung nicht gestartet: ${checkout.reason}`;
+    }
+  }
+
+  // The code is drawn only after validation and checkout, so a rejected order never blocks one.
   const zueriCode = allocateZueriCode(
     typeof input.preferredPlz === 'string' ? input.preferredPlz : undefined
   );
 
-  const now = new Date().toISOString();
   const order: Order = {
-    // Unguessable id: knowing it is what lets a guest open their own ticket.
-    id: `ord_${crypto.randomBytes(12).toString('hex')}`,
+    id: orderId,
     zueriCode,
     portions: normalizedPortions,
     drinks: normalizedDrinks,
     totalPortions: normalizedPortions.length,
     totalChf,
     paymentMethod: input.paymentMethod,
-    paymentStatus: paymentResult.paymentStatus,
-    status: paymentResult.initialOrderStatus,
+    paymentStatus: status as Order['paymentStatus'],
+    status,
     idempotencyKey: input.idempotencyKey,
     correlationId: generateCorrelationId('ord'),
     customerNote: cleanNote(input.customerNote),
+    manualResolutionNote: failureNote,
     createdAt: now,
     updatedAt: now,
-    paidAt: paymentResult.paymentStatus === 'paid' ? now : undefined,
+    stopId,
+    declaration: { version: declaration.version, lines: declaration.lines },
+    payment,
   };
 
   ordersStore.unshift(order);
@@ -436,26 +417,47 @@ export function getOrderById(orderId: string): Order | undefined {
   return ordersStore.find((o) => o.id === orderId);
 }
 
+export function getOrderByPaymentRef(providerRef: string): Order | undefined {
+  return ordersStore.find((o) => o.payment?.providerRef === providerRef);
+}
+
 export function getAllOrders(): Order[] {
   return [...ordersStore];
 }
 
-/** Orders the crew still has to act on. Finished and cancelled ones are left out. */
+function hasOpenRefund(order: Order): boolean {
+  return order.refundDue !== undefined && order.refundDue.resolvedAt === undefined;
+}
+
+/** Orders the crew still has to act on, including finished ones with an open refund. */
 export function getActiveOrders(): Order[] {
-  return ordersStore.filter((o) => ACTIVE_STATUSES.includes(o.status));
+  return ordersStore.filter((o) => ACTIVE_STATUSES.includes(o.status) || hasOpenRefund(o));
+}
+
+/** Orders created on the same calendar day as `now` (server time). */
+export function getOrdersTodayCount(now: number = Date.now()): number {
+  const today = new Date(now).toDateString();
+  return ordersStore.filter((o) => new Date(o.createdAt).toDateString() === today).length;
 }
 
 export function toPublicOrder(order: Order): PublicOrderView {
   return {
     id: order.id,
     zueriCode: order.zueriCode,
-    portions: order.portions,
+    portions: order.portions.map((p) => ({
+      portionIndex: p.portionIndex,
+      variant: p.variant,
+      spiceLevel: p.spiceLevel,
+      addKaiDao: p.addKaiDao,
+    })),
     drinks: order.drinks,
     totalPortions: order.totalPortions,
     totalChf: order.totalChf,
     paymentMethod: order.paymentMethod,
     status: order.status,
     createdAt: order.createdAt,
+    declaration: order.declaration,
+    paymentUrl: order.status === 'pending_payment' ? order.payment?.redirectUrl : undefined,
   };
 }
 
@@ -467,15 +469,36 @@ export function getBoardEntries(): BoardEntry[] {
     if (o.status === 'received' || o.status === 'in_wok' || o.status === 'plating') {
       entries.push({ plz: o.zueriCode.plz, quarter: o.zueriCode.quarter, phase: 'preparing' });
     } else if (o.status === 'ready') {
-      entries.push({ plz: o.zueriCode.plz, quarter: o.zueriCode.quarter, phase: 'ready' });
+      entries.push({
+        plz: o.zueriCode.plz,
+        quarter: o.zueriCode.quarter,
+        phase: 'ready',
+        readyAt: o.readyAt,
+      });
     }
   }
   return entries;
 }
 
+/** What guests may know about the queue before they order. */
+export function getQueueInfo(): { estimatedWaitMinutes: number; ordersPaused: boolean } {
+  return {
+    estimatedWaitMinutes: getWokDemand().estimatedWaitMinutes,
+    ordersPaused: getFeatureFlags().ordersPaused,
+  };
+}
+
+function markPaid(order: Order, nowIso: string): void {
+  order.paymentStatus = 'paid';
+  order.status = 'received';
+  order.paidAt = nowIso;
+  order.updatedAt = nowIso;
+  order.previousStatus = undefined;
+}
+
 /**
- * Station 1 (Kasse / Cashier): Confirms cash payment or resolves a digital payment fallback manually.
- * Transitions the order from `pending_cash` or `payment_error_fallback` into `received` (active in Wok Demand).
+ * Station 1 (Kasse / Cashier): confirms a payment by hand.
+ * Moves an unpaid order (cash, open digital payment or payment fallback) into `received`.
  */
 export function confirmOrderPaymentAtCashier(orderId: string, resolutionNote?: string): Order {
   const order = ordersStore.find((o) => o.id === orderId);
@@ -483,15 +506,11 @@ export function confirmOrderPaymentAtCashier(orderId: string, resolutionNote?: s
     throw new Error('ORDER_NOT_FOUND');
   }
 
-  if (order.status !== 'pending_cash' && order.status !== 'payment_error_fallback') {
+  if (!UNPAID_STATUSES.includes(order.status)) {
     throw new Error(`INVALID_CASHIER_TRANSITION: Order is already in status ${order.status}`);
   }
 
-  const now = new Date().toISOString();
-  order.paymentStatus = 'paid';
-  order.status = 'received';
-  order.paidAt = now;
-  order.updatedAt = now;
+  markPaid(order, new Date().toISOString());
   const note = cleanNote(resolutionNote);
   if (note) {
     order.manualResolutionNote = note;
@@ -540,10 +559,15 @@ export function advanceOrderStatus(
   }
 
   const now = new Date().toISOString();
+  order.previousStatus = order.status;
   order.status = targetStatus;
   order.updatedAt = now;
 
-  if (targetStatus === 'plating') {
+  if (targetStatus === 'in_wok') {
+    for (const p of order.portions) {
+      if (!p.firedAt) p.firedAt = now;
+    }
+  } else if (targetStatus === 'plating') {
     order.platedAt = now;
   } else if (targetStatus === 'ready') {
     order.readyAt = now;
@@ -565,8 +589,214 @@ export function advanceOrderStatus(
 }
 
 /**
+ * Takes back the last crew move of an order (mis-tap), within UNDO_WINDOW_MS:
+ * plating -> back to the wok queue, ready -> plating, completed -> ready.
+ */
+export function undoLastMove(orderId: string, now: number = Date.now()): Order {
+  const order = ordersStore.find((o) => o.id === orderId);
+  if (!order) {
+    throw new Error('ORDER_NOT_FOUND');
+  }
+  const previous = order.previousStatus;
+  const undoable =
+    (order.status === 'plating' && (previous === 'received' || previous === 'in_wok')) ||
+    (order.status === 'ready' && previous === 'plating') ||
+    (order.status === 'completed' && previous === 'ready');
+  if (!undoable || !previous) {
+    throw new Error('INVALID_UNDO: Dieser Schritt kann nicht zurückgenommen werden.');
+  }
+  if (now - Date.parse(order.updatedAt) > UNDO_WINDOW_MS) {
+    throw new Error('INVALID_UNDO: Zu spät, der Schritt liegt mehr als eine Minute zurück.');
+  }
+
+  if (order.status === 'completed') {
+    if (!reclaimZueriCode(order.zueriCode.plz)) {
+      throw new Error('INVALID_UNDO: Der Züri-Code ist bereits neu vergeben.');
+    }
+    order.completedAt = undefined;
+  } else if (order.status === 'ready') {
+    order.readyAt = undefined;
+  } else {
+    order.platedAt = undefined;
+  }
+
+  order.status = previous;
+  order.previousStatus = undefined;
+  order.updatedAt = new Date(now).toISOString();
+  persistOrders();
+  return order;
+}
+
+export interface WokBatchResult {
+  variant: DishVariantId;
+  portions: number;
+  codes: string[];
+}
+
+/**
+ * Station 2 (Koch): starts one wok batch of a variant. Takes the oldest paid portions that
+ * are not in the wok yet, at most one wok load, and marks them as cooking.
+ * The Schöpfer then sees which boxes are actually cooked.
+ */
+export function startWokBatch(variant: unknown, now: number = Date.now()): WokBatchResult {
+  if (typeof variant !== 'string' || !Object.prototype.hasOwnProperty.call(MENU_DISHES, variant)) {
+    throw new Error('INVALID_DISH_VARIANT');
+  }
+  const { wokBatchSize } = getFeatureFlags();
+  const iso = new Date(now).toISOString();
+  const queue = ordersStore
+    .filter((o) => o.status === 'received' || o.status === 'in_wok')
+    .sort((a, b) => Date.parse(a.paidAt || a.createdAt) - Date.parse(b.paidAt || b.createdAt));
+
+  let fired = 0;
+  const codes: string[] = [];
+  for (const order of queue) {
+    if (fired >= wokBatchSize) break;
+    let touched = false;
+    for (const portion of order.portions) {
+      if (fired >= wokBatchSize) break;
+      if (portion.variant !== variant || portion.firedAt) continue;
+      portion.firedAt = iso;
+      fired += 1;
+      touched = true;
+    }
+    if (touched) {
+      codes.push(order.zueriCode.formatted);
+      if (order.status === 'received') {
+        order.previousStatus = undefined;
+        order.status = 'in_wok';
+      }
+      order.updatedAt = iso;
+    }
+  }
+
+  if (fired > 0) persistOrders();
+  return { variant: variant as DishVariantId, portions: fired, codes };
+}
+
+// --- Payment webhook ---------------------------------------------------------------------
+
+export type PaymentEventOutcome =
+  | 'PAID'
+  | 'ALREADY_PAID'
+  | 'DUPLICATE_EVENT'
+  | 'FALLBACK'
+  | 'REFUND_DUE'
+  | 'IGNORED'
+  | 'UNKNOWN_ORDER';
+
+function flagRefund(order: Order, reason: RefundReason, event: PaymentEvent, nowIso: string): void {
+  order.refundDue = {
+    reason,
+    amountChf: event.amountRappen / 100,
+    providerRef: event.providerRef,
+    flaggedAt: nowIso,
+  };
+  order.updatedAt = nowIso;
+}
+
+function rememberEvent(eventId: string): void {
+  processedPaymentEvents.push(eventId);
+  if (processedPaymentEvents.length > MAX_PROCESSED_EVENTS) {
+    processedPaymentEvents = processedPaymentEvents.slice(-MAX_PROCESSED_EVENTS);
+  }
+  writeJsonAtomic('payment-events', processedPaymentEvents);
+}
+
+/**
+ * Applies one VERIFIED provider event to its order. Safe to call several times with the
+ * same event (providers retry webhooks).
+ *
+ * - succeeded, order still unpaid         -> paid, into the wok queue
+ * - succeeded, amount or currency differs -> not released, cashier alert + refund flag
+ * - succeeded, order already settled by the cashier or cancelled -> refund flag, never lost
+ * - failed / expired, order waiting for the provider -> payment_error_fallback (code stays reserved)
+ */
+export function applyPaymentEvent(event: PaymentEvent, now: number = Date.now()): PaymentEventOutcome {
+  if (processedPaymentEvents.includes(event.id)) return 'DUPLICATE_EVENT';
+
+  const order = ordersStore.find((o) => o.id === event.orderId);
+  if (!order || !order.payment || order.payment.providerRef !== event.providerRef) {
+    rememberEvent(event.id);
+    console.error(
+      `[holy-basil] Zahlungs-Event ${event.id} passt zu keiner Bestellung (${event.orderId}).`
+    );
+    return 'UNKNOWN_ORDER';
+  }
+
+  const nowIso = new Date(now).toISOString();
+  let outcome: PaymentEventOutcome = 'IGNORED';
+
+  if (event.type === 'payment.succeeded') {
+    const amountOk =
+      event.currency === 'CHF' && event.amountRappen === chfToRappen(order.totalChf);
+
+    if (order.payment.settledEventId) {
+      outcome = 'ALREADY_PAID';
+    } else if (!amountOk) {
+      // Money arrived, but not the amount of this order: a human has to look at it.
+      flagRefund(order, 'AMOUNT_MISMATCH', event, nowIso);
+      if (order.status === 'pending_payment') {
+        order.status = 'payment_error_fallback';
+        order.paymentStatus = 'payment_error_fallback';
+      }
+      order.payment.failureReason = 'AMOUNT_MISMATCH';
+      recordPaymentAttempt('fallback');
+      outcome = 'REFUND_DUE';
+    } else if (order.status === 'pending_payment' || order.status === 'payment_error_fallback') {
+      markPaid(order, nowIso);
+      order.payment.settledEventId = event.id;
+      recordPaymentAttempt('success');
+      outcome = 'PAID';
+    } else if (order.status === 'cancelled') {
+      flagRefund(order, 'PAID_AFTER_CANCEL', event, nowIso);
+      order.payment.settledEventId = event.id;
+      outcome = 'REFUND_DUE';
+    } else {
+      // The cashier already took the money by hand: the guest paid twice.
+      flagRefund(order, 'DOUBLE_PAYMENT', event, nowIso);
+      order.payment.settledEventId = event.id;
+      outcome = 'REFUND_DUE';
+    }
+  } else if (order.status === 'pending_payment') {
+    order.status = 'payment_error_fallback';
+    order.paymentStatus = 'payment_error_fallback';
+    order.payment.failureReason = event.type;
+    order.updatedAt = nowIso;
+    recordPaymentAttempt('fallback');
+    outcome = 'FALLBACK';
+  }
+
+  rememberEvent(event.id);
+  persistOrders();
+  return outcome;
+}
+
+/** The cashier refunded the guest: clears the refund flag. */
+export function resolveRefund(orderId: string, note?: string): Order {
+  const order = ordersStore.find((o) => o.id === orderId);
+  if (!order) {
+    throw new Error('ORDER_NOT_FOUND');
+  }
+  if (!order.refundDue || order.refundDue.resolvedAt) {
+    throw new Error('INVALID_REFUND: Keine offene Rückerstattung.');
+  }
+  const now = new Date().toISOString();
+  order.refundDue.resolvedAt = now;
+  order.updatedAt = now;
+  if (order.status === 'cancelled') {
+    order.paymentStatus = 'refunded';
+  }
+  const cleaned = cleanNote(note);
+  if (cleaned) order.manualResolutionNote = cleaned;
+  persistOrders();
+  return order;
+}
+
+/**
  * Cancels unpaid orders nobody paid for within PENDING_ORDER_TTL_MS, so abandoned
- * cash orders do not block Züri-Codes for the rest of the day.
+ * orders do not block Züri-Codes for the rest of the day. Paid orders never expire.
+ * If a payment still arrives afterwards, the webhook raises a refund flag.
  */
 export function expireStalePendingOrders(
   now: number = Date.now(),
@@ -574,7 +804,7 @@ export function expireStalePendingOrders(
 ): number {
   let expired = 0;
   for (const order of ordersStore) {
-    if (order.status !== 'pending_cash' && order.status !== 'payment_error_fallback') continue;
+    if (!UNPAID_STATUSES.includes(order.status)) continue;
     const created = Date.parse(order.createdAt);
     if (Number.isNaN(created) || now - created < maxAgeMs) continue;
     const iso = new Date(now).toISOString();
@@ -589,51 +819,48 @@ export function expireStalePendingOrders(
   return expired;
 }
 
-export function getWokDemand(): WokDemandSummary {
-  return getWokDemandSummary(ordersStore);
+/**
+ * Moves finished orders (handed over or cancelled, no open refund) that are older than
+ * `maxAgeMs` into a monthly archive file, so the live file stays small.
+ */
+export function archiveFinishedOrders(
+  now: number = Date.now(),
+  maxAgeMs: number = ARCHIVE_AFTER_MS
+): number {
+  const keep: Order[] = [];
+  const byMonth = new Map<string, Order[]>();
+  for (const order of ordersStore) {
+    const finished = order.status === 'completed' || order.status === 'cancelled';
+    const age = now - Date.parse(order.updatedAt);
+    if (finished && !hasOpenRefund(order) && age >= maxAgeMs) {
+      const month = order.createdAt.slice(0, 7);
+      byMonth.set(month, [...(byMonth.get(month) || []), order]);
+    } else {
+      keep.push(order);
+    }
+  }
+  let moved = 0;
+  for (const [month, orders] of byMonth) {
+    const name = `orders-archive-${month}`;
+    const existing = readJson<Order[]>(name, []);
+    writeJsonAtomic(name, [...(Array.isArray(existing) ? existing : []), ...orders]);
+    moved += orders.length;
+  }
+  if (moved > 0) {
+    ordersStore = keep;
+    persistOrders();
+  }
+  return moved;
+}
+
+export function getWokDemand(now: number = Date.now()): WokDemandSummary {
+  return getWokDemandSummary(ordersStore, now);
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function cleanText(value: unknown, maxLength: number): string {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : '';
-}
-
-export function subscribeNewsletter(input: {
-  email: string;
-  preferredPlz?: string;
-  preferredQuarter?: string;
-}): NewsletterSubscriber {
-  const cleanEmail = cleanText(input?.email, 254).toLowerCase();
-  if (!EMAIL_PATTERN.test(cleanEmail)) {
-    throw new Error('INVALID_EMAIL');
-  }
-  const preferredPlz = cleanText(input.preferredPlz, 10);
-  const preferredQuarter = cleanText(input.preferredQuarter, 40);
-
-  const existing = subscribersStore.find((s) => s.email === cleanEmail);
-  if (existing) {
-    if (preferredPlz) existing.preferredPlz = preferredPlz;
-    if (preferredQuarter) existing.preferredQuarter = preferredQuarter;
-    writeJsonAtomic('subscribers', subscribersStore);
-    return existing;
-  }
-
-  const subscriber: NewsletterSubscriber = {
-    id: `sub_${crypto.randomBytes(8).toString('hex')}`,
-    email: cleanEmail,
-    preferredPlz: preferredPlz || '8004',
-    preferredQuarter: preferredQuarter || 'LANGSTRASSE',
-    createdAt: new Date().toISOString(),
-  };
-
-  subscribersStore.unshift(subscriber);
-  writeJsonAtomic('subscribers', subscribersStore);
-  return subscriber;
-}
-
-export function getNewsletterSubscribers(): NewsletterSubscriber[] {
-  return [...subscribersStore];
 }
 
 const B2B_EVENT_TYPES = ['catering', 'popup', 'cooking_class'] as const;
@@ -702,10 +929,13 @@ export function setLiveTruckLocation(locationId: string | null): TruckLocationSt
 
 export function resetOrderStore(): void {
   ordersStore = [];
-  subscribersStore = [];
   b2bInquiriesStore = [];
+  processedPaymentEvents = [];
   liveLocationId = 'loc_1';
   inFlightByIdempotencyKey.clear();
   resetZueriCodeAllocations();
-  clearPaymentIdempotencyCache();
+  resetNewsletter();
+  resetRateLimits();
+  resetOutbox();
+  resetPaymentService();
 }

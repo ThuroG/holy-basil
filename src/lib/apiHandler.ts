@@ -1,12 +1,9 @@
 import {
   createOrder,
-  getAllOrders,
   getOrderById,
   advanceOrderStatus,
   confirmOrderPaymentAtCashier,
   getWokDemand,
-  subscribeNewsletter,
-  getNewsletterSubscribers,
   createB2BInquiry,
   getB2BInquiries,
   getTruckLocations,
@@ -16,7 +13,23 @@ import {
   getBoardEntries,
   toPublicOrder,
   setCustomSpiceLevelsAndPersist,
+  setOrdersPausedAndPersist,
+  getOrdersTodayCount,
+  getQueueInfo,
+  getOrderByPaymentRef,
+  startWokBatch,
+  undoLastMove,
+  resolveRefund,
+  applyPaymentEvent,
 } from './orderStore.js';
+import {
+  requestSubscription,
+  confirmSubscription,
+  unsubscribe,
+  getNewsletterOverview,
+} from './newsletter.js';
+import { checkRateLimit, RateLimitBucket } from './rateLimit.js';
+import { getPaymentProvider, buildTestWebhook, chfToRappen } from './paymentService.js';
 import { loginCrew, logoutCrew, buildCrewCookie, buildClearCrewCookie } from './auth.js';
 import {
   createSuccessResponse,
@@ -33,6 +46,7 @@ import {
   KAI_DAO_PRICE_CHF,
   SPICE_LABELS,
 } from '../config/features.js';
+import { complianceConfig } from '../config/compliance.js';
 import { CreateOrderInput, OrderStatus } from './types.js';
 
 export interface ApiRequestInput {
@@ -48,6 +62,10 @@ export interface ApiRequestInput {
   clientKey?: string;
   /** True when the request arrived over HTTPS (sets the Secure cookie flag). */
   secure?: boolean;
+  /** Unparsed request body. The payment webhook signature is checked against exactly these bytes. */
+  rawBody?: string;
+  /** Public address of this site, for links in e-mails. */
+  baseUrl?: string;
 }
 
 export interface ApiResult {
@@ -76,6 +94,22 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       startTime,
       { correlationId }
     );
+
+  /** Guests are rate limited per client; the crew is not. */
+  const limited = (bucket: RateLimitBucket): ApiResult | null => {
+    if (isCrew) return null;
+    const check = checkRateLimit(bucket, req.clientKey);
+    if (check.allowed) return null;
+    const res: ApiResult = createErrorResponse(
+      429,
+      'RATE_LIMITED',
+      'Zu viele Anfragen. Bitte kurz warten oder an der Kasse melden.',
+      startTime,
+      { correlationId, fallbackAction: 'CONTACT_CREW' }
+    );
+    res.headers = { 'Retry-After': String(check.retryAfterSeconds) };
+    return res;
+  };
 
   try {
     // 0. Crew session: login, logout, status
@@ -139,6 +173,7 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
           {
             features: getFeatureFlags(),
             paymentMethods: getAvailablePaymentMethods(),
+            queue: getQueueInfo(),
             menu: {
               dishes: MENU_DISHES,
               drinks: MENU_DRINKS,
@@ -152,18 +187,25 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       }
       if (method === 'PATCH' || method === 'POST') {
         if (!isCrew) return crewRequired();
-        const payload = body as { enableCustomSpiceLevels?: boolean };
-        if (typeof payload.enableCustomSpiceLevels !== 'boolean') {
+        const payload = body as { enableCustomSpiceLevels?: unknown; ordersPaused?: unknown };
+        const hasSpice = typeof payload.enableCustomSpiceLevels === 'boolean';
+        const hasPause = typeof payload.ordersPaused === 'boolean';
+        if (
+          (!hasSpice && !hasPause) ||
+          (payload.enableCustomSpiceLevels !== undefined && !hasSpice) ||
+          (payload.ordersPaused !== undefined && !hasPause)
+        ) {
           return createErrorResponse(
             400,
             'INVALID_FEATURE_TOGGLE_PAYLOAD',
-            'Feld enableCustomSpiceLevels (boolean) ist erforderlich.',
+            'Feld enableCustomSpiceLevels oder ordersPaused (boolean) ist erforderlich.',
             startTime,
             { correlationId }
           );
         }
-        const updated = setCustomSpiceLevelsAndPersist(payload.enableCustomSpiceLevels);
-        return createSuccessResponse({ features: updated }, startTime, correlationId);
+        if (hasSpice) setCustomSpiceLevelsAndPersist(payload.enableCustomSpiceLevels as boolean);
+        if (hasPause) setOrdersPausedAndPersist(payload.ordersPaused as boolean);
+        return createSuccessResponse({ features: getFeatureFlags() }, startTime, correlationId);
       }
     }
 
@@ -178,7 +220,7 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
           {
             orders,
             wokDemand,
-            totalOrdersToday: getAllOrders().length,
+            totalOrdersToday: getOrdersTodayCount(),
             demoPayments: getFeatureFlags().demoPayments,
           },
           startTime,
@@ -187,13 +229,15 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       }
 
       if (method === 'POST') {
+        const tooMany = limited('orders');
+        if (tooMany) return tooMany;
         const payload = { ...body } as unknown as CreateOrderInput;
         const headerIdemp = req.headers?.['idempotency-key'];
         if (headerIdemp && !payload.idempotencyKey) {
           payload.idempotencyKey = headerIdemp;
         }
 
-        const order = await createOrder(payload, { allowSimulatedFailure: isCrew });
+        const order = await createOrder(payload, { allowSimulatedFailure: isCrew, isCrew });
 
         // If payment fallback was triggered, still return 201 Created with explicit fallback warning
         return createCreatedResponse(
@@ -227,7 +271,7 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
         }
         // Guests reach their own ticket through the unguessable order id and see the public view only.
         return createSuccessResponse(
-          { order: isCrew ? order : toPublicOrder(order) },
+          { order: isCrew ? order : toPublicOrder(order), queue: getQueueInfo() },
           startTime,
           correlationId
         );
@@ -236,7 +280,7 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       if (method === 'PATCH' || method === 'POST') {
         if (!isCrew) return crewRequired();
         const payload = body as {
-          action?: 'confirm_cash' | 'advance_status';
+          action?: 'confirm_cash' | 'advance_status' | 'undo' | 'refund_done';
           status?: OrderStatus;
           note?: string;
         };
@@ -248,6 +292,20 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
             startTime,
             correlationId
           );
+        }
+
+        if (payload.action === 'undo') {
+          const updated = undoLastMove(orderId);
+          return createSuccessResponse(
+            { order: updated, wokDemand: getWokDemand() },
+            startTime,
+            correlationId
+          );
+        }
+
+        if (payload.action === 'refund_done') {
+          const updated = resolveRefund(orderId, payload.note);
+          return createSuccessResponse({ order: updated }, startTime, correlationId);
         }
 
         if (!payload.status) {
@@ -275,9 +333,77 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       return createSuccessResponse({ wokDemand: getWokDemand() }, startTime, correlationId);
     }
 
-    // 5b. GET /api/board (public pickup board: codes and phase only)
+    // 5a. POST /api/wok/batch (the cook starts one wok batch of a variant)
+    if (pathname === '/api/wok/batch' && method === 'POST') {
+      if (!isCrew) return crewRequired();
+      const batch = startWokBatch(body.variant);
+      return createSuccessResponse({ batch, wokDemand: getWokDemand() }, startTime, correlationId);
+    }
+
+    // 5b. GET /api/board (public pickup board: codes, phase and queue info only)
     if (pathname === '/api/board' && method === 'GET') {
-      return createSuccessResponse({ entries: getBoardEntries() }, startTime, correlationId);
+      return createSuccessResponse(
+        { entries: getBoardEntries(), queue: getQueueInfo() },
+        startTime,
+        correlationId
+      );
+    }
+
+    // 5c. POST /api/webhooks/payment (called by the payment provider, not by browsers)
+    if (pathname === '/api/webhooks/payment' && method === 'POST') {
+      const provider = getPaymentProvider();
+      if (!provider) {
+        return createErrorResponse(404, 'NO_PAYMENT_PROVIDER', 'Kein Zahlungsanbieter aktiv.', startTime, {
+          correlationId,
+        });
+      }
+      let event;
+      try {
+        event = provider.verifyWebhook(req.rawBody ?? '', req.headers || {});
+      } catch {
+        // Wrong signature or broken payload: tell the sender nothing more than that.
+        return createErrorResponse(400, 'WEBHOOK_REJECTED', 'Signatur oder Inhalt ungültig.', startTime, {
+          correlationId,
+        });
+      }
+      // Verified events always get a 2xx, so the provider stops retrying.
+      const outcome = applyPaymentEvent(event);
+      return createSuccessResponse({ received: true, outcome }, startTime, correlationId);
+    }
+
+    // 5d. POST /api/payments/test/:ref (TEST provider only: plays the provider's part)
+    if (pathname.startsWith('/api/payments/test/') && method === 'POST') {
+      const provider = getPaymentProvider();
+      const ref = pathname.replace('/api/payments/test/', '');
+      const order = provider && provider.name === 'test' ? getOrderByPaymentRef(ref) : undefined;
+      if (!provider || !order) {
+        return createErrorResponse(404, 'PAYMENT_NOT_FOUND', 'Zahlung wurde nicht gefunden.', startTime, {
+          correlationId,
+        });
+      }
+      const outcome = body.outcome;
+      if (outcome !== 'succeeded' && outcome !== 'failed' && outcome !== 'lost') {
+        return createErrorResponse(400, 'INVALID_TEST_OUTCOME', 'outcome: succeeded | failed | lost.', startTime, {
+          correlationId,
+        });
+      }
+      let result = 'NO_WEBHOOK_SENT';
+      if (outcome !== 'lost') {
+        // Goes through the same signature check as a real webhook.
+        const signed = buildTestWebhook({
+          type: outcome === 'succeeded' ? 'payment.succeeded' : 'payment.failed',
+          providerRef: ref,
+          orderId: order.id,
+          amountRappen: chfToRappen(order.totalChf),
+          currency: 'CHF',
+        });
+        result = applyPaymentEvent(provider.verifyWebhook(signed.rawBody, signed.headers));
+      }
+      return createSuccessResponse(
+        { outcome: result, returnUrl: `/order/${order.id}` },
+        startTime,
+        correlationId
+      );
     }
 
     // 6. GET / POST /api/newsletter
@@ -285,24 +411,45 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       if (method === 'GET') {
         if (!isCrew) return crewRequired();
         return createSuccessResponse(
-          { subscribers: getNewsletterSubscribers() },
+          { subscribers: getNewsletterOverview() },
           startTime,
           correlationId
         );
       }
       if (method === 'POST') {
-        const payload = body as {
-          email?: string;
-          preferredPlz?: string;
-          preferredQuarter?: string;
-        };
-        const sub = subscribeNewsletter({
-          email: payload.email || '',
-          preferredPlz: payload.preferredPlz,
-          preferredQuarter: payload.preferredQuarter,
-        });
-        return createCreatedResponse({ subscriber: sub }, startTime, correlationId);
+        const payload = body as { email?: unknown; preferredPlz?: unknown; preferredQuarter?: unknown };
+        const tooMany = limited('newsletter');
+        if (tooMany) return tooMany;
+        await requestSubscription(payload, req.baseUrl || '');
+        // Same answer for new, pending and already confirmed addresses.
+        const res: ApiResult = createSuccessResponse(
+          { status: 'confirmation_sent' },
+          startTime,
+          correlationId
+        );
+        res.statusCode = 202;
+        return res;
       }
+    }
+
+    // 6b. Double opt-in: confirm and unsubscribe (called by the pages behind the e-mail links)
+    if (pathname === '/api/newsletter/confirm' && method === 'POST') {
+      if (confirmSubscription(body.token) !== 'confirmed') {
+        return createErrorResponse(
+          400,
+          'INVALID_OR_EXPIRED_TOKEN',
+          'Der Link ist ungültig oder abgelaufen. Bitte neu anmelden.',
+          startTime,
+          { correlationId }
+        );
+      }
+      return createSuccessResponse({ status: 'confirmed' }, startTime, correlationId);
+    }
+
+    if (pathname === '/api/newsletter/unsubscribe' && method === 'POST') {
+      // Unknown tokens get the same answer: the address is not on the list afterwards either way.
+      unsubscribe(body.token);
+      return createSuccessResponse({ status: 'unsubscribed' }, startTime, correlationId);
     }
 
     // 7. GET / POST /api/b2b
@@ -312,6 +459,8 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
         return createSuccessResponse({ inquiries: getB2BInquiries() }, startTime, correlationId);
       }
       if (method === 'POST') {
+        const tooMany = limited('b2b');
+        if (tooMany) return tooMany;
         const payload = body as unknown as Parameters<typeof createB2BInquiry>[0];
         const inq = createB2BInquiry(payload);
         return createCreatedResponse({ inquiry: inq }, startTime, correlationId);
@@ -363,6 +512,23 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       return createErrorResponse(422, 'INVALID_PORTION_COUNT', message, startTime, {
         correlationId,
         fallbackAction: 'RETRY_REQUEST',
+      });
+    }
+
+    if (message === 'ORDERS_PAUSED') {
+      return createErrorResponse(
+        409,
+        'ORDERS_PAUSED',
+        'Wir nehmen gerade keine neuen Bestellungen an. Bitte in ein paar Minuten nochmals versuchen.',
+        startTime,
+        { correlationId, fallbackAction: 'RETRY_REQUEST' }
+      );
+    }
+
+    if (message === 'ORIGIN_NOT_DECLARED') {
+      return createErrorResponse(422, 'ORIGIN_NOT_DECLARED', complianceConfig.texts.originMissing, startTime, {
+        correlationId,
+        fallbackAction: 'CONTACT_CREW',
       });
     }
 

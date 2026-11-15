@@ -6,12 +6,18 @@ export type DrinkId = 'thai_iced_tea' | 'coconut_water' | 'zueri_mate';
 
 export type PaymentMethod = 'twint' | 'card' | 'cash';
 
-export type PaymentStatus = 'pending_cash' | 'paid' | 'payment_error_fallback' | 'refunded';
+export type PaymentStatus =
+  | 'pending_cash'
+  | 'pending_payment'
+  | 'paid'
+  | 'payment_error_fallback'
+  | 'refunded';
 
 /**
  * 4-Station Foodtruck Pipeline Status:
  * 1. pending_cash: Customer chose cash, needs to pay at Cashier (Kasse) first
- * 2. payment_error_fallback: Digital payment timed out or failed -> Cashier manual review triggered
+ * 1b. pending_payment: Guest was sent to the payment provider; the signed webhook confirms the payment
+ * 2. payment_error_fallback: Digital payment could not be started or failed -> Cashier manual review triggered
  * 3. received: Paid & active in Wok Demand Queue (Koch sees aggregated totals, Schöpfer sees boxes)
  * 4. in_wok: Explicitly in the pan (optional intermediate state, also covered in Wok Demand)
  * 5. plating: Schöpfer finished scooping rice/krapao/egg -> waiting for QC & Drinks
@@ -21,6 +27,7 @@ export type PaymentStatus = 'pending_cash' | 'paid' | 'payment_error_fallback' |
  */
 export type OrderStatus =
   | 'pending_cash'
+  | 'pending_payment'
   | 'payment_error_fallback'
   | 'received'
   | 'in_wok'
@@ -34,6 +41,8 @@ export interface OrderPortionItem {
   variant: DishVariantId;
   spiceLevel: SpiceLevel;
   addKaiDao: boolean; // + CHF 2.50
+  /** Set when the cook started the wok batch that contains this portion. */
+  firedAt?: string;
 }
 
 export interface OrderDrinkItem {
@@ -69,6 +78,43 @@ export interface Order {
   readyAt?: string;
   completedAt?: string;
   cancelledAt?: string;
+  /** Tour stop that was live when the order was placed (decides the declared meat origin). */
+  stopId?: string | null;
+  /** Declaration the guest saw before paying (LGV / LIV evidence). */
+  declaration?: OrderDeclarationSnapshot;
+  /** Digital payment at the provider. Absent for cash orders. */
+  payment?: OrderPaymentInfo;
+  /** Money that has to go back to the guest. The cashier clears it. */
+  refundDue?: RefundDue;
+  /** Status before the last crew move, kept for the short undo window. */
+  previousStatus?: OrderStatus;
+}
+
+export interface OrderDeclarationSnapshot {
+  version: string;
+  lines: string[];
+}
+
+export interface OrderPaymentInfo {
+  provider: string;
+  /** Checkout / payment reference at the provider. */
+  providerRef: string;
+  /** Where the guest pays. Only shown while the payment is open. */
+  redirectUrl: string;
+  expiresAt: string;
+  /** Provider event that settled the payment. */
+  settledEventId?: string;
+  failureReason?: string;
+}
+
+export type RefundReason = 'PAID_AFTER_CANCEL' | 'DOUBLE_PAYMENT' | 'AMOUNT_MISMATCH';
+
+export interface RefundDue {
+  reason: RefundReason;
+  amountChf: number;
+  providerRef: string;
+  flaggedAt: string;
+  resolvedAt?: string;
 }
 
 /** What a guest may see about an order: no internal notes, keys or correlation ids. */
@@ -82,6 +128,9 @@ export interface PublicOrderView {
   paymentMethod: PaymentMethod;
   status: OrderStatus;
   createdAt: string;
+  declaration?: OrderDeclarationSnapshot;
+  /** Link to the payment page, only while the payment is still open. */
+  paymentUrl?: string;
 }
 
 /** What the public pickup board shows: code and phase only. */
@@ -89,6 +138,8 @@ export interface BoardEntry {
   plz: string;
   quarter: string;
   phase: 'preparing' | 'ready';
+  /** When the code was called (ready entries only). Lets the board flash new calls. */
+  readyAt?: string;
 }
 
 export interface CreateOrderInput {
@@ -111,7 +162,16 @@ export interface CreateOrderInput {
 export interface WokProteinBatch {
   variant: DishVariantId;
   variantName: string;
+  /** All paid portions that are not plated yet (waiting + in the wok). */
   totalPortions: number;
+  /** Portions the cook has not started yet. */
+  queuedPortions: number;
+  /** Portions in a started wok batch. */
+  cookingPortions: number;
+  /** Size of the next batch: the oldest waiting portions, at most one wok load. */
+  nextBatchSize: number;
+  /** Minutes the oldest waiting portion has been waiting since payment. */
+  oldestWaitingMinutes: number;
   bySpice: Record<SpiceLevel, number>;
 }
 
@@ -122,6 +182,8 @@ export interface WokDemandSummary {
   customSpiceEnabled: boolean;
   batches: Record<DishVariantId, WokProteinBatch>;
   estimatedWaitMinutes: number;
+  /** Variant with the oldest waiting portion: what the cook should start next. */
+  nextVariant: DishVariantId | null;
 }
 
 export interface NewsletterSubscriber {
@@ -130,7 +192,18 @@ export interface NewsletterSubscriber {
   preferredPlz: string;
   preferredQuarter: string;
   createdAt: string;
+  status: NewsletterStatus;
+  /** SHA-256 of the confirmation token. The token itself only exists in the e-mail. */
+  confirmTokenHash?: string;
+  confirmExpiresAt?: string;
+  confirmedAt?: string;
+  /** Token for the unsubscribe link that goes into every e-mail. */
+  unsubscribeToken: string;
+  /** Evidence of consent: which text the person agreed to, and when. */
+  consent: { textVersion: string; text: string; requestedAt: string };
 }
+
+export type NewsletterStatus = 'pending' | 'confirmed';
 
 export interface B2BInquiry {
   id: string;

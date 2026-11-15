@@ -1,8 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  processOrderPayment,
-  clearPaymentIdempotencyCache,
+  startCheckout,
+  getPaymentProvider,
+  buildTestWebhook,
+  chfToRappen,
+  resetPaymentService,
+  WEBHOOK_SIGNATURE_HEADER,
 } from '../../src/lib/paymentService.js';
+import { resetFeatureFlags, setDemoPaymentsEnabled } from '../../src/config/features.js';
 import {
   createSuccessResponse,
   createCreatedResponse,
@@ -11,72 +16,101 @@ import {
   resetSlaMetrics,
 } from '../../src/lib/response.js';
 
-describe('Payment Service (99.99% Reliability & Idempotency)', () => {
+const checkout = (extra: Record<string, unknown> = {}) => ({
+  orderId: 'ord_test',
+  amountRappen: 4200,
+  currency: 'CHF' as const,
+  method: 'twint' as const,
+  idempotencyKey: 'key_1',
+  returnUrl: '/order/ord_test',
+  ...extra,
+});
+
+describe('Payment service: provider interface, timeout guard and webhook signature', () => {
   beforeEach(() => {
-    clearPaymentIdempotencyCache();
+    resetFeatureFlags();
+    setDemoPaymentsEnabled(true);
+    resetPaymentService();
     resetSlaMetrics();
   });
 
-  it('places cash payments immediately into pending_cash status', async () => {
-    const res = await processOrderPayment({
-      amountChf: 28.5,
-      paymentMethod: 'cash',
-      idempotencyKey: 'cash_key_1',
-    });
-
-    expect(res.paymentStatus).toBe('pending_cash');
-    expect(res.initialOrderStatus).toBe('pending_cash');
-    expect(res.fallbackTriggered).toBe(false);
-    expect(res.idempotentReplay).toBe(false);
-
-    // Replay with same idempotency key
-    const replay = await processOrderPayment({
-      amountChf: 28.5,
-      paymentMethod: 'cash',
-      idempotencyKey: 'cash_key_1',
-    });
-    expect(replay.idempotentReplay).toBe(true);
-    expect(replay.transactionId).toBe(res.transactionId);
+  it('has no provider unless demo payments are on', async () => {
+    setDemoPaymentsEnabled(false);
+    expect(getPaymentProvider()).toBeNull();
+    const res = await startCheckout(checkout());
+    expect(res.ok).toBe(false);
+    expect(res.ok === false && res.reason).toBe('NO_PAYMENT_PROVIDER');
   });
 
-  it('processes digital payments (TWINT / Card) under 1000ms SLA', async () => {
-    const res = await processOrderPayment({
-      amountChf: 42.0,
-      paymentMethod: 'twint',
-      idempotencyKey: 'twint_key_1',
-    });
-
-    expect(res.paymentStatus).toBe('paid');
-    expect(res.initialOrderStatus).toBe('received');
+  it('opens a checkout with a redirect URL well inside the 1000ms SLA', async () => {
+    const res = await startCheckout(checkout());
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.provider).toBe('test');
+    expect(res.session.redirectUrl).toBe(`/pay/test/${res.session.providerRef}`);
+    expect(Date.parse(res.session.expiresAt)).toBeGreaterThan(Date.now());
     expect(res.latencyMs).toBeLessThan(1000);
-    expect(res.fallbackTriggered).toBe(false);
   });
 
-  it('triggers zero-loss PAYMENT_ERROR_FALLBACK when upstream gateway fails or times out', async () => {
-    const failed = await processOrderPayment({
-      amountChf: 15.0,
-      paymentMethod: 'card',
-      simulateFailure: true,
-    });
-
-    expect(failed.paymentStatus).toBe('payment_error_fallback');
-    expect(failed.initialOrderStatus).toBe('payment_error_fallback');
-    expect(failed.fallbackTriggered).toBe(true);
-    expect(failed.fallbackReason).toBe('UPSTREAM_PAYMENT_PROVIDER_REJECTED');
-
-    const metrics = getSlaMetrics();
-    expect(metrics.paymentFallbacksTriggered).toBe(1);
-    // A fallback keeps the order, but the payment itself failed: the rate must show that.
-    expect(metrics.paymentReliabilityRate).toBe(0);
+  it('turns a provider rejection into a result instead of an exception', async () => {
+    const res = await startCheckout(checkout({ simulateFailure: true }));
+    expect(res.ok).toBe(false);
+    expect(res.ok === false && res.reason).toBe('UPSTREAM_PAYMENT_PROVIDER_REJECTED');
   });
 
-  it('rejects invalid zero or negative payment amounts', async () => {
-    await expect(
-      processOrderPayment({
-        amountChf: 0,
-        paymentMethod: 'twint',
-      })
-    ).rejects.toThrow('INVALID_PAYMENT_AMOUNT');
+  it('rejects zero, negative and fractional Rappen amounts', async () => {
+    for (const amountRappen of [0, -100, 12.5]) {
+      await expect(startCheckout(checkout({ amountRappen }))).rejects.toThrow('INVALID_PAYMENT_AMOUNT');
+    }
+    expect(chfToRappen(17.5)).toBe(1750);
+    expect(chfToRappen(0.1 + 0.2)).toBe(30);
+  });
+
+  it('accepts a correctly signed webhook and rejects tampered, unsigned and stale ones', () => {
+    const provider = getPaymentProvider()!;
+    const event = {
+      type: 'payment.succeeded' as const,
+      providerRef: 'test_abc',
+      orderId: 'ord_1',
+      amountRappen: 1500,
+      currency: 'CHF',
+    };
+    const signed = buildTestWebhook(event);
+    expect(provider.verifyWebhook(signed.rawBody, signed.headers)).toMatchObject(event);
+
+    // Body changed after signing (e.g. a lower amount)
+    const tampered = signed.rawBody.replace('1500', '1');
+    expect(() => provider.verifyWebhook(tampered, signed.headers)).toThrow('WEBHOOK_SIGNATURE_INVALID');
+
+    // No or malformed signature header
+    expect(() => provider.verifyWebhook(signed.rawBody, {})).toThrow('WEBHOOK_SIGNATURE_INVALID');
+    expect(() =>
+      provider.verifyWebhook(signed.rawBody, { [WEBHOOK_SIGNATURE_HEADER]: 't=abc,v1=zz' })
+    ).toThrow('WEBHOOK_SIGNATURE_INVALID');
+
+    // Valid signature, but replayed ten minutes later
+    expect(() =>
+      provider.verifyWebhook(signed.rawBody, signed.headers, Date.now() + 10 * 60 * 1000)
+    ).toThrow('WEBHOOK_SIGNATURE_INVALID');
+
+    // Signed with another secret (after a restart without PAYMENT_WEBHOOK_SECRET)
+    resetPaymentService();
+    expect(() => provider.verifyWebhook(signed.rawBody, signed.headers)).toThrow(
+      'WEBHOOK_SIGNATURE_INVALID'
+    );
+  });
+
+  it('rejects a signed webhook whose payload is not a payment event', () => {
+    const provider = getPaymentProvider()!;
+    for (const bad of [
+      { type: 'payment.hacked', providerRef: 'a', orderId: 'b', amountRappen: 1, currency: 'CHF' },
+      { type: 'payment.succeeded', providerRef: 'a', orderId: 'b', amountRappen: 1.5, currency: 'CHF' },
+    ]) {
+      const signed = buildTestWebhook(bad as any);
+      expect(() => provider.verifyWebhook(signed.rawBody, signed.headers)).toThrow(
+        'WEBHOOK_PAYLOAD_INVALID'
+      );
+    }
   });
 });
 

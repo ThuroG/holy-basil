@@ -174,7 +174,8 @@ describe('Payments: cash only unless demo mode is on', () => {
       simulatePaymentFailure: true,
     };
     const asGuest = await guest({ method: 'POST', pathname: '/api/orders', body });
-    expect((asGuest.body as any).data.order.status).toBe('received');
+    // The guest cannot force a failure: the checkout opens and waits for the webhook.
+    expect((asGuest.body as any).data.order.status).toBe('pending_payment');
 
     const asCrew = await crew({ method: 'POST', pathname: '/api/orders', body });
     expect((asCrew.body as any).data.order.status).toBe('payment_error_fallback');

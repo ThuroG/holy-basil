@@ -1,6 +1,6 @@
 # Holy Basil Zürich · Pad Krapao Foodtruck & Web-Plattform
 
-[![Vitest Coverage](https://img.shields.io/badge/coverage-93.6%25-brightgreen.svg)](#-qualität--tests)
+[![Vitest Coverage](https://img.shields.io/badge/coverage-95.6%25-brightgreen.svg)](#-qualität--tests)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A520-green.svg)](https://nodejs.org/)
 
@@ -41,25 +41,30 @@ Entwickelt nach dem dimensionalen **Scroll-Craft**-Standard:
 
 ### 2. Mobile QR-Bestell-App (`/order`)
 Optimiert für Smartphone-Browser bei direkter QR-Code-Nutzung vor Ort oder vorab online:
+- **Ein Screen, zwei Taps:** Card antippen, Bestellen antippen. Keine Vorauswahl, kein Popup. Wartezeit steht oben.
+- **Deklaration immer sichtbar:** 100 % vegane Saucenbasis als Badge, Fleischherkunft auf jeder Card, und in der fixen Leiste über dem Bestellbutton Herkunft, Allergene und Kreuzkontakt für genau diesen Warenkorb. «Allergene & Zutaten» klappt an Ort und Stelle auf.
 - **1 bis 10 Portionen pro Bestellung:** Schneller *Express-Modus* ("alle Boxen identisch") oder detailgenaue *Box-für-Box-Konfiguration*.
 - **Feature-Toggle für Schärfegrade (`enableCustomSpiceLevels`):**
   - Standardmässig auf `false`: Alle Boxen erhalten die perfekt ausbalancierte *Standardschärfe (leicht scharf 🌶️)* für maximale Wok-Kadenz.
   - Dynamisch zuschaltbar für 4 Stufen (*Mild*, *Leicht scharf*, *Thai Spicy*, *Extra Hot*).
-- **Zahlungsarten:** **Barzahlung am Truck (`pending_cash`)**. TWINT und Karte sind noch nicht angebunden und erscheinen nur im Demo-Modus als Simulation (siehe [Betrieb & Sicherheit](#-betrieb--sicherheit)).
+- **Zahlungsarten:** **Barzahlung am Truck (`pending_cash`)**. TWINT und Karte sind noch nicht angebunden und laufen nur im Demo-Modus über einen Test-Provider (siehe [Betrieb & Sicherheit](#-betrieb--sicherheit)).
 - **Ticket bleibt erhalten:** Nach der Bestellung liegt das Ticket unter `/order/<id>` und überlebt Reload und gesperrtes Handy.
 - **Züri-Code Boarding-Pass:** Jede Bestellung erhält eine eindeutige Zürcher Postleitzahl mit Quartiersnamen (z. B. `8004 · LANGSTRASSE`).
 
 ### 3. Foodtruck Operations & Admin KDS (`/admin`, nur mit Crew-PIN)
 Das Küchenleitsystem strukturiert den Ablauf am Truck in 4 klare Arbeitsstationen:
-1. **Station 1 – Kasse:** Überwacht Barzahlungen (`pending_cash`) und Zahlungs-Timeouts (`payment_error_fallback`) mit 1-Tap-Freigabe in den Wok.
-2. **Station 2 – Zero-Click Wok-Cockpit:** Der Koch muss nichts tippen. Ein intelligenter Aggregator summiert alle bezahlten, ungeschöpften Portionen nach Protein und Eiern inklusive konkreter Batch-Empfehlung in Echtzeit.
-3. **Station 3 – Schöpfer-Station:** Boxen anrichten, Reis portionieren, Krapao & Spiegelei schöpfen, 1-Tap Übergabe an QC.
+1. **Station 1 – Kasse:** Überwacht Barzahlungen (`pending_cash`), offene Online-Zahlungen und Zahlungs-Fallbacks mit 1-Tap-Freigabe in den Wok. Code-Suche per Ziffernfeld, Rückerstattungen als eigene Tickets.
+2. **Station 2 – Wok-Cockpit:** Summiert alle bezahlten, ungeschöpften Portionen nach Protein und Eiern in Echtzeit. Pro Sorte «noch zu braten» und «im Wok», Marke «Als Nächstes» für die am längsten wartende Sorte, 1 Tap startet eine Wok-Ladung.
+3. **Station 3 – Schöpfer-Station:** Boxen anrichten, Reis portionieren, Krapao & Spiegelei schöpfen, 1-Tap Übergabe an QC. Jede Box zeigt «im Wok» oder «wartet».
 4. **Station 4 – Qualitätskontrolle (QC) & Drinks:** Kontrolle, Hinzufügen von gekühltem *Thai Iced Tea* / *Kokoswasser*, Aufruf auf den Monitor (`ready`) und Übergabe an den Gast (`completed`).
+
+Für Stosszeiten: Ticket-Alter mit Farbstufen, Rückgängig für Fehl-Taps, Schalter «Annahme pausieren», Wartezeit für Gäste. Details in [README_APP_AND_TECH.md, Kapitel 7](README_APP_AND_TECH.md).
 
 ### 4. Public Pickup Board (`/board`)
 Grossbildschirm-Anzeige für wartende Gäste vor dem Foodtruck mit SBB-Split-Flap-Ästhetik:
-- Spalte 1: *Im Wok & Schöpfen* (gelb pulsierend)
-- Spalte 2: *Abholbereit am Truck* (grün leuchtend)
+- Spalte 1: *In Zubereitung*
+- Spalte 2: *Abholbereit am Truck* (grün leuchtend, neuer Aufruf blinkt und löst einen Ton aus)
+- Zeigt nur so viele Codes, wie ohne Scrollen passen, dazu «+ N weitere», Wartezeit und «Annahme pausiert».
 
 ---
 
@@ -69,39 +74,49 @@ Grossbildschirm-Anzeige für wartende Gäste vor dem Foodtruck mit SBB-Split-Fla
 | :--- | :--- |
 | **Crew-Zugang** | `/admin` und alle schreibenden Crew-Routen verlangen eine Anmeldung mit PIN (`CREW_PIN`). Ohne gesetzte PIN erzeugt der Server bei jedem Start eine zufällige und zeigt sie in der Konsole. |
 | **Gäste** | Sehen nur die eigene Bestellung (über die nicht erratbare Bestell-ID) und auf dem Board nur Code und Status. |
-| **Zahlung** | Standard: nur Bar an der Kasse. Erst die Kasse gibt eine Bestellung für den Wok frei. `DEMO_PAYMENTS=1` blendet TWINT/Karte als **Simulation** ein. Es ist kein Zahlungsanbieter angebunden. |
-| **Daten** | Bestellungen, Newsletter, B2B-Anfragen und Einstellungen liegen als JSON in `data/` und werden beim Start geladen. Aktive Bestellungen behalten nach einem Neustart ihren Züri-Code. |
+| **Zahlung** | Standard: nur Bar an der Kasse. Erst die Kasse gibt eine Bestellung für den Wok frei. `DEMO_PAYMENTS=1` schaltet TWINT/Karte über einen **Test-Provider** ein (es fliesst kein Geld). Es ist kein echter Zahlungsanbieter angebunden. Digitale Bestellungen gelten erst mit dem signierten Webhook als bezahlt. |
+| **Daten** | Bestellungen, Newsletter, B2B-Anfragen und Einstellungen liegen als JSON in `data/` und werden beim Start geladen. Aktive Bestellungen behalten nach einem Neustart ihren Züri-Code. Abgeschlossene Bestellungen wandern nach 12 Stunden in ein Monatsarchiv (`orders-archive-JJJJ-MM.json`). |
+| **Deklaration** | Fleischherkunft und Allergene kommen aus `src/config/compliance.ts`. Fehlt eine Herkunft, ist die Variante nicht bestellbar. Jede Bestellung speichert die angezeigte Deklaration. |
+| **Newsletter** | Double-Opt-in mit Bestätigungs- und Abmeldelink. Der Versand ist heute ein **Mock**: E-Mails landen in `data/outbox.json` und in der Konsole. |
+| **Missbrauchsschutz** | Gäste sind pro Adresse begrenzt (Bestellungen, Newsletter, B2B). Hinter einem Reverse Proxy `TRUST_PROXY=1` setzen. |
 | **Statusfolge** | Fest vorgegeben: Kasse → Wok → Schöpfen → Aufruf → Übergabe. Rücksprünge und unbekannte Status werden abgelehnt. |
-| **Züri-Codes** | Zufällige Vergabe, 5 Minuten Sperre nach Übergabe. Unbezahlte Bestellungen verfallen nach 20 Minuten. |
+| **Züri-Codes** | 80 Codes, zufällige Vergabe, 5 Minuten Sperre nach Übergabe. Unbezahlte Bestellungen verfallen nach 20 Minuten. |
 
 ### Umgebungsvariablen
 
 | Variable | Wirkung |
 | :--- | :--- |
 | `CREW_PIN` | PIN für `/admin` (mind. 4 Zeichen). Im Betrieb immer setzen. |
-| `DEMO_PAYMENTS` | `1` = TWINT/Karte als Simulation sichtbar, Demo-Bestellungen beim ersten Start. |
+| `DEMO_PAYMENTS` | `1` = TWINT/Karte über den Test-Provider, Demo-Bestellungen beim ersten Start. |
+| `PAYMENT_WEBHOOK_SECRET` | Geheimnis für die Webhook-Signatur (mind. 16 Zeichen). Ohne Wert gilt ein zufälliges pro Start. |
+| `TRUST_PROXY` | `1` = Client-Adresse aus `X-Forwarded-For` lesen (nur hinter einem eigenen Reverse Proxy setzen). |
+| `RATE_LIMIT_ORDERS` / `RATE_LIMIT_FORMS` | Limits pro Adresse, Standard 30 Bestellungen in 5 Minuten und 5 Formulare in 10 Minuten. |
 | `PUBLIC_BASE_URL` | Öffentliche Adresse für den QR-Code, z. B. `https://holybasil.ch`. |
 | `PORT` | Port, Standard `3000`. |
 | `HB_DATA_DIR` | Datenordner, Standard `./data`. |
 
 ### Vor dem ersten echten Einsatz offen
 
-- Zahlungsanbieter für TWINT/Karte anbinden (inkl. Webhook-Bestätigung).
-- Impressum, Datenschutzerklärung und Double-Opt-in für den Newsletter.
-- HTTPS über einen Reverse Proxy, Schriften selbst hosten statt von Google laden.
-- Die Tourdaten in `src/lib/orderStore.ts` sind Beispieldaten.
+Der Server listet die offenen Punkte bei jedem Start in der Konsole auf.
+
+- **Zahlungsanbieter:** Schnittstelle, Webhook und Fallbacks stehen. Es fehlt der Adapter für den echten Anbieter (`src/lib/paymentService.ts`).
+- **E-Mail-Versand:** Double-Opt-in steht, der Versand ist ein Mock (`src/lib/mailer.ts`).
+- **Rechtstexte:** `/impressum` und `/datenschutz` sind Entwürfe mit Platzhaltern (`src/config/legal.ts`) und müssen anwaltlich geprüft werden.
+- **Allergene:** Alle Komponenten stehen auf `verified: false`, bis die Lieferantenspezifikationen vorliegen (`src/config/compliance.ts`).
+- HTTPS über einen Reverse Proxy.
+- Die Tourdaten in `src/config/tourStops.ts` sind Beispieldaten.
 
 ---
 
 ## ✅ Qualität & Tests
 
-40 automatisierte Tests (Vitest) decken Bestellablauf, Zugriffsschutz, Statusfolge, Eingabeprüfung, Neustart-Verhalten und den HTTP-Server ab.
+95 automatisierte Tests (Vitest) decken Bestellablauf, Deklaration, Zahlungs-Webhook, Wok-Batches, Newsletter, Zugriffsschutz, Statusfolge, Eingabeprüfung, Neustart-Verhalten und den HTTP-Server ab.
 
 | Kennzahl | Wert |
 | :--- | :--- |
-| Statements / Lines | 93.6 % |
-| Branches | 89.2 % |
-| Functions | 97.8 % |
+| Statements / Lines | 95.6 % |
+| Branches | 91.2 % |
+| Functions | 98.8 % |
 
 Gemessen über den gesamten Server-Code in `src/`. Die Views sind HTML-Vorlagen: Ihr Browser-Skript läuft in diesen Tests nicht und ist damit nicht abgedeckt.
 
@@ -127,7 +142,7 @@ npm install
 # Server starten (Port 3000, nur Barzahlung)
 npm run dev
 
-# Oder zum Ausprobieren: Demo-Modus mit simulierter TWINT-/Kartenzahlung und Beispiel-Bestellungen
+# Oder zum Ausprobieren: Demo-Modus mit Test-Zahlungsanbieter (TWINT/Karte, kein echtes Geld) und Beispiel-Bestellungen
 npm run dev:demo
 ```
 
@@ -145,23 +160,30 @@ Der Server ist anschliessend erreichbar unter:
 ## 📁 Projektstruktur
 
 ```
-├── assets/                    # Marken-Assets, Logo-Iterationen (v1–v7) & Team Sticker/Embleme
+├── assets/                    # Marken-Assets, Logo-Iterationen (v1–v7), Team Sticker/Embleme, fonts/
 ├── data/                      # Lokaler Speicher: Bestellungen, Newsletter, B2B, Einstellungen (nicht im Git)
 ├── scrollcraft/               # Scroll-Craft Landingpage Engine & Assets
 │   └── builds/holy-basil/     # HTML, CSS, JS & Briefing der 5-Act Experience
 ├── src/
 │   ├── config/
-│   │   └── features.ts        # Feature Toggles, Menü- und Preiskonfiguration
+│   │   ├── compliance.ts      # Fleischherkunft, Allergene, Deklarationstexte (LGV / LIV)
+│   │   ├── features.ts        # Feature Toggles, Menü- und Preiskonfiguration
+│   │   ├── legal.ts           # Stammdaten für Impressum/Datenschutz, Newsletter-Einwilligung
+│   │   └── tourStops.ts       # Tour-Stopps (Beispieldaten)
 │   ├── lib/
 │   │   ├── apiHandler.ts      # REST API Router & JSON Endpoints, Crew-/Gast-Rechte
 │   │   ├── auth.ts            # Crew-PIN, Sessions, Login-Bremse
 │   │   ├── orderStore.ts      # Auftrags-Lebenszyklus, Züri-Code Zuordnung & Datenhaltung
-│   │   ├── paymentService.ts  # Zahlungs-SIMULATION (Demo), Idempotenz & 800ms Fallback Guard
+│   │   ├── mailer.ts          # E-Mail-Versand (heute Mock: data/outbox.json)
+│   │   ├── newsletter.ts      # Tour-Newsletter mit Double-Opt-in
+│   │   ├── paymentService.ts  # Zahlungs-Schnittstelle, Test-Provider, Webhook-Signatur, 800ms Guard
+│   │   ├── rateLimit.ts       # Begrenzung pro Client
+│   │   ├── storage.ts         # JSON-Dateien im Datenordner
 │   │   ├── response.ts        # Einheitliche API-Responses & Latenz-Tracking
 │   │   ├── types.ts           # Vollständige TypeScript Domain-Typen
 │   │   ├── wokDemand.ts       # Zero-Click Aggregator für den Koch
-│   │   └── zueriCodes.ts      # Pool & Kollisionsschutz für 55+ Zürcher Postleitzahlen
-│   ├── views/                 # Serverseitig gerenderte HTML-Views (order, admin, board)
+│   │   └── zueriCodes.ts      # Pool & Kollisionsschutz für 80 Zürcher Postleitzahlen
+│   ├── views/                 # Serverseitig gerenderte HTML-Views (order, admin, board, Rechtsseiten)
 │   └── server.ts              # HTTP Server & Statische Asset-Auslieferung
 ├── tests/                     # Vitest Unit- und Integrations-Testsuite
 ├── README_APP_AND_TECH.md     # Ausführliche technische Architektur & PRD

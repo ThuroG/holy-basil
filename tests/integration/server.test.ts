@@ -3,7 +3,9 @@ import type { AddressInfo } from 'node:net';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { createAppServer } from '../../src/server.js';
 import { resetOrderStore } from '../../src/lib/orderStore.js';
-import { resetFeatureFlags } from '../../src/config/features.js';
+import { resetFeatureFlags, setDemoPaymentsEnabled } from '../../src/config/features.js';
+import { buildTestWebhook, chfToRappen } from '../../src/lib/paymentService.js';
+import { getOrderById } from '../../src/lib/orderStore.js';
 import { resetAuth } from '../../src/lib/auth.js';
 
 let server: http.Server;
@@ -33,12 +35,14 @@ const json = (body: unknown) => ({
 
 describe('HTTP server', () => {
   it('serves the guest pages without crew links', async () => {
-    for (const route of ['/', '/order', '/order/ord_abc', '/board']) {
+    for (const route of ['/', '/order', '/order/ord_abc', '/board', '/impressum', '/datenschutz']) {
       const res = await fetch(base + route);
       expect(res.status, route).toBe(200);
       const html = await res.text();
       expect(html, route).not.toContain('href="/admin"');
       expect(html, route).not.toContain('/api/health');
+      // No page talks to a font CDN: fonts come from this server
+      expect(html, route).not.toMatch(/fonts.(googleapis|gstatic).com/);
       expect(res.headers.get('x-content-type-options')).toBe('nosniff');
     }
   });
@@ -125,5 +129,81 @@ describe('HTTP server', () => {
     expect((await fetch(base + '/assets/%E0%A4%A')).status).toBe(404);
     expect((await fetch(base + '/nope')).status).toBe(404);
     expect((await fetch(base + '/order', { method: 'DELETE' })).status).toBe(405);
+  });
+
+  it('serves self-hosted fonts and the legal pages with a draft notice', async () => {
+    const css = await fetch(base + '/fonts/fonts.css');
+    expect(css.status).toBe(200);
+    expect(css.headers.get('content-type')).toContain('text/css');
+    const font = /url\((\/fonts\/[a-z0-9-]+\.woff2)\)/.exec(await css.text())![1];
+    const woff = await fetch(base + font);
+    expect(woff.status).toBe(200);
+    expect(woff.headers.get('content-type')).toBe('font/woff2');
+    expect((await fetch(base + '/fonts/..%2F..%2Fpackage.json')).status).toBe(404);
+
+    const impressum = await (await fetch(base + '/impressum')).text();
+    expect(impressum).toContain('Impressum');
+    expect(impressum).toContain('ENTWURF');
+    const privacy = await (await fetch(base + '/datenschutz')).text();
+    expect(privacy).toContain('Double-Opt-in');
+
+    for (const route of ['/', '/order', '/board']) {
+      const html = await (await fetch(base + route)).text();
+      expect(html, route).toContain('href="/impressum"');
+      expect(html, route).toContain('href="/datenschutz"');
+    }
+  });
+
+  it('shows the newsletter pages without acting on a plain page view', async () => {
+    const token = 'a'.repeat(64);
+    const confirm = await (await fetch(base + '/newsletter/confirm?token=' + token)).text();
+    expect(confirm).toContain('Anmeldung bestätigen');
+    expect(confirm).toContain(token);
+    const unsub = await (await fetch(base + '/newsletter/unsubscribe?token=' + token)).text();
+    expect(unsub).toContain('Jetzt abmelden');
+    // A malformed token never reaches the page script
+    const odd = await (await fetch(base + '/newsletter/confirm?token=%3Cscript%3E')).text();
+    expect(odd).not.toContain('<script>"');
+    expect(odd).toContain('"token":""');
+  });
+
+  it('verifies the payment webhook against the raw body over HTTP', async () => {
+    setDemoPaymentsEnabled(true);
+    const res = await fetch(base + '/api/orders', json({ portions: [{ variant: 'vegan' }], paymentMethod: 'twint' }));
+    const pub = (await res.json()).data.order;
+    expect(pub.status).toBe('pending_payment');
+
+    // The test provider's payment page exists only for a known payment
+    expect((await fetch(base + pub.paymentUrl)).status).toBe(200);
+    expect(await (await fetch(base + pub.paymentUrl)).text()).toContain('TEST-PROVIDER');
+    expect((await fetch(base + '/pay/test/test_unknown')).status).toBe(404);
+
+    const order = getOrderById(pub.id)!;
+    const signed = buildTestWebhook({
+      type: 'payment.succeeded',
+      providerRef: order.payment!.providerRef,
+      orderId: order.id,
+      amountRappen: chfToRappen(order.totalChf),
+      currency: 'CHF',
+    });
+    const send = (body: string, headers: Record<string, string>) =>
+      fetch(base + '/api/webhooks/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...headers },
+        body,
+      });
+
+    // Same JSON, different bytes (extra space): the signature no longer matches
+    const reformatted = await send(signed.rawBody.replace('{', '{ '), signed.headers);
+    expect(reformatted.status).toBe(400);
+    expect(getOrderById(pub.id)!.status).toBe('pending_payment');
+
+    const ok = await send(signed.rawBody, signed.headers);
+    expect(ok.status).toBe(200);
+    expect((await ok.json()).data.outcome).toBe('PAID');
+    expect(getOrderById(pub.id)!.status).toBe('received');
+
+    setDemoPaymentsEnabled(false);
+    expect((await fetch(base + pub.paymentUrl)).status).toBe(404);
   });
 });

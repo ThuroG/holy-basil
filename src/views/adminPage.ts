@@ -1,14 +1,15 @@
+import { FONT_LINK } from './shared.js';
+
 export function renderAdminPageHtml(): string {
   return `<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
   <title>HOLY BASIL · Foodtruck Operations, KDS & Admin</title>
   <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+  ${FONT_LINK}
   <style>
     :root {
       --bg: #0A0C0A;
@@ -241,6 +242,44 @@ export function renderAdminPageHtml(): string {
       padding: 0.5rem;
     }
     .action-btn:disabled { opacity: 0.5; cursor: wait; }
+    /* Peak-hour additions: batch buttons, ticket age, search, undo */
+    .wok-pan-card--next { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(255, 213, 79, 0.5); }
+    .wok-pan-sub { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+    .wok-next-tag {
+      display: inline-block; margin-bottom: 0.3rem; padding: 0.1rem 0.45rem; border-radius: 6px;
+      background: var(--gold); color: #141004; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800;
+    }
+    .batch-btn {
+      width: 100%; min-height: 52px; margin-top: 0.6rem; border-radius: 12px; border: 0;
+      background: var(--green-neon); color: #061108; font-family: var(--font-display);
+      font-weight: 800; font-size: 0.95rem; cursor: pointer;
+    }
+    .batch-btn:disabled { background: #233026; color: var(--muted); cursor: not-allowed; }
+    .cockpit-meta { font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink); }
+    .age {
+      font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; padding: 0.1rem 0.4rem;
+      border-radius: 6px; background: #1A231C; color: var(--muted); white-space: nowrap;
+    }
+    .age--warn { background: rgba(255, 213, 79, 0.2); color: var(--gold); }
+    .age--late { background: rgba(229, 57, 53, 0.3); color: #FFCDD2; }
+    .order-ticket--late { border-color: var(--chili); }
+    .order-ticket--go { border-color: var(--green-neon); box-shadow: 0 0 0 1px var(--green-neon); }
+    .order-ticket--refund { border-color: var(--chili); background: rgba(229, 57, 53, 0.16); }
+    .ticket-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.25rem 0.5rem; }
+    .ticket-head > span { white-space: nowrap; }
+    .box-state { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; }
+    .box-state--fire { color: var(--green-neon); }
+    .box-state--wait { color: var(--muted); }
+    .kasse-search {
+      width: 100%; padding: 0.7rem; margin-bottom: 0.75rem; border-radius: 10px;
+      border: 1.5px solid var(--gold); background: #0A0D0B; color: var(--ink);
+      font-family: var(--font-mono); font-size: 1.2rem; letter-spacing: 0.12em;
+    }
+    .action-btn { min-height: 48px; }
+    #toast button {
+      margin-left: 0.8rem; padding: 0.45rem 0.8rem; border-radius: 8px; border: 0;
+      background: var(--ink); color: #0A0C0A; font-weight: 800; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -251,9 +290,9 @@ export function renderAdminPageHtml(): string {
       <span>HOLY BASIL · FOODTRUCK OPERATIONS &amp; ADMIN</span>
     </a>
     <div class="nav-pills">
-      <button type="button" class="tab-btn active" data-filter="all">Alle Stationen (Live Pipeline)</button>
-      <button type="button" class="tab-btn" data-filter="kasse">1. Kasse (Bar &amp; Freigabe)</button>
-      <button type="button" class="tab-btn" data-filter="wok">2. Wok Demand (Koch)</button>
+      <button type="button" class="tab-btn active" data-filter="all">Alle Stationen</button>
+      <button type="button" class="tab-btn" data-filter="kasse">1. Kasse</button>
+      <button type="button" class="tab-btn" data-filter="wok">2. Wok (Koch)</button>
       <button type="button" class="tab-btn" data-filter="schoepfer">3. Schöpfer</button>
       <button type="button" class="tab-btn" data-filter="qc">4. QC &amp; Drinks</button>
       <a href="/order" class="tab-btn" style="text-decoration: none; color: var(--gold);">+ Gast-Bestellung</a>
@@ -263,90 +302,75 @@ export function renderAdminPageHtml(): string {
   </header>
 
   <main class="main-wrap">
-    <div id="connectionState" style="color: #FF8A80; font-family: var(--font-mono); font-size: 0.85rem;"></div>
+    <div id="connectionState" role="status" style="color: #FF8A80; font-family: var(--font-mono); font-size: 0.85rem;"></div>
     <div id="demoBanner" style="display: none; margin-bottom: 0.9rem; padding: 0.6rem 0.9rem; border-radius: 10px; border: 1.5px solid var(--gold); color: var(--gold); font-size: 0.85rem;">
-      DEMO-MODUS: TWINT und Karte sind simuliert. Es fliesst kein Geld.
+      DEMO-MODUS: TWINT und Karte laufen über den Test-Provider. Es fliesst kein Geld.
+    </div>
+    <div id="pausedBanner" style="display: none; margin-bottom: 0.9rem; padding: 0.6rem 0.9rem; border-radius: 10px; border: 1.5px solid var(--chili); color: #FFCDD2; font-size: 0.9rem; font-weight: 700;">
+      ANNAHME PAUSIERT: Gäste können gerade nicht bestellen.
     </div>
 
-    <!-- STATION 2: ZERO-CLICK WOK DEMAND COCKPIT FOR THE COOK -->
+    <!-- STATION 2: WOK DEMAND COCKPIT FOR THE COOK -->
     <section class="wok-cockpit-bar" id="wokCockpitSection">
       <div class="wok-header-row">
         <div>
           <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--gold); font-weight: 700;">
-            🔥 STATION 2 · ZERO-CLICK WOK DEMAND MANAGEMENT (FÜR DEN KOCH)
+            🔥 STATION 2 · WOK DEMAND (KOCH)
           </span>
           <h2 style="font-family: var(--font-display); font-size: 1.4rem; margin: 0.2rem 0 0 0;">
-            Aktueller Pfannen-Bedarf (Nur bezahlte, noch nicht geschöpfte Portionen)
+            Noch zu braten (nur bezahlte Portionen)
           </h2>
+          <div class="cockpit-meta" id="cockpitMeta"></div>
         </div>
-        <div id="demoTools" style="display: none; gap: 0.65rem; align-items: center;">
-          <button type="button" class="tab-btn" id="btnSeedDemoOrder" style="border-color: var(--gold); color: var(--gold);">
-            ⚡ Test-Bestellung erzeugen
-          </button>
-          <button type="button" class="tab-btn" id="btnSimulatePaymentFallback" style="border-color: var(--chili); color: #FF8A80;">
-            ⚠️ Zahlungs-Fallback testen
-          </button>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center;">
+          <button type="button" class="tab-btn" id="btnTogglePause">Annahme pausieren</button>
+          <span id="demoTools" style="display: none; gap: 0.65rem; align-items: center;">
+            <button type="button" class="tab-btn" id="btnSeedDemoOrder" style="border-color: var(--gold); color: var(--gold);">
+              ⚡ Test-Bestellung
+            </button>
+            <button type="button" class="tab-btn" id="btnSimulatePaymentFallback" style="border-color: var(--chili); color: #FF8A80;">
+              ⚠️ Zahlungs-Fallback testen
+            </button>
+          </span>
         </div>
       </div>
 
-      <div class="wok-grid">
-        <div class="wok-pan-card">
-          <div class="wok-pan-label">🍗 HOLY CHICKEN</div>
-          <div class="wok-pan-count" id="wokChickenCount">0</div>
-          <div class="wok-spice-breakdown" id="wokChickenSpice">Pfanne bereit</div>
-        </div>
-        <div class="wok-pan-card">
-          <div class="wok-pan-label">🌱 HOLY VEGAN</div>
-          <div class="wok-pan-count" id="wokVeganCount">0</div>
-          <div class="wok-spice-breakdown" id="wokVeganSpice">Pfanne bereit</div>
-        </div>
-        <div class="wok-pan-card">
-          <div class="wok-pan-label">🥩 PORK / MIX</div>
-          <div class="wok-pan-count" id="wokPorkCount">0</div>
-          <div class="wok-spice-breakdown" id="wokPorkSpice">Pfanne bereit</div>
-        </div>
-        <div class="wok-pan-card wok-pan-card--egg">
-          <div class="wok-pan-label">🍳 KAI DAO EIER</div>
-          <div class="wok-pan-count" id="wokEggCount">0</div>
-          <div class="wok-spice-breakdown">Im Wok knusprig ausbacken</div>
-        </div>
-      </div>
+      <div class="wok-grid" id="wokGrid"></div>
     </section>
 
     <!-- 3 INTERACTIVE CREW STATIONS: KASSE -> SCHÖPFER -> QC & DRINKS -->
     <section class="stations-grid" id="stationsGrid">
-      <!-- STATION 1: KASSE (CASHIER & MANUAL PAYMENT FALLBACK) -->
       <div class="station-col" id="colKasse">
         <div class="station-col__title">
           <span>💵 1. Kasse &amp; Zahlungsfreigabe</span>
           <span style="font-family: var(--font-mono); color: var(--gold);" id="countKasse">0</span>
         </div>
         <div class="station-col__sub">
-          Kunde zahlt bar am Truck oder manuelle Klärung -> 1 Tap schickt Bestellung in den Wok
+          Gast nennt den Code, zahlt, 1 Tap schickt die Bestellung in den Wok
         </div>
+        <label for="kasseSearch" style="position:absolute;left:-9999px;">Code suchen</label>
+        <input id="kasseSearch" class="kasse-search" type="text" inputmode="numeric" autocomplete="off" placeholder="Code suchen, z. B. 8004">
         <div id="listKasse"></div>
       </div>
 
-      <!-- STATION 3: SCHÖPFER (ASSEMBLY / PLATING) -->
       <div class="station-col" id="colSchoepfer">
         <div class="station-col__title">
           <span>🍱 3. Schöpfer (Boxen packen)</span>
           <span style="font-family: var(--font-mono); color: var(--green-neon);" id="countSchoepfer">0</span>
         </div>
         <div class="station-col__sub">
-          Duftreis, gebratenes Krapao aus dem Wok &amp; Kai Dao Spiegelei in Boxen anrichten
+          Grün umrandet = alle Boxen sind im Wok gestartet. Älteste zuerst.
         </div>
         <div id="listSchoepfer"></div>
       </div>
 
-      <!-- STATION 4: QUALITÄTSKONTROLLE & DRINKS (QC & HANDOUT) -->
       <div class="station-col" id="colQc">
         <div class="station-col__title">
           <span>🔔 4. Qualitätskontrolle &amp; Drinks</span>
           <span style="font-family: var(--font-mono); color: var(--green-neon);" id="countQc">0</span>
         </div>
         <div class="station-col__sub">
-          Boxen prüfen, bestellte Getränke dazustellen, Züri-Code aufrufen &amp; übergeben
+          Boxen prüfen, Getränke dazustellen, Züri-Code aufrufen &amp; übergeben
         </div>
         <div id="listQc"></div>
       </div>
@@ -356,33 +380,31 @@ export function renderAdminPageHtml(): string {
     <section class="admin-panel-grid">
       <div class="station-col" style="min-height: auto;">
         <div class="station-col__title">
-          <span>⚙️ Feature Toggle &amp; Foodtruck Settings</span>
+          <span>⚙️ Einstellungen</span>
         </div>
         <div class="station-col__sub">
-          Steuerung der Schärfegrad-Auswahl für den Bestellprozess
+          Schärfegrad-Auswahl und Standort
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; background: #0B100C; padding: 1rem; border-radius: 12px; border: 1.5px solid rgba(82, 196, 90, 0.35);">
           <div>
             <div style="font-weight: 700;">Individuelle Schärfegrade erlauben</div>
-            <div style="font-size: 0.8rem; color: var(--muted);" id="spiceToggleStatusText">
-              Aktuell: AUS (Nur Standardschärfe: leicht scharf 🌶️)
-            </div>
+            <div style="font-size: 0.8rem; color: var(--muted);" id="spiceToggleStatusText"></div>
           </div>
           <button type="button" class="tab-btn active" id="btnToggleSpiceFeature">
-            Toggle umschalten
+            Umschalten
           </button>
         </div>
 
         <div style="margin-top: 1rem; font-weight: 700;">Truck-Standort heute</div>
         <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">
-          Steuert «Heute live» auf der Landingpage.
+          Steuert «Heute live» auf der Landingpage und die deklarierte Fleischherkunft.
         </div>
         <div id="locationButtons" style="display: flex; flex-wrap: wrap; gap: 0.45rem;"></div>
       </div>
 
       <div class="station-col" style="min-height: auto;">
         <div class="station-col__title">
-          <span>🛡️ Non-Functional Requirements (SLA &amp; Health)</span>
+          <span>🛡️ System (SLA &amp; Health)</span>
         </div>
         <div class="station-col__sub">
           Messwerte seit Serverstart. Ziele: &lt; 1000ms Latenz · 99.5% beantwortete Anfragen
@@ -410,11 +432,26 @@ export function renderAdminPageHtml(): string {
 
   <script>
     const VARIANT_LABELS = { vegan: "🌱 Holy Vegan", chicken: "🍗 Holy Chicken", pork_mix: "🥩 Holy Pork/Mix" };
+    const WOK_LABELS = { chicken: "🍗 HOLY CHICKEN", vegan: "🌱 HOLY VEGAN", pork_mix: "🥩 PORK / MIX" };
+    const WOK_ORDER = ["chicken", "vegan", "pork_mix"];
     const DRINK_LABELS = { thai_iced_tea: "🧋 Thai Iced Tea", coconut_water: "🥥 Kokoswasser", zueri_mate: "⚡ Züri Mate" };
     const SPICE_TEXT = { mild: "mild", leicht_scharf: "leicht scharf", original_thai_spicy: "Thai Spicy", extra_hot: "Extra Hot" };
+    const REFUND_REASONS = {
+      PAID_AFTER_CANCEL: "Online bezahlt, nachdem die Bestellung storniert war",
+      DOUBLE_PAYMENT: "Doppelt bezahlt: bar an der Kasse und online",
+      AMOUNT_MISMATCH: "Online-Betrag stimmt nicht mit der Bestellung überein"
+    };
+    const UNPAID = ["pending_cash", "pending_payment", "payment_error_fallback"];
+    const WARN_MIN = 5;
+    const LATE_MIN = 10;
 
     let currentCustomSpice = false;
-    let busy = false;
+    let ordersPaused = false;
+    let kasseFilter = "";
+    let clockOffset = 0;        // server time minus tablet time, so ages are right on any tablet
+    let lastOrders = null;
+    let lastWok = null;
+    const pending = new Set();  // ticket ids / keys with a request in flight
     const lastHtml = {};
 
     // Every value that comes from the server goes through esc() before it lands in innerHTML.
@@ -442,12 +479,25 @@ export function renderAdminPageHtml(): string {
     }
 
     let toastTimer = null;
-    function showToast(message) {
+    function showToast(message, undoId) {
       const el = document.getElementById("toast");
       el.textContent = message;
+      el.style.background = undoId ? "#123018" : "#3A1412";
+      el.style.borderColor = undoId ? "var(--green-neon)" : "var(--chili)";
+      el.style.color = undoId ? "#F5F7F5" : "#FFCDD2";
+      if (undoId) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Rückgängig";
+        btn.addEventListener("click", () => {
+          el.style.display = "none";
+          runAction(undoId, () => api("/api/orders/" + encodeURIComponent(undoId), "PATCH", { action: "undo" }));
+        });
+        el.appendChild(btn);
+      }
       el.style.display = "block";
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.style.display = "none"; }, 5000);
+      toastTimer = setTimeout(() => { el.style.display = "none"; }, undoId ? 8000 : 5000);
     }
 
     async function api(path, method, body) {
@@ -464,12 +514,25 @@ export function renderAdminPageHtml(): string {
       if (!json.success) {
         throw new Error((json.error && json.error.message) || "Aktion fehlgeschlagen");
       }
+      if (json.meta && json.meta.timestamp) {
+        clockOffset = Date.parse(json.meta.timestamp) - Date.now();
+      }
       return json.data;
     }
 
-    function formatSpiceBreakdown(batch, customEnabled) {
-      if (batch.totalPortions === 0) return "Pfanne frei";
-      if (!customEnabled) return batch.totalPortions + "x Standardschärfe (leicht scharf 🌶️)";
+    function minutesSince(iso) {
+      const t = Date.parse(iso);
+      if (Number.isNaN(t)) return 0;
+      return Math.max(0, Math.floor((Date.now() + clockOffset - t) / 60000));
+    }
+
+    function ageBadge(iso) {
+      const m = minutesSince(iso);
+      const cls = m >= LATE_MIN ? " age--late" : m >= WARN_MIN ? " age--warn" : "";
+      return '<span class="age' + cls + '">' + (m < 1 ? "neu" : m + " Min") + '</span>';
+    }
+
+    function formatSpiceBreakdown(batch) {
       const parts = [];
       if (batch.bySpice.mild) parts.push(batch.bySpice.mild + "x Mild");
       if (batch.bySpice.leicht_scharf) parts.push(batch.bySpice.leicht_scharf + "x Leicht scharf");
@@ -478,12 +541,42 @@ export function renderAdminPageHtml(): string {
       return parts.join(" · ");
     }
 
-    function renderPortionSummary(order) {
+    function renderWok(wok) {
+      return WOK_ORDER.map((v) => {
+        const b = wok.batches[v];
+        const next = wok.nextVariant === v;
+        const key = "batch:" + v;
+        return '<div class="wok-pan-card' + (next ? ' wok-pan-card--next' : '') + '">' +
+          (next ? '<div class="wok-next-tag">ALS NÄCHSTES</div>' : '') +
+          '<div class="wok-pan-label">' + WOK_LABELS[v] + '</div>' +
+          '<div class="wok-pan-count">' + esc(b.queuedPortions) + '</div>' +
+          '<div class="wok-pan-sub">im Wok: ' + esc(b.cookingPortions) +
+            (b.queuedPortions > 0 ? ' · ältestes wartet ' + esc(b.oldestWaitingMinutes) + ' Min' : '') + '</div>' +
+          (wok.customSpiceEnabled && b.totalPortions > 0
+            ? '<div class="wok-spice-breakdown">' + esc(formatSpiceBreakdown(b)) + '</div>' : '') +
+          '<button type="button" class="batch-btn" data-batch="' + v + '"' +
+            (b.nextBatchSize === 0 || pending.has(key) ? ' disabled' : '') + '>' +
+            (b.nextBatchSize > 0 ? '🔥 Batch starten (' + esc(b.nextBatchSize) + ')' : 'Nichts offen') +
+          '</button>' +
+        '</div>';
+      }).join("") +
+      '<div class="wok-pan-card wok-pan-card--egg">' +
+        '<div class="wok-pan-label">🍳 KAI DAO EIER</div>' +
+        '<div class="wok-pan-count">' + esc(wok.totalKaiDaoEggs) + '</div>' +
+        '<div class="wok-pan-sub">für alle offenen Portionen</div>' +
+      '</div>';
+    }
+
+    function renderPortionSummary(order, showWokState) {
       return order.portions.map((p) =>
-        '<div style="font-size: 0.85rem; margin-top: 0.25rem;">• Box #' + esc(p.portionIndex) + ': <strong>' +
+        '<div style="font-size: 0.85rem; margin-top: 0.25rem;">• Box ' + esc(p.portionIndex) + ': <strong>' +
         esc(VARIANT_LABELS[p.variant] || p.variant) + '</strong>' +
         (p.addKaiDao ? '<span style="color:var(--gold);font-weight:700;"> + Kai Dao 🍳</span>' : '') +
-        ' <span style="color:var(--muted);font-size:0.76rem;">(' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + ')</span></div>'
+        ' <span style="color:var(--muted);font-size:0.76rem;">(' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + ')</span>' +
+        (showWokState
+          ? (p.firedAt ? ' <span class="box-state box-state--fire">🔥 im Wok</span>' : ' <span class="box-state box-state--wait">⏳ wartet</span>')
+          : '') +
+        '</div>'
       ).join("");
     }
 
@@ -498,54 +591,81 @@ export function renderAdminPageHtml(): string {
 
     function actionBtn(cls, action, id, label, status) {
       return '<button type="button" class="action-btn ' + cls + '" data-action="' + action + '" data-id="' + esc(id) + '"' +
-        (status ? ' data-status="' + status + '"' : '') + '>' + label + '</button>';
+        (status ? ' data-status="' + status + '"' : '') + (pending.has(id) ? ' disabled' : '') + '>' + label + '</button>';
     }
 
-    function renderKasse(orders) {
-      if (orders.length === 0) return '<div style="color:var(--muted);font-size:0.85rem;">Keine offenen Zahlungen an der Kasse.</div>';
-      return orders.map((o) => {
+    function renderRefund(o) {
+      return '<div class="order-ticket order-ticket--refund">' +
+        '<div class="ticket-head">' +
+          '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
+          '<strong style="font-family:var(--font-mono);font-size:1.05rem;">CHF ' + chf(o.refundDue.amountChf) + '</strong>' +
+        '</div>' +
+        '<div style="font-size:0.82rem;font-weight:700;margin-top:0.3rem;">↩️ RÜCKERSTATTUNG OFFEN</div>' +
+        '<div style="font-size:0.8rem;margin-top:0.2rem;">' + esc(REFUND_REASONS[o.refundDue.reason] || o.refundDue.reason) + '</div>' +
+        '<div style="font-size:0.74rem;color:var(--muted);margin-top:0.2rem;">Referenz: ' + esc(o.refundDue.providerRef) + '</div>' +
+        actionBtn('action-btn--cash', 'refund_done', o.id, '✓ CHF ' + chf(o.refundDue.amountChf) + ' zurückerstattet') +
+      '</div>';
+    }
+
+    function renderKasse(orders, refunds, hidden) {
+      if (orders.length === 0 && refunds.length === 0) {
+        return '<div style="color:var(--muted);font-size:0.85rem;">' +
+          (hidden > 0 ? 'Kein Treffer für «' + esc(kasseFilter) + '». ' + hidden + ' offene Zahlung(en) ausgeblendet.' : 'Keine offenen Zahlungen an der Kasse.') +
+          '</div>';
+      }
+      return refunds.map(renderRefund).join("") + orders.map((o) => {
         const isError = o.status === "payment_error_fallback";
+        const isOnline = o.status === "pending_payment";
+        const label = isError
+          ? '⚠️ ZAHLUNG NICHT BESTÄTIGT: an der Kasse klären'
+          : isOnline
+            ? '📱 ONLINE-ZAHLUNG LÄUFT (bar kassieren möglich)'
+            : '💵 BARZAHLUNG AM TRUCK (offen)';
         return '<div class="order-ticket ' + (isError ? 'order-ticket--error' : 'order-ticket--cash') + '">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div class="ticket-head">' +
             '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
-            '<strong style="font-family:var(--font-mono);font-size:1.05rem;">CHF ' + chf(o.totalChf) + '</strong>' +
+            '<span>' + ageBadge(o.createdAt) + ' <strong style="font-family:var(--font-mono);font-size:1.05rem;">CHF ' + chf(o.totalChf) + '</strong></span>' +
           '</div>' +
-          '<div style="font-size:0.78rem;color:var(--gold);margin-top:0.2rem;">' +
-            (isError ? '⚠️ ZAHLUNG NICHT BESTÄTIGT: an der Kasse klären' : '💵 BARZAHLUNG AM TRUCK (offen)') +
-          '</div>' +
-          renderPortionSummary(o) +
+          '<div style="font-size:0.78rem;color:var(--gold);margin-top:0.2rem;">' + label + '</div>' +
+          renderPortionSummary(o, false) +
           actionBtn('action-btn--cash', 'confirm_cash', o.id, '✓ CHF ' + chf(o.totalChf) + ' kassiert · In den Wok freigeben') +
           actionBtn('action-btn--ghost', 'cancel', o.id, 'Stornieren (nicht bezahlt)') +
         '</div>';
-      }).join("");
+      }).join("") +
+      (hidden > 0 ? '<div style="color:var(--muted);font-size:0.8rem;">' + hidden + ' weitere ausgeblendet (Suche aktiv).</div>' : '');
     }
 
     function renderSchoepfer(orders) {
       if (orders.length === 0) return '<div style="color:var(--muted);font-size:0.85rem;">Keine Boxen zum Schöpfen offen.</div>';
-      return orders.map((o) =>
-        '<div class="order-ticket">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+      return orders.map((o) => {
+        const allFired = o.portions.every((p) => p.firedAt);
+        const late = minutesSince(o.paidAt || o.createdAt) >= LATE_MIN;
+        return '<div class="order-ticket' + (allFired ? ' order-ticket--go' : late ? ' order-ticket--late' : '') + '">' +
+          '<div class="ticket-head">' +
             '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
-            '<span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--green-neon);">' + esc(o.totalPortions) + ' Box(en) · Bezahlt</span>' +
+            '<span>' + ageBadge(o.paidAt || o.createdAt) + ' <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--green-neon);">' + esc(o.totalPortions) + ' Box(en)</span></span>' +
           '</div>' +
-          renderPortionSummary(o) +
+          (allFired ? '<div class="box-state box-state--fire" style="margin-top:0.25rem;">ALLES IM WOK · SCHÖPFEN</div>' : '') +
+          renderPortionSummary(o, true) +
           actionBtn('action-btn--plate', 'advance', o.id, '🍱 Boxen geschöpft · Weiter an QC &amp; Drinks', 'plating') +
-        '</div>'
-      ).join("");
+        '</div>';
+      }).join("");
     }
 
     function renderQc(orders) {
       if (orders.length === 0) return '<div style="color:var(--muted);font-size:0.85rem;">Keine Bestellungen in der QC / Ausgabe.</div>';
       return orders.map((o) => {
         const ready = o.status === "ready";
-        return '<div class="order-ticket" style="' + (ready ? 'border-color:var(--gold);background:#142418;' : '') + '">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        const since = ready ? o.readyAt : o.platedAt;
+        const noShow = ready && minutesSince(since) >= WARN_MIN;
+        return '<div class="order-ticket' + (noShow ? ' order-ticket--late' : '') + '" style="' + (ready && !noShow ? 'border-color:var(--gold);background:#142418;' : '') + '">' +
+          '<div class="ticket-head">' +
             '<span class="order-code">' + esc(o.zueriCode.formatted) + '</span>' +
-            '<span style="font-family:var(--font-mono);font-size:0.78rem;color:' + (ready ? 'var(--gold)' : 'var(--ink)') + ';">' +
-              (ready ? '🔔 AUFGERUFEN' : 'QC PRÜFUNG') +
-            '</span>' +
+            '<span>' + ageBadge(since) + ' <span style="font-family:var(--font-mono);font-size:0.78rem;color:' + (ready ? 'var(--gold)' : 'var(--ink)') + ';">' +
+              (noShow ? '⚠️ NICHT ABGEHOLT' : ready ? '🔔 AUFGERUFEN' : 'QC PRÜFUNG') +
+            '</span></span>' +
           '</div>' +
-          renderPortionSummary(o) +
+          renderPortionSummary(o, false) +
           renderDrinkSummary(o) +
           (ready
             ? actionBtn('action-btn--done', 'advance', o.id, '✓ An Gast übergeben (Abschliessen)', 'completed')
@@ -564,100 +684,153 @@ export function renderAdminPageHtml(): string {
       '<button type="button" class="tab-btn ' + (closed ? 'active' : '') + '" data-location="">Truck geschlossen</button>';
     }
 
-    async function refreshDashboard() {
-      if (busy) return;
+    // Draws all stations from the last data. Also called every 20 s so the ages keep moving.
+    function renderStations() {
+      if (!lastOrders || !lastWok) return;
+      setHtml("wokGrid", renderWok(lastWok));
+
+      // Oldest first: the crew works the queue top to bottom.
+      const queue = lastOrders.slice().reverse();
+      const refunds = queue.filter((o) => o.refundDue && !o.refundDue.resolvedAt);
+      const unpaid = queue.filter((o) => UNPAID.includes(o.status));
+      const filter = kasseFilter.trim();
+      const kasse = filter ? unpaid.filter((o) => String(o.zueriCode.plz).startsWith(filter)) : unpaid;
+      const paidAt = (o) => Date.parse(o.paidAt || o.createdAt);
+      const schoepfer = queue
+        .filter((o) => o.status === "received" || o.status === "in_wok")
+        .sort((a, b) => {
+          // Orders whose boxes are all in the wok come first, then the longest waiting.
+          const fa = a.portions.every((p) => p.firedAt) ? 0 : 1;
+          const fb = b.portions.every((p) => p.firedAt) ? 0 : 1;
+          return fa - fb || paidAt(a) - paidAt(b);
+        });
+      const qc = queue
+        .filter((o) => o.status === "plating" || o.status === "ready")
+        .sort((a, b) => Date.parse(a.platedAt || a.createdAt) - Date.parse(b.platedAt || b.createdAt));
+
+      setText("countKasse", String(unpaid.length + refunds.length));
+      setHtml("listKasse", renderKasse(kasse, refunds, unpaid.length - kasse.length));
+      setText("countSchoepfer", String(schoepfer.length));
+      setHtml("listSchoepfer", renderSchoepfer(schoepfer));
+      setText("countQc", String(qc.length));
+      setHtml("listQc", renderQc(qc));
+    }
+
+    async function refreshOrders() {
       try {
-        const [ordData, health, locData] = await Promise.all([
-          api("/api/orders"),
-          api("/api/health"),
-          api("/api/locations")
-        ]);
+        const ordData = await api("/api/orders");
+        lastOrders = ordData.orders;
+        lastWok = ordData.wokDemand;
+        currentCustomSpice = lastWok.customSpiceEnabled;
 
-        const orders = ordData.orders;
-        const wokDemand = ordData.wokDemand;
-        currentCustomSpice = wokDemand.customSpiceEnabled;
+        setText("cockpitMeta", "Wartezeit ca. " + lastWok.estimatedWaitMinutes + " Min · " +
+          lastWok.totalActivePortions + " Portionen offen · " + ordData.totalOrdersToday + " Bestellungen heute");
+        renderStations();
 
-        setText("wokChickenCount", String(wokDemand.batches.chicken.totalPortions));
-        setText("wokChickenSpice", formatSpiceBreakdown(wokDemand.batches.chicken, currentCustomSpice));
-        setText("wokVeganCount", String(wokDemand.batches.vegan.totalPortions));
-        setText("wokVeganSpice", formatSpiceBreakdown(wokDemand.batches.vegan, currentCustomSpice));
-        setText("wokPorkCount", String(wokDemand.batches.pork_mix.totalPortions));
-        setText("wokPorkSpice", formatSpiceBreakdown(wokDemand.batches.pork_mix, currentCustomSpice));
-        setText("wokEggCount", String(wokDemand.totalKaiDaoEggs));
-
-        // Oldest first: the crew works the queue top to bottom.
-        const queue = orders.slice().reverse();
-        const kasse = queue.filter((o) => o.status === "pending_cash" || o.status === "payment_error_fallback");
-        const schoepfer = queue.filter((o) => o.status === "received" || o.status === "in_wok");
-        const qc = queue.filter((o) => o.status === "plating" || o.status === "ready");
-
-        setText("countKasse", String(kasse.length));
-        setHtml("listKasse", renderKasse(kasse));
-        setText("countSchoepfer", String(schoepfer.length));
-        setHtml("listSchoepfer", renderSchoepfer(schoepfer));
-        setText("countQc", String(qc.length));
-        setHtml("listQc", renderQc(qc));
-
-        document.getElementById("demoTools").style.display = ordData.demoPayments ? "flex" : "none";
+        document.getElementById("demoTools").style.display = ordData.demoPayments ? "inline-flex" : "none";
         document.getElementById("demoBanner").style.display = ordData.demoPayments ? "block" : "none";
-
         setText("spiceToggleStatusText", currentCustomSpice
           ? "Aktuell: AKTIV (Gäste wählen Mild / Leicht scharf / Thai Spicy / Extra Hot)"
-          : "Aktuell: AUS (Nur Standardschärfe: leicht scharf 🌶️ für maximalen Wok-Speed)");
-        setText("slaPayment", health.metrics.paymentAttempts > 0 ? health.metrics.paymentReliabilityRate.toFixed(1) + "%" : "–");
-        setText("slaLatency", health.metrics.avgLatencyMs + " ms");
-        setText("slaAvail", health.metrics.availabilityRate.toFixed(2) + "%");
-
-        setHtml("locationButtons", renderLocations(locData));
+          : "Aktuell: AUS (nur Standardschärfe für maximalen Wok-Speed)");
         setText("connectionState", "");
       } catch (err) {
         setText("connectionState", "⚠️ Keine Verbindung zum Server. Anzeige ist evtl. veraltet.");
       }
     }
 
-    async function runAction(fn) {
-      if (busy) return;
-      busy = true;
+    // Slow-changing data: no need to ask for it every two seconds.
+    async function refreshSlow() {
+      try {
+        const [health, locData] = await Promise.all([api("/api/health"), api("/api/locations")]);
+        ordersPaused = Boolean(health.features.ordersPaused);
+        setText("btnTogglePause", ordersPaused ? "▶ Annahme fortsetzen" : "⏸ Annahme pausieren");
+        document.getElementById("pausedBanner").style.display = ordersPaused ? "block" : "none";
+        setText("slaPayment", health.metrics.paymentAttempts > 0 ? health.metrics.paymentReliabilityRate.toFixed(1) + "%" : "–");
+        setText("slaLatency", health.metrics.avgLatencyMs + " ms");
+        setText("slaAvail", health.metrics.availabilityRate.toFixed(2) + "%");
+        setHtml("locationButtons", renderLocations(locData));
+      } catch {}
+    }
+
+    // One request per ticket at a time. Other tickets stay tappable while it runs.
+    async function runAction(key, fn, undoMessage) {
+      if (pending.has(key)) return;
+      pending.add(key);
+      renderStations();
       try {
         await fn();
+        if (undoMessage) showToast(undoMessage, key);
       } catch (err) {
         showToast("Nicht ausgeführt: " + (err && err.message ? err.message : "Fehler"));
       } finally {
-        busy = false;
-        refreshDashboard();
+        pending.delete(key);
+        await refreshOrders();
+        renderStations();
       }
+    }
+
+    function codeOf(id) {
+      const o = (lastOrders || []).find((x) => x.id === id);
+      return o ? o.zueriCode.formatted : "";
     }
 
     // One listener for all order buttons (event delegation), independent of re-renders.
     document.getElementById("stationsGrid").addEventListener("click", (event) => {
       const btn = event.target.closest("[data-action]");
-      if (!btn) return;
+      if (!btn || btn.disabled) return;
       const id = btn.getAttribute("data-id");
       const action = btn.getAttribute("data-action");
-      btn.disabled = true;
+      const url = "/api/orders/" + encodeURIComponent(id);
 
       if (action === "confirm_cash") {
-        runAction(() => api("/api/orders/" + encodeURIComponent(id), "PATCH", { action: "confirm_cash", note: "An Kasse bestätigt" }));
+        runAction(id, () => api(url, "PATCH", { action: "confirm_cash", note: "An Kasse bestätigt" }));
       } else if (action === "cancel") {
-        runAction(() => api("/api/orders/" + encodeURIComponent(id), "PATCH", { status: "cancelled", note: "An Kasse storniert" }));
+        if (!window.confirm("Bestellung " + codeOf(id) + " wirklich stornieren?")) return;
+        runAction(id, () => api(url, "PATCH", { status: "cancelled", note: "An Kasse storniert" }));
+      } else if (action === "refund_done") {
+        runAction(id, () => api(url, "PATCH", { action: "refund_done", note: "An Kasse zurückerstattet" }));
       } else if (action === "advance") {
-        runAction(() => api("/api/orders/" + encodeURIComponent(id), "PATCH", { status: btn.getAttribute("data-status") }));
+        const status = btn.getAttribute("data-status");
+        const labels = { plating: "geschöpft", ready: "aufgerufen", completed: "übergeben" };
+        runAction(id, () => api(url, "PATCH", { status }), codeOf(id) + " " + (labels[status] || status) + ".");
       }
+    });
+
+    document.getElementById("wokGrid").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-batch]");
+      if (!btn || btn.disabled) return;
+      const variant = btn.getAttribute("data-batch");
+      runAction("batch:" + variant, () => api("/api/wok/batch", "POST", { variant }));
+    });
+
+    document.getElementById("kasseSearch").addEventListener("input", (event) => {
+      kasseFilter = event.target.value.replace(/[^0-9]/g, "");
+      renderStations();
     });
 
     document.getElementById("locationButtons").addEventListener("click", (event) => {
       const btn = event.target.closest("[data-location]");
       if (!btn) return;
       const id = btn.getAttribute("data-location");
-      runAction(() => api("/api/locations", "PATCH", { locationId: id || null }));
+      runAction("location", async () => {
+        await api("/api/locations", "PATCH", { locationId: id || null });
+        await refreshSlow();
+      });
     });
 
     document.getElementById("btnToggleSpiceFeature").addEventListener("click", () => {
-      runAction(() => api("/api/features", "PATCH", { enableCustomSpiceLevels: !currentCustomSpice }));
+      runAction("spice", () => api("/api/features", "PATCH", { enableCustomSpiceLevels: !currentCustomSpice }));
+    });
+
+    document.getElementById("btnTogglePause").addEventListener("click", () => {
+      runAction("pause", async () => {
+        await api("/api/features", "PATCH", { ordersPaused: !ordersPaused });
+        await refreshSlow();
+      });
     });
 
     document.getElementById("btnSeedDemoOrder").addEventListener("click", () => {
-      runAction(() => api("/api/orders", "POST", {
+      runAction("seed", () => api("/api/orders", "POST", {
         portions: [
           { variant: "chicken", addKaiDao: true },
           { variant: "vegan", addKaiDao: false }
@@ -668,7 +841,7 @@ export function renderAdminPageHtml(): string {
     });
 
     document.getElementById("btnSimulatePaymentFallback").addEventListener("click", () => {
-      runAction(() => api("/api/orders", "POST", {
+      runAction("seed", () => api("/api/orders", "POST", {
         portions: [{ variant: "pork_mix", addKaiDao: true }],
         drinks: [{ drinkId: "coconut_water", quantity: 1 }],
         paymentMethod: "card",
@@ -694,8 +867,11 @@ export function renderAdminPageHtml(): string {
       });
     });
 
-    refreshDashboard();
-    setInterval(refreshDashboard, 2000);
+    refreshOrders();
+    refreshSlow();
+    setInterval(refreshOrders, 2000);
+    setInterval(refreshSlow, 10000);
+    setInterval(renderStations, 20000);
   </script>
 </body>
 </html>`;

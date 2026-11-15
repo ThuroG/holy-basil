@@ -8,6 +8,12 @@ import {
 } from '../../src/lib/orderStore.js';
 import { setCustomSpiceLevelsEnabled, setDemoPaymentsEnabled, resetFeatureFlags } from '../../src/config/features.js';
 
+/** A paid order: created as cash and released by the cashier. */
+async function paidOrder(portions: Parameters<typeof createOrder>[0]['portions']) {
+  const order = await createOrder({ portions, paymentMethod: 'cash' });
+  return confirmOrderPaymentAtCashier(order.id);
+}
+
 describe('Zero-Click Wok Demand Aggregator (Cook Cockpit)', () => {
   beforeEach(() => {
     resetFeatureFlags();
@@ -42,22 +48,16 @@ describe('Zero-Click Wok Demand Aggregator (Cook Cockpit)', () => {
   it('aggregates up to 10 portions across multiple orders with default spice when toggle is false', async () => {
     setCustomSpiceLevelsEnabled(false);
 
-    await createOrder({
-      portions: [
-        { variant: 'chicken', spiceLevel: 'extra_hot', addKaiDao: true },
-        { variant: 'chicken', spiceLevel: 'mild', addKaiDao: true },
-        { variant: 'pork_mix', addKaiDao: false },
-      ],
-      paymentMethod: 'twint',
-    });
+    await paidOrder([
+      { variant: 'chicken', spiceLevel: 'extra_hot', addKaiDao: true },
+      { variant: 'chicken', spiceLevel: 'mild', addKaiDao: true },
+      { variant: 'pork_mix', addKaiDao: false },
+    ]);
 
-    await createOrder({
-      portions: [
-        { variant: 'chicken', addKaiDao: false },
-        { variant: 'vegan', addKaiDao: true },
-      ],
-      paymentMethod: 'card',
-    });
+    await paidOrder([
+      { variant: 'chicken', addKaiDao: false },
+      { variant: 'vegan', addKaiDao: true },
+    ]);
 
     const demand = getWokDemand();
     expect(demand.customSpiceEnabled).toBe(false);
@@ -75,14 +75,11 @@ describe('Zero-Click Wok Demand Aggregator (Cook Cockpit)', () => {
   it('splits Wok Demand by custom spice levels when feature toggle is enabled', async () => {
     setCustomSpiceLevelsEnabled(true);
 
-    const ord = await createOrder({
-      portions: [
-        { variant: 'chicken', spiceLevel: 'mild', addKaiDao: true },
-        { variant: 'chicken', spiceLevel: 'original_thai_spicy', addKaiDao: true },
-        { variant: 'chicken', spiceLevel: 'original_thai_spicy', addKaiDao: false },
-      ],
-      paymentMethod: 'twint',
-    });
+    const ord = await paidOrder([
+      { variant: 'chicken', spiceLevel: 'mild', addKaiDao: true },
+      { variant: 'chicken', spiceLevel: 'original_thai_spicy', addKaiDao: true },
+      { variant: 'chicken', spiceLevel: 'original_thai_spicy', addKaiDao: false },
+    ]);
 
     let demand = getWokDemand();
     expect(demand.customSpiceEnabled).toBe(true);
