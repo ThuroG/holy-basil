@@ -152,3 +152,95 @@ Für **Phase 2 (Weihnachtsessen, Teamevents, Firmen-Lunches)** kann die App in e
 - **99.5 % API-Verfügbarkeit & RFC-Response-Codes:** Deterministische JSON-Antworten mit HTTP-Statuscodes (`200`, `201`, `400`, `404`, `422`, `401`, `500`) und eindeutiger `correlationId`.
 - **> 80 % Testabdeckung:** Automatisierte Unit- und Integrationstests via Vitest (`npm run test:coverage`, aktuell **93.6 % Line & Statement Coverage** über den gesamten Server-Code).
 
+---
+
+## 9. Lebensmittelrecht & Deklaration (LGV / LIV, Kantonales Labor Zürich)
+
+> **Status:** verbindlich für `/order`, Truck-Aushang und Rezepturordner. Alle Texte und Daten leben zentral in `complianceConfig` (`src/config/features.ts`). Kein Compliance-Text darf im Frontend hartkodiert werden.
+> **Rechtsgrundlagen:** LGV (SR 817.02), LIV (SR 817.022.16) inkl. Anhang 6 (Allergene). Vor Go-Live Artikelverweise gegen die aktuelle Fassung prüfen und durch das Kantonale Labor Zürich gegenlesen lassen.
+
+**Leitprinzip:** Die Pflichtangaben sind *passiv, aber nicht überspringbar*. Es gibt keine Checkbox und keinen Extra-Tap. Der 20-Sekunden-Flow bleibt, weil alles bereits im Checkout-Screen steht.
+
+### 9.1 Schriftliche Fleischherkunft (vor Kaufabschluss)
+
+Pflicht: Die Herkunft jeder Fleischart im Warenkorb steht **schriftlich und vor der Zahlung** sichtbar. Mündliche Auskunft genügt nicht. Bei Fleisch-Mischungen wird **pro Tierart** deklariert.
+
+| Variante | Pflichttext (Template) | Standard |
+| :--- | :--- | :--- |
+| Holy Chicken | `Fleischherkunft: Poulet: {Land}` | Poulet: Schweiz |
+| Holy Pork / Mix | `Fleischherkunft: Schwein: {Land}` und `Fleischherkunft: Rind: {Land}` | Schwein: Schweiz, Rind: Schweiz |
+| Holy Vegan | keine Fleischangabe | – |
+
+- **Zusatz bei Hormonen/Leistungsförderern:** Stammt Import-Fleisch (typisch Rind) aus Produktion mit Hormonen oder Leistungsförderern, hängt das System `(mit Hormonen / Leistungsförderern erzeugt)` an. Gesteuert über `growthPromoters: true`.
+- **Wechselnde Lieferanten pro Tour-Stopp:** `origin.byStop[stopId]` überschreibt den Standard, optional mit `validFrom` / `validUntil`. Auflösung: Stopp-Override (im Zeitfenster) → Standard → *nicht auflösbar*.
+- **Fail closed:** Ist die Herkunft für Stopp und Datum nicht auflösbar, ist die Variante nicht bestellbar, und der Zahlungsbutton wird deaktiviert. Angezeigt wird: «Herkunft für diesen Standort noch nicht erfasst – bitte Crew fragen.»
+- **Revisionssicherheit:** Beim Bestellabschluss wird die angezeigte Deklaration (`complianceConfig.version` plus gerenderte Zeilen) als Snapshot an der Bestellung gespeichert.
+- **Betrieb:** Vor jedem Tour-Stopp prüft die Crew anhand der Lieferscheine, ob die Herkunft stimmt, und passt bei Abweichung die Config an. Lieferscheine kommen in den Rezepturordner.
+
+#### Pflicht-Sichtbarkeit im UI von `/order`
+
+| # | Ort | Inhalt | Pflicht |
+| :-: | :--- | :--- | :--- |
+| 1 | **Hero-Card** (Schritt 1) | Kurzzeile unter dem Preis, z. B. `Poulet: Schweiz` | Empfohlen. Die Angabe steht so schon bei der Auswahl. |
+| 2 | **Upgrade-Drawer** (Schritt 2) | Bei Kai Dao: `Eier aus Freilandhaltung, Herkunft: Schweiz` | Empfohlen. |
+| 3 | **Checkout-Zusammenfassung**, **direkt über dem Zahlungsbutton**, ohne Aufklappen | Herkunftszeile(n) je Fleischart im Warenkorb, Allergen-Kurzhinweis, `Allergene`-Link (1-Tap-Modal), Eier-/Kreuzkontaminationshinweis | **Zwingend.** Zahlungsbutton nie ohne diesen Block rendern. |
+| 4 | **Ticket** `/order/<id>` | Wiederholung der Herkunft und des Snapshots | Zwingend (Nachweis, Zweitzugriff). |
+
+Das gilt für alle Zahlungsarten, auch für «Bestellen & bar zahlen».
+
+### 9.2 Allergen-Management (14 Hauptallergene)
+
+Die 14 Hauptallergene: Gluten (Weizen, Roggen, Gerste, Hafer, Dinkel …), Krebstiere, Eier, Fisch, Erdnüsse, Soja, Milch, Schalenfrüchte, Sellerie, Senf, Sesam, Sulfite, Lupinen, Weichtiere.
+
+**Allergen-Matrix (Soll-Stand, vor Go-Live pro Komponente mit Lieferantenspezifikation bestätigen):**
+● = enthalten · ◐ = kann Spuren enthalten / zu prüfen · – = nicht enthalten
+
+| Komponente | Gluten | Eier | Soja | Milch | Sesam | Übrige 10 | Bemerkung |
+| :--- | :-: | :-: | :-: | :-: | :-: | :-: | :--- |
+| Vegane Krapao-Sauce/Paste | ● (Weizen in Sojasauce) | – | ● | – | ◐ | – | Bei glutenfreiem Tamari Gluten streichen. Sesam nur, wenn im Rezept. |
+| Jasmin-Duftreis | – | – | – | – | – | – | |
+| Holy Vegan (Soja-/Pilz-Mince) | ◐ (Weizenprotein im Mince) | – | ● | – | – | – | Falls Weizenprotein enthalten ist, zu ● ändern. |
+| Holy Chicken (Fleisch) | – | – | – | – | – | – | Allergene nur über Sauce. |
+| Holy Pork / Mix (Fleisch) | – | – | – | – | – | – | Allergene nur über Sauce. |
+| Kai Dao (Spiegelei) | – | ● | – | – | – | – | |
+| Thai Iced Tea (Hafer-Kokos-Creme) | ● (Hafer) | – | – | – | – | – | Kokos ist kein CH-Allergen. |
+| Thai Iced Tea (Variante Kondensmilch) | – | – | – | ● | – | – | Dann nicht vegan. |
+| Kokoswasser | – | – | – | – | – | – | |
+| Züri Mate / Limo | – | – | – | – | – | – | Spezifikation prüfen. |
+
+**Abgeleitete Angaben pro Gericht (inkl. Sauce):**
+
+| Gericht | Enthält | Kann Spuren enthalten (Betrieb) |
+| :--- | :--- | :--- |
+| Holy Vegan | Soja, Gluten | Gluten (Mince), Sesam, Ei |
+| Holy Chicken / Pork-Mix | Soja, Gluten | Sesam, Ei |
+| + Kai Dao | zusätzlich Eier | – |
+
+Das System berechnet diese Werte aus den Komponenten (`resolveAllergens`). Wer eine Komponente ändert, ändert automatisch alle betroffenen Gerichte.
+
+**Zulässiger Hinweistext (Offenverkauf, Truck-Aushang und App):**
+
+> **Allergene:** Unsere Saucen und Gerichte können Soja, Gluten (Weizen), Ei und Sesam enthalten. Detaillierte Allergeninformationen finden Sie in der App unter «Allergene» sowie im Rezepturordner am Truck. Unsere Crew gibt gerne Auskunft.
+
+- **1-Tap-Modal «Allergene & Zutaten»:** Der Link steht im Checkout über dem Zahlungsbutton und jeweils auf den Hero-Cards. Das Modal zeigt pro Gericht die Zutaten und alle 14 Allergene mit Status «enthält» oder «kann Spuren enthalten», dazu Stand-Datum (`reviewedAt`).
+- **Rezepturordner am Truck (physisch):** Er enthält pro Rezeptur die Zutatenliste, die Spezifikationsblätter der Zukaufprodukte, die aktuelle Allergen-Matrix und die Lieferscheine der Fleischherkunft. Die Crew kennt den Ordnerstandort und liefert Auskünfte aus dem Ordner, nicht aus dem Gedächtnis.
+- **Änderungsprozess:** Neue Zutat oder neuer Lieferant → Config anpassen → `version` und `reviewedAt` erhöhen → Ordner aktualisieren. Wirksam, bevor das Produkt verkauft wird.
+
+### 9.3 Produktionsmethoden & Kreuzkontamination
+
+- **Eier (Kai Dao):** Standardtext `Kai Dao: Eier aus Freilandhaltung, Herkunft: Schweiz` (oder Bodenhaltung). In der Schweiz ist Käfighaltung verboten. Eier aus Haltungsformen, die in der Schweiz nicht erlaubt sind, müssten ausdrücklich deklariert werden (`Eier aus Käfighaltung`). Bei Schweizer Ware entfällt diese Pflichtdeklaration. Die freiwillige Angabe «Freiland/Boden» muss aber stimmen: Beleg über Lieferschein und Lieferantenzertifikat im Ordner. Bei Importeiern oder unbekannter Haltung wechselt der Text automatisch auf den Käfig-Hinweis.
+- **Kreuzkontamination im Wok-Betrieb (Standardhinweis im Checkout):** *«Hinweis: Alle Gerichte werden im selben Wok-Betrieb zubereitet. Trotz sorgfältiger Trennung können Spuren von Ei, Soja, Gluten oder Sesam nicht vollständig ausgeschlossen werden.»*
+- **Holy Vegan:** *«Holy Vegan wird mit eigenem Wok und Besteck und rein pflanzlichen Saucen zubereitet. Kreuzkontakt mit tierischen Produkten in der Küche kann nicht vollständig ausgeschlossen werden.»* Die Aussage «eigener Wok und Besteck» ist nur zulässig, wenn die Crew das auch einhält (Arbeitsanweisung an Station 2). Die **100 % vegane Saucenbasis** bleibt als Werbeaussage, aber nur für die Basis.
+- **Holy Vegan + Kai Dao:** Das Gericht ist **vegetarisch, nicht vegan**. Das UI zeigt «vegetarisch» statt «vegan». Das Ei wird in einer separaten Pfanne zubereitet.
+
+### 9.4 Konfiguration & Tests
+
+- Datenquelle: `complianceConfig` in `src/config/features.ts` (Schema siehe Code). Das Frontend rendert ausschliesslich über `buildCheckoutDeclaration()`.
+- Pflicht-Tests (Vitest):
+  1. Jedes Menü-Item hat Komponenten, und alle Komponenten existieren.
+  2. Alle 14 Allergene haben ein Label.
+  3. Fehlt die Herkunft für Stopp und Datum, ist `blocked === true`.
+  4. Ein Stopp-Override gilt nur im Zeitfenster.
+  5. Kai Dao plus Käfig/unbekannt erzeugt den Käfig-Hinweis.
+  6. Vegan plus Kai Dao zeigt den Vegetarisch-Hinweis.
+  7. Release-Gate: Solange eine Komponente `verified: false` ist, schlägt der Produktions-Build/Start-Check mit einer Warnung an.

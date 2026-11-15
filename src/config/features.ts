@@ -164,3 +164,14 @@ export const SPICE_LABELS: Record<SpiceLevel, { name: string; badge: string; des
     description: 'Kompromisslose Nachtmarkt-Schärfe für echte Chili-Heads.',
   },
 };
+
+export interface ComplianceConfig {
+  version: string; reviewedAt: string; reviewedBy: string;
+  components: Record<ComponentId, { label: string; allergens: Partial<Record<AllergenId, 'contains'|'may_contain'>>; verified: boolean; note?: string }>;
+  items: Record<ComplianceItemId, { label: string; components: ComponentId[]; meat: MeatSpecies[]; isVegan: boolean }>;
+  kitchenCrossContact: AllergenId[];
+  origin: { default: Partial<Record<MeatSpecies, MeatOrigin>>; byStop: Record<string, StopOriginOverride> };
+  eggs: { origin: CountryCode; husbandry: 'freiland'|'boden'|'kaefig'|'unknown' };
+  texts: { originLine: string; allergenShort: string; crossContact: string; /* … */ };
+  ui: { originAbovePayButton: true; blockOnMissingOrigin: true; allergenModal: 'one-tap'; recipeBinderOnTruck: true };
+}
