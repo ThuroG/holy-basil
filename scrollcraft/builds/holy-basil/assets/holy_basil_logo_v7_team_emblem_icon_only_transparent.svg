@@ -1,0 +1,172 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 930" width="100%" height="100%">
+  <defs>
+    <!-- Multi-stage Neon-Gold Halo Bloom (Brand Guardian + UI Designer spec) -->
+    <filter id="goldHaloGlowV6" x="-35%" y="-35%" width="170%" height="170%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur1" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- 3D Extruded Die-Cut Sticker Shadow (UI Finish-Gate spec) -->
+    <filter id="sticker3DShadow" x="-15%" y="-15%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="0" flood-color="#050806" flood-opacity="1" />
+      <feDropShadow dx="0" dy="14" stdDeviation="10" flood-color="#000000" flood-opacity="0.85" />
+    </filter>
+
+    <!-- Street-Art Rotated Halftone Dot Matrix Pattern (Whimsy Injector spec) -->
+    <pattern id="streetHalftone" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(22)">
+      <circle cx="7" cy="7" r="2.6" fill="#1B4D2E" opacity="0.6" />
+    </pattern>
+
+    <!-- Street Gold Gradient for Halo -->
+    <linearGradient id="streetGoldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFB300" />
+      <stop offset="50%" stop-color="#FFF1A8" />
+      <stop offset="100%" stop-color="#FFD54F" />
+    </linearGradient>
+
+    <!-- Golden Halo Light Cast onto the Upper Crown of the Basil Leaf (Visual Storyteller spec) -->
+    <radialGradient id="haloCrownLight" cx="50%" cy="6%" r="55%">
+      <stop offset="0%" stop-color="#FFE082" stop-opacity="0.78" />
+      <stop offset="42%" stop-color="#FFD54F" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#2E7D32" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Outer Sticker Rim Gradient (Neon Herb #52C45A to Holy Leaf Core #2E7D32) -->
+    <linearGradient id="stickerRimGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#69F0AE" />
+      <stop offset="45%" stop-color="#52C45A" />
+      <stop offset="100%" stop-color="#2E7D32" />
+    </linearGradient>
+  </defs>
+
+  <!-- LAYER 1: PITCH BLACK CANVAS (#0A0A0A) & STREET-ART HALFTONE MEDALLION (Aligned to x=425) -->
+  
+  <g transform="translate(425, 365)">
+    <!-- Outer Stencil Tag Ring -->
+    <circle cx="0" cy="0" r="244" fill="#0D130E" stroke="#1B4D2E" stroke-width="3" stroke-dasharray="32 12 8 12" />
+    <!-- Halftone Street Medallion -->
+    <circle cx="0" cy="0" r="222" fill="url(#streetHalftone)" />
+    <!-- Inner Vignette Ring -->
+    <circle cx="0" cy="0" r="222" fill="none" stroke="#2E7D32" stroke-width="1.5" opacity="0.5" />
+    <!-- Subtle Crosshair Street Stencil Ticks -->
+    <line x1="-258" y1="0" x2="-234" y2="0" stroke="#2E7D32" stroke-width="2.5" />
+    <line x1="234" y1="0" x2="258" y2="0" stroke="#2E7D32" stroke-width="2.5" />
+  </g>
+
+  <!-- LAYER 2: UPRIGHT DOMED BASIL LEAF WITH DIE-CUT STICKER RIM & GOLDEN HALO CROWN LIGHT (Aligned to x=425) -->
+  <g filter="url(#sticker3DShadow)" transform="translate(7, -20)">
+    <!-- Outer Neon-Herb Die-Cut Sticker Keyline (#52C45A) -->
+    <path d="
+      M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+      C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 C 392 595, 392 625, 396 648 C 400 660, 412 668, 420 668
+      C 414 652, 408 632, 412 608 C 415 590, 422 578, 432 570 C 485 552, 535 512, 558 460 L 546 462
+      C 562 422, 560 380, 544 344 L 532 348 C 535 308, 520 268, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+      fill="#0A0A0A" stroke="url(#stickerRimGrad)" stroke-width="22" stroke-linejoin="round" />
+
+    <!-- Thick Black Inner Cutout Buffer -->
+    <path d="
+      M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+      C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 C 392 595, 392 625, 396 648 C 400 660, 412 668, 420 668
+      C 414 652, 408 632, 412 608 C 415 590, 422 578, 432 570 C 485 552, 535 512, 558 460 L 546 462
+      C 562 422, 560 380, 544 344 L 532 348 C 535 308, 520 268, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+      fill="#2E7D32" stroke="#0A0A0A" stroke-width="11" stroke-linejoin="round" />
+
+    <!-- Left Half Shading: Deep Krapao (#1B4D2E) & Core Green (#2E7D32) -->
+    <path d="
+      M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+      C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 L 402 572 C 395 470, 396 365, 422 205 Z"
+      fill="#1B4D2E" />
+    <path d="M 392 315 C 365 280, 355 245, 356 214 C 332 238, 314 268, 304 300 C 330 330, 362 365, 390 402 Z" fill="#2E7D32" />
+    <path d="M 388 430 C 355 390, 326 350, 290 308 C 276 336, 268 368, 270 398 C 304 442, 345 485, 388 520 Z" fill="#2E7D32" />
+    <path d="M 386 535 C 345 505, 305 462, 262 408 C 258 448, 278 494, 322 524 C 348 542, 370 552, 388 562 Z" fill="#256638" />
+    <path d="M 342 252 C 325 275, 320 302, 345 335 C 338 302, 342 276, 356 252 Z" fill="#52C45A" opacity="0.7" />
+    <path d="M 288 345 C 276 375, 282 412, 315 452 C 298 412, 294 378, 302 348 Z" fill="#52C45A" opacity="0.6" />
+
+    <!-- Right Half Domed Pillows: Neon Herb (#52C45A) & Specular Highlights (#69F0AE) -->
+    <path d="M 420 184 C 444 186, 466 208, 476 238 C 455 258, 435 285, 412 312 C 414 265, 418 220, 420 184 Z" fill="#52C45A" />
+    <path d="M 432 202 C 446 208, 458 222, 462 238 C 446 255, 432 272, 420 288 C 422 255, 426 225, 432 202 Z" fill="#69F0AE" opacity="0.75" />
+    <path d="M 410 355 C 442 315, 472 280, 494 246 C 514 274, 526 308, 524 342 C 490 380, 448 420, 404 458 Z" fill="#52C45A" />
+    <path d="M 424 365 C 452 332, 478 302, 496 274 C 508 294, 514 316, 512 338 C 482 370, 450 400, 418 428 Z" fill="#69F0AE" opacity="0.7" />
+    <path d="M 404 485 C 448 442, 495 402, 540 354 C 552 386, 552 422, 538 456 C 498 492, 452 522, 412 548 Z" fill="#52C45A" />
+    <path d="M 422 492 C 460 456, 498 424, 532 388 C 538 410, 536 432, 526 452 C 492 480, 455 506, 422 526 Z" fill="#69F0AE" opacity="0.65" />
+    <path d="M 416 558 C 458 532, 502 504, 546 468 C 524 512, 478 546, 430 564 Z" fill="#52C45A" opacity="0.85" />
+
+    <!-- NEW v6: Golden Halo Warm Light Cast onto the Upper Crown of the Leaf -->
+    <path d="
+      M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 330 230, 315 255, 305 282
+      Q 418 310 512 282 C 504 260, 496 244, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+      fill="url(#haloCrownLight)" />
+
+    <!-- Deep Krapao (#1B4D2E) Shadow Trenches along Veins -->
+    <path d="M 418 182 C 402 285, 396 395, 404 568 L 418 565 C 408 420, 412 300, 426 195 Z" fill="#1B4D2E" />
+    <path d="M 404 378 C 438 335, 468 294, 492 246 L 484 242 C 460 286, 430 326, 402 362 Z" fill="#1B4D2E" />
+    <path d="M 402 478 C 445 435, 492 398, 536 352 L 530 346 C 486 388, 440 425, 400 464 Z" fill="#1B4D2E" />
+    <path d="M 412 554 C 450 526, 490 500, 530 468 L 522 462 C 484 492, 445 518, 410 542 Z" fill="#1B4D2E" />
+
+    <!-- Bold Black Ink Contour & Organic Veins -->
+    <path d="
+      M 418 175 C 395 178, 375 192, 360 212 L 350 208 C 325 235, 305 268, 294 304 L 283 300 C 268 332, 260 368, 262 402 L 252 398
+      C 246 445, 268 498, 315 530 C 345 550, 372 560, 388 572 C 392 595, 392 625, 396 648 C 400 660, 412 668, 420 668
+      C 414 652, 408 632, 412 608 C 415 590, 422 578, 432 570 C 485 552, 535 512, 558 460 L 546 462
+      C 562 422, 560 380, 544 344 L 532 348 C 535 308, 520 268, 496 236 L 484 242 C 476 206, 448 176, 418 175 Z"
+      fill="none" stroke="#0A0A0A" stroke-width="8.5" stroke-linejoin="round" />
+    <path d="
+      M 414 662 C 404 632, 400 598, 400 562 C 396 465, 394 365, 424 205
+      C 402 355, 404 462, 410 562 C 410 598, 410 632, 418 664 Z"
+      fill="#52C45A" stroke="#0A0A0A" stroke-width="5.5" stroke-linejoin="round" />
+    <path d="M 408 292 C 428 260, 444 232, 456 208" fill="none" stroke="#0A0A0A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 402 375 C 436 334, 466 294, 488 250" fill="none" stroke="#0A0A0A" stroke-width="6" stroke-linecap="round" />
+    <path d="M 402 478 C 446 435, 492 396, 534 352" fill="none" stroke="#0A0A0A" stroke-width="6" stroke-linecap="round" />
+    <path d="M 412 552 C 448 526, 488 500, 524 470" fill="none" stroke="#0A0A0A" stroke-width="5.5" stroke-linecap="round" />
+    <path d="M 402 318 C 392 282, 386 248, 384 220" fill="none" stroke="#0A0A0A" stroke-width="4.5" stroke-linecap="round" />
+    <path d="M 396 425 C 368 385, 345 344, 326 298" fill="none" stroke="#0A0A0A" stroke-width="5" stroke-linecap="round" />
+    <path d="M 398 532 C 365 502, 335 465, 305 420" fill="none" stroke="#0A0A0A" stroke-width="5" stroke-linecap="round" />
+
+    <!-- Spray Drips & Aerosol Micro-Splatter Dots around Leaf -->
+    <path d="M 340 548 L 340 582" stroke="#52C45A" stroke-width="6" stroke-linecap="round" />
+    <circle cx="340" cy="595" r="4" fill="#52C45A" />
+    <path d="M 495 538 L 495 568" stroke="#52C45A" stroke-width="5.5" stroke-linecap="round" />
+    <circle cx="495" cy="580" r="3.5" fill="#52C45A" />
+    <circle cx="242" cy="315" r="4" fill="#52C45A" opacity="0.85" />
+    <circle cx="228" cy="332" r="2.2" fill="#52C45A" opacity="0.7" />
+    <circle cx="578" cy="355" r="4.5" fill="#52C45A" opacity="0.85" />
+    <circle cx="592" cy="340" r="2.5" fill="#52C45A" opacity="0.7" />
+  </g>
+
+  <!-- LAYER 3: STREET GOLD HALO + 7 RAYS + AEROSOL SPRAY DRIPS (Optically centered at x=425) -->
+  <g filter="url(#goldHaloGlowV6)" transform="translate(425, 108)">
+    <!-- 7 Radiating Golden Rays -->
+    <g stroke="#FFD54F" stroke-width="7.5" stroke-linecap="round">
+      <line x1="-124" y1="-16" x2="-96" y2="-2" />
+      <line x1="-88" y1="-45" x2="-70" y2="-20" />
+      <line x1="-46" y1="-62" x2="-36" y2="-32" />
+      <line x1="0" y1="-68" x2="0" y2="-35" />
+      <line x1="46" y1="-62" x2="36" y2="-32" />
+      <line x1="88" y1="-45" x2="70" y2="-20" />
+      <line x1="124" y1="-16" x2="96" y2="-2" />
+    </g>
+    <!-- Aerosol Gold Mist Dots -->
+    <circle cx="-110" cy="24" r="3" fill="#FFD54F" opacity="0.85" />
+    <circle cx="-98" cy="34" r="1.8" fill="#FFD54F" opacity="0.7" />
+    <circle cx="112" cy="20" r="3.2" fill="#FFD54F" opacity="0.85" />
+    <circle cx="102" cy="32" r="2" fill="#FFD54F" opacity="0.7" />
+
+    <!-- Outer Black Cutout + Street Gold Ring -->
+    <ellipse cx="0" cy="4" rx="102" ry="27" fill="none" stroke="#0A0A0A" stroke-width="25" />
+    <ellipse cx="0" cy="4" rx="102" ry="27" fill="none" stroke="url(#streetGoldGrad)" stroke-width="15" />
+    <ellipse cx="0" cy="4" rx="91" ry="17.5" fill="none" stroke="#0A0A0A" stroke-width="4" />
+    <path d="M -70 -6 Q 0 -21 70 -6" fill="none" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" opacity="0.95" />
+
+    <!-- Golden Spray Drips -->
+    <path d="M -58 22 L -58 52" stroke="#FFD54F" stroke-width="6.5" stroke-linecap="round" />
+    <circle cx="-58" cy="64" r="4.2" fill="#FFD54F" />
+    <path d="M -44 25 L -44 40" stroke="#FFB300" stroke-width="4.5" stroke-linecap="round" />
+    <path d="M 52 22 L 52 46" stroke="#FFB300" stroke-width="6" stroke-linecap="round" />
+    <circle cx="52" cy="57" r="3.8" fill="#FFD54F" />
+  </g>
+</svg>
