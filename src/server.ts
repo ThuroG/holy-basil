@@ -336,6 +336,12 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     return;
   }
 
+  if (pathname === '/credits') {
+    if (await sendFile(res, path.join(BUILD_DIR, 'credits.html'), 'public, max-age=3600')) return;
+    sendText(res, 404, 'Foto-Credits nicht gefunden.');
+    return;
+  }
+
   // Pages behind the links in the newsletter e-mails. The action itself needs a tap (POST),
   // so a mail scanner that opens the link does not confirm or unsubscribe anybody.
   if (pathname === '/newsletter/confirm' || pathname === '/newsletter/unsubscribe') {

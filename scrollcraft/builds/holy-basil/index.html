@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HOLY BASIL ZÜRICH · Pad Krapao Streetfood & Foodtruck</title>
 <meta name="description" content="Authentisches Thai Pad Krapao in Zürich. Ein Gericht, 100% vegane Saucenbasis, heisser Wok, faire CHF 12 bis 15. Vorbestellen mit deinem Züri-Code.">
-<link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/holy_basil_logo_v7_team_emblem_icon_only_transparent.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/fonts/fonts.css">
@@ -80,18 +80,24 @@
   .site-bar__brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.45rem;
     text-decoration: none;
-    color: var(--sc-ink);
-    font-family: var(--sc-font-display);
-    font-weight: 800;
-    font-size: 1.15rem;
-    letter-spacing: -0.02em;
   }
 
-  .site-bar__brand img {
-    width: 38px;
-    height: 38px;
+  .site-bar__brand-icon {
+    display: block;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 46px;
+    object-fit: contain;
+  }
+
+  .site-bar__brand-wordmark {
+    display: block;
+    flex: 0 1 132px;
+    width: 132px;
+    height: auto;
+    max-height: 54px;
     object-fit: contain;
   }
 
@@ -114,6 +120,12 @@
     border-radius: 50%;
     background: var(--sc-accent);
     box-shadow: 0 0 8px var(--sc-accent);
+    opacity: 0.3;
+    transition: opacity 180ms ease;
+  }
+
+  .site-bar__dot.is-live {
+    opacity: 1;
   }
 
   .site-bar__actions {
@@ -224,8 +236,8 @@
   /* Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker) */
   .hb-plane--subject {
     top: 11%;
-    right: 7%;
-    width: 430px;
+    right: 4%;
+    width: clamp(300px, 38vw, 560px);
     max-width: none;
     z-index: 4;
     display: flex;
@@ -237,7 +249,16 @@
     width: 100%;
     height: auto;
     max-width: none;
+    aspect-ratio: 5 / 3;
+    object-fit: cover;
+    border: 3px solid rgba(82, 196, 90, 0.8);
+    border-radius: 16px;
     transform: translateZ(0);
+  }
+
+  .hb-plane--subject picture {
+    display: block;
+    width: 100%;
   }
 
   .hb-hero-calligraphy {
@@ -422,6 +443,15 @@
     width: max-content;
   }
 
+  .hb-menu-scroll-hint {
+    display: none;
+  }
+
+  [data-sc-act="pan"] [data-sc-stage]:focus-visible {
+    outline: 3px solid var(--hb-gold);
+    outline-offset: -3px;
+  }
+
   .hb-rail-lead {
     width: 440px;
     flex-shrink: 0;
@@ -505,6 +535,14 @@
     grid-template-columns: 1.15fr 0.85fr;
     gap: 2.25rem;
     align-items: stretch;
+  }
+
+  .hb-tour-disclaimer {
+    max-width: 48ch;
+    margin: 0.6rem 0 0;
+    color: var(--sc-ink-soft);
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .hb-flap-board {
@@ -615,6 +653,23 @@
     border-color: var(--sc-accent);
   }
 
+  .hb-hood-pill:focus-visible {
+    outline: 3px solid var(--hb-gold);
+    outline-offset: 3px;
+  }
+
+  .hb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .hb-newsletter-card {
     background: #141C16;
     border: 2px solid rgba(255, 213, 79, 0.6);
@@ -711,7 +766,16 @@
     }
     .site-bar__brand {
       white-space: nowrap;
-      font-size: 1.02rem;
+      gap: 0.35rem;
+    }
+    .site-bar__brand-icon {
+      width: 36px;
+      height: 40px;
+    }
+    .site-bar__brand-wordmark {
+      flex-basis: 110px;
+      width: 110px;
+      max-height: 46px;
     }
     .site-bar .hb-cta {
       padding: 0.5rem 0.95rem;
@@ -733,11 +797,14 @@
       -webkit-backdrop-filter: none;
     }
     .hb-plane--subject {
-      width: 220px;
-      top: 8%;
-      right: 4%;
-      opacity: 0.48;
+      width: min(calc(100vw - (var(--sc-gutter) * 2)), 360px);
+      top: 9%;
+      right: var(--sc-gutter);
+      opacity: 1;
       transform: translate3d(0, 0, 0);
+    }
+    .hb-plane--subject img {
+      aspect-ratio: 4 / 3;
     }
     .hb-plane--front {
       display: none;
@@ -758,8 +825,42 @@
     }
     .hb-rail-lead,
     .hb-dish-card {
-      width: 310px;
+      width: min(84vw, 340px);
       padding: 1.35rem;
+    }
+    [data-sc-act="pan"] [data-sc-stage] {
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      scrollbar-color: var(--sc-accent) rgba(82, 196, 90, 0.16);
+      padding-block: 4.5rem 2rem;
+    }
+    [data-sc-act="pan"] [data-sc-pan] {
+      align-items: center;
+      height: 100%;
+      margin-top: 0;
+      padding-right: var(--sc-gutter);
+      transform: none !important;
+      will-change: auto;
+    }
+    [data-sc-act="pan"] [data-sc-pan] > * {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    [data-sc-act="pan"] [data-sc-stage]::-webkit-scrollbar {
+      height: 8px;
+    }
+    [data-sc-act="pan"] [data-sc-stage]::-webkit-scrollbar-thumb {
+      background: var(--sc-accent);
+      border-radius: 999px;
+    }
+    .hb-menu-scroll-hint {
+      display: block;
+      margin: 0.85rem 0 0;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
     }
     .hb-tour-stage {
       padding: 3.5rem 1rem 1rem 1rem;
@@ -778,13 +879,13 @@
 <div class="sc-grain" aria-hidden="true"></div>
 
 <header class="site-bar">
-  <a class="site-bar__brand" href="#top">
-    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" alt="Holy Basil Logo">
-    <span>HOLY BASIL</span>
+  <a class="site-bar__brand" href="#top" aria-label="Holy Basil – Startseite">
+    <img class="site-bar__brand-icon" src="/assets/holy_basil_logo_v7_team_emblem_icon_only_transparent.svg" alt="" aria-hidden="true">
+    <img class="site-bar__brand-wordmark" src="/assets/holy_basil_logo_v7_team_emblem_typography_only_transparent.svg" alt="" aria-hidden="true">
   </a>
   <div class="site-bar__live">
-    <span class="site-bar__dot"></span>
-    <span id="navLiveSpot">TOUR DURCH ZÜRICH</span>
+    <span class="site-bar__dot" aria-hidden="true"></span>
+    <span id="navLiveSpot" aria-live="polite" aria-atomic="true">TOURPLAN · NICHT LIVE BESTÄTIGT</span>
   </div>
   <div class="site-bar__actions">
     <a class="hb-nav-link" href="#tour">Tour-Plan</a>
@@ -810,7 +911,20 @@
 
       <!-- Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker — Transparent Cutout) -->
       <div class="hb-plane hb-plane--subject" data-sc-parallax="-0.55">
-        <img src="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" width="430" height="485" decoding="async" fetchpriority="high" alt="Holy Basil Blatt mit goldenem Heiligenschein und Kalligraphie">
+        <picture>
+          <source media="(max-width: 639px)" srcset="/assets/photo-f86750087-780x975.webp">
+          <img
+            src="/assets/photo-f86750087.webp"
+            srcset="/assets/photo-f86750087-500.webp 500w, /assets/photo-f86750087-960.webp 960w, /assets/photo-f86750087-1280.webp 1280w, /assets/photo-f86750087.webp 1920w"
+            sizes="(max-width: 760px) 88vw, 42vw"
+            width="1920"
+            height="1150"
+            decoding="async"
+            fetchpriority="high"
+            alt="Pad Krapao mit Reis, Basilikum und Spiegelei"
+            data-source="stand-in"
+            data-subject="stand-in">
+        </picture>
       </div>
 
       <!-- Sibling Scrim for guaranteed > 4.5:1 contrast -->
@@ -829,8 +943,8 @@
       <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.62 0">
         <div class="hb-hero-copy">
           <span class="hb-tag-pill">BANGKOK NIGHTMARKET ENERGY · ZÜRICH</span>
-          <img class="hb-hero-calligraphy" src="/assets/holy_basil_logo_v7_team_emblem_typography_only_transparent.svg" width="320" height="132" decoding="async" alt="Holy Basil Street Calligraphy Lockup">
-          <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Ein Gericht. Volle Wok-Hitze.</h1>
+          <img class="hb-hero-calligraphy" src="/assets/holy_basil_logo_v7_team_emblem_typography_only_transparent.svg" width="320" height="94" decoding="async" alt="Holy Basil Street Calligraphy Lockup">
+          <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Pad Krapao aus dem heissen Wok für Zürich.</h1>
           <p class="sc-body" style="margin-top: 0.75rem;">
             Wir bringen Thailands wahres National-Streetfood nach Zürich: Echtes Pad Krapao mit heiligem Basilikum, Chilis und 100% veganer Umami-Basis für faire 12 bis 15 CHF.
           </p>
@@ -845,7 +959,7 @@
       <div class="sc-copy sc-copy--lead" data-sc-cue="0.46 0.99 0.12 0.08">
         <div class="hb-hero-copy">
           <span class="hb-tag-pill">ZERO QUEUE · ZÜRI-CODE SYSTEM</span>
-          <h2 class="sc-display sc-display--lg">Kein Anstehen. Dein Quartier ruft dich auf.</h2>
+          <h2 class="sc-display sc-display--lg">Bestellen ohne Anstehen in deinem Quartier.</h2>
           <p class="sc-body" style="margin-top: 0.75rem;">
             Bestelle bis zu 10 Portionen in 20 Sekunden per QR-Code oder Browser. Statt Kassenbon #047 bekommst du deinen eigenen Züri-Code wie 8004 LANGSTRASSE.
           </p>
@@ -903,15 +1017,16 @@
 
   <!-- ACT 3 · THE EMOTIONAL PEAK: Sizzling Wok Lineup (pan + tilt, largest span 3.6) -->
   <section data-sc-act="pan" data-sc-span="3.6" data-sc-drift="#0D130E">
-    <div data-sc-stage>
+    <div data-sc-stage role="region" aria-label="Speisekarte. Mit Wischen oder Pfeiltasten durch die Varianten blättern." tabindex="0">
       <div class="hb-rail" data-sc-pan="0.06">
         <!-- Lead Item -->
         <div class="hb-rail-lead">
           <span class="hb-tag-pill">THE WOK LINEUP · STANDARDSCHÄRFE LEICHT SCHARF</span>
-          <h2 class="sc-display sc-display--lg">Drei Varianten. Ein heisser Wok.</h2>
+          <h2 class="sc-display sc-display--lg">Drei Pad-Krapao-Varianten aus dem heissen Wok.</h2>
           <p class="sc-body" style="margin-top: 0.85rem;">
             Jede Box kommt mit duftendem Jasminreis, frischem Holy Basil, Knoblauch und unserer 100% veganen Krapao-Sauce in unserer perfekt ausbalancierten Standardschärfe (leicht scharf).
           </p>
+          <p class="hb-menu-scroll-hint">Wische nach links für alle Varianten.</p>
           <div class="hb-btn-row">
             <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
           </div>
@@ -1002,22 +1117,24 @@
             <p class="sc-body" style="margin-top: 0.4rem;">
               Wir haben keinen fixen Platz, sondern touren durch Zürich. Scrolle durch die Züri-Codes oder wähle dein Quartier:
             </p>
+            <p class="hb-tour-disclaimer">Beispiel-Tourplan: Stopps und Zeiten sind Vorschläge. Der Live-Standort erscheint erst nach Crew-Bestätigung.</p>
           </div>
 
           <div class="hb-flap-display">
             <div class="hb-flap-code" id="flapCode">8005 · ZÜRI WEST</div>
             <div class="hb-flap-spot" id="flapSpot">Prime Tower / Hardbrücke Vorplatz</div>
-            <div class="hb-flap-meta" id="flapMeta">HEUTE LIVE · 11:30 bis 14:30 Uhr · Hardstrasse 201</div>
+            <div class="hb-flap-meta" id="flapMeta">TOURPLAN · KEIN LIVE-STANDORT BESTÄTIGT</div>
           </div>
 
           <div>
-            <div class="hb-hood-pills" id="hoodPills">
-              <button type="button" class="hb-hood-pill is-active" data-idx="0">8005 ZÜRI WEST</button>
-              <button type="button" class="hb-hood-pill" data-idx="1">8004 LANGSTRASSE</button>
-              <button type="button" class="hb-hood-pill" data-idx="2">8050 OERLIKON</button>
-              <button type="button" class="hb-hood-pill" data-idx="3">8400 WINTI</button>
-              <button type="button" class="hb-hood-pill" data-idx="4">8001 NIEDERDORF</button>
+            <div class="hb-hood-pills" id="hoodPills" role="group" aria-label="Tourplan nach Quartier">
+              <button type="button" class="hb-hood-pill" data-idx="0" aria-pressed="false">8005 ZÜRI WEST</button>
+              <button type="button" class="hb-hood-pill" data-idx="1" aria-pressed="false">8004 LANGSTRASSE</button>
+              <button type="button" class="hb-hood-pill" data-idx="2" aria-pressed="false">8050 OERLIKON</button>
+              <button type="button" class="hb-hood-pill" data-idx="3" aria-pressed="false">8400 WINTI</button>
+              <button type="button" class="hb-hood-pill" data-idx="4" aria-pressed="false">8001 NIEDERDORF</button>
             </div>
+            <p class="hb-sr-only" id="tourAnnouncement" role="status" aria-live="polite" aria-atomic="true"></p>
           </div>
         </div>
 
@@ -1105,7 +1222,8 @@
         <a href="/order">Bestell-App</a> ·
         <a href="/board">Pickup Board</a> ·
         <a href="/impressum">Impressum</a> ·
-        <a href="/datenschutz">Datenschutz</a>
+        <a href="/datenschutz">Datenschutz</a> ·
+        <a href="/credits">Photographs via Wikimedia Commons</a>
       </div>
     </footer>
   </section>
@@ -1119,12 +1237,14 @@
   // Bespoke Signature Move: Züri-Code Hood Split-Flap Scrubber driven by scroll & click
   // Tour data comes from /api/locations (one source of truth, the crew sets the live stop in /admin).
   // The stops below are only the fallback when the API cannot be reached.
+  const LIVE_LOCATION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+  let liveLocationState = { id: null, updatedAt: null, isFresh: false };
   let TOUR_STOPS = [
-    { plz: "8005", quarter: "ZÜRI WEST", spot: "Prime Tower / Hardbrücke Vorplatz", meta: "DIENSTAG · 11:30 – 14:30 Uhr · Hardstrasse 201, 8005 Zürich" },
-    { plz: "8004", quarter: "LANGSTRASSE", spot: "Kanzleiareal / Helvetiaplatz Pop-up", meta: "DONNERSTAG · 17:30 – 22:30 Uhr · Kanzleistrasse 56, 8004 Zürich" },
-    { plz: "8050", quarter: "OERLIKON", spot: "MFO-Park / Bahnhof Oerlikon Nord", meta: "FREITAG · 11:30 – 14:30 Uhr · Sophie-Taeuber-Strasse 4, 8050 Zürich" },
-    { plz: "8400", quarter: "WINTI", spot: "Lagerplatz / Sulzerareal Streetfood Corner", meta: "SAMSTAG · 12:00 – 21:00 Uhr · Lagerplatz 18, 8400 Winterthur" },
-    { plz: "8001", quarter: "NIEDERDORF", spot: "Hirschenplatz / Züri Altstadt Pop-up", meta: "SONNTAG · 12:00 – 18:00 Uhr · Hirschenplatz, 8001 Zürich" }
+    { id: "loc_1", plz: "8005", quarter: "ZÜRI WEST", dayLabel: "DIENSTAG", hours: "11:30 – 14:30 Uhr", address: "Hardstrasse 201, 8005 Zürich", spot: "Prime Tower / Hardbrücke Vorplatz" },
+    { id: "loc_2", plz: "8004", quarter: "LANGSTRASSE", dayLabel: "DONNERSTAG", hours: "17:30 – 22:30 Uhr", address: "Kanzleistrasse 56, 8004 Zürich", spot: "Kanzleiareal / Helvetiaplatz Pop-up" },
+    { id: "loc_3", plz: "8050", quarter: "OERLIKON", dayLabel: "FREITAG", hours: "11:30 – 14:30 Uhr", address: "Sophie-Taeuber-Strasse 4, 8050 Zürich", spot: "MFO-Park / Bahnhof Oerlikon Nord" },
+    { id: "loc_4", plz: "8400", quarter: "WINTI", dayLabel: "SAMSTAG", hours: "12:00 – 21:00 Uhr", address: "Lagerplatz 18, 8400 Winterthur", spot: "Lagerplatz / Sulzerareal Streetfood Corner" },
+    { id: "loc_5", plz: "8001", quarter: "NIEDERDORF", dayLabel: "SONNTAG", hours: "12:00 – 18:00 Uhr", address: "Hirschenplatz, 8001 Zürich", spot: "Hirschenplatz / Züri Altstadt Pop-up" }
   ];
 
   const tourSection = document.getElementById("tour");
@@ -1135,6 +1255,7 @@
   const flapSpot = document.getElementById("flapSpot");
   const flapMeta = document.getElementById("flapMeta");
   const hoodPillBox = document.getElementById("hoodPills");
+  const tourAnnouncement = document.getElementById("tourAnnouncement");
   const navLiveSpot = document.getElementById("navLiveSpot");
   const navLiveDot = document.querySelector(".site-bar__dot");
 
@@ -1149,6 +1270,8 @@
       btn.type = "button";
       btn.className = "hb-hood-pill";
       btn.setAttribute("data-idx", String(i));
+      btn.setAttribute("aria-pressed", String(i === activeIdx));
+      btn.classList.toggle("is-active", i === activeIdx);
       btn.textContent = s.plz + " " + s.quarter;
       hoodPillBox.appendChild(btn);
     });
@@ -1159,30 +1282,80 @@
   let lastTourBucket = -1;
   let scrollTicking = false;
 
-  function renderTourStop(idx, progressBucket) {
+  function formatLocationTime(value) {
+    return new Intl.DateTimeFormat("de-CH", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Europe/Zurich"
+    }).format(new Date(value));
+  }
+
+  function getTourStopMeta(stop) {
+    const schedule = [stop.dayLabel, stop.hours, stop.quarter].filter(Boolean).join(" · ");
+    if (liveLocationState.isFresh && liveLocationState.id === stop.id) {
+      return "TEAM-BESTÄTIGT · " + formatLocationTime(liveLocationState.updatedAt) + " · " + [stop.hours, stop.quarter].filter(Boolean).join(" · ");
+    }
+    return "TOURPLAN · " + schedule;
+  }
+
+  function updateLiveLocationState(data) {
+    const parsedUpdatedAt = typeof data.liveLocationUpdatedAt === "string"
+      ? Date.parse(data.liveLocationUpdatedAt)
+      : Number.NaN;
+    const now = Date.now();
+    const hasValidTime = Number.isFinite(parsedUpdatedAt) && parsedUpdatedAt <= now;
+    const sameZurichDay = hasValidTime
+      && new Intl.DateTimeFormat("de-CH", { dateStyle: "short", timeZone: "Europe/Zurich" }).format(new Date(parsedUpdatedAt))
+        === new Intl.DateTimeFormat("de-CH", { dateStyle: "short", timeZone: "Europe/Zurich" }).format(new Date(now));
+    const isFresh = hasValidTime && sameZurichDay && now - parsedUpdatedAt <= LIVE_LOCATION_MAX_AGE_MS;
+    const updatedAt = hasValidTime ? new Date(parsedUpdatedAt).toISOString() : null;
+    const id = typeof data.liveLocationId === "string" ? data.liveLocationId : null;
+    liveLocationState = { id, updatedAt, isFresh };
+
+    const liveStop = isFresh ? TOUR_STOPS.find((stop) => stop.id === id) : null;
+    if (navLiveSpot) {
+      if (liveStop) {
+        navLiveSpot.textContent = "BESTÄTIGT " + formatLocationTime(updatedAt) + " · " + liveStop.plz + " " + liveStop.quarter;
+      } else if (isFresh && data.liveLocationId === null) {
+        navLiveSpot.textContent = "TRUCK GESCHLOSSEN · " + formatLocationTime(updatedAt);
+      } else if (updatedAt) {
+        navLiveSpot.textContent = "TOURPLAN · ZULETZT " + formatLocationTime(updatedAt);
+      } else {
+        navLiveSpot.textContent = "TOURPLAN · NICHT LIVE BESTÄTIGT";
+      }
+    }
+    if (navLiveDot) navLiveDot.classList.toggle("is-live", Boolean(liveStop));
+  }
+
+  function renderTourStop(idx, progressBucket, announce = false) {
     const safeIdx = Math.max(0, Math.min(TOUR_STOPS.length - 1, idx));
     const s = TOUR_STOPS[safeIdx];
+    if (!s) return;
     if (tourStage && progressBucket !== lastTourBucket) {
       lastTourBucket = progressBucket;
       tourStage.setAttribute("data-sc-verify-state", "flap:" + s.plz + ":" + progressBucket);
     }
-    // Only touch the text when the stop changes: no screen-reader chatter on every scroll event.
-    if (safeIdx === activeIdx) return;
-    activeIdx = safeIdx;
-    if (flapDisplay) {
-      flapDisplay.classList.remove("is-flipping");
-      // Trigger mechanical split-flap animation without blocking scroll
-      requestAnimationFrame(() => {
-        flapDisplay.classList.add("is-flipping");
-      });
+    const stopChanged = safeIdx !== activeIdx;
+    if (stopChanged) {
+      activeIdx = safeIdx;
+      if (flapDisplay) {
+        flapDisplay.classList.remove("is-flipping");
+        requestAnimationFrame(() => {
+          flapDisplay.classList.add("is-flipping");
+        });
+      }
+      if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
+      if (flapSpot) flapSpot.textContent = s.spot;
     }
-    if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
-    if (flapSpot) flapSpot.textContent = s.spot;
-    if (flapMeta) flapMeta.textContent = s.meta;
+    if (flapMeta) flapMeta.textContent = getTourStopMeta(s);
     if (hoodPillBox) {
       [...hoodPillBox.querySelectorAll(".hb-hood-pill")].forEach((btn, i) => {
         btn.classList.toggle("is-active", i === safeIdx);
+        btn.setAttribute("aria-pressed", String(i === safeIdx));
       });
+    }
+    if (announce && tourAnnouncement) {
+      tourAnnouncement.textContent = s.plz + " " + s.quarter + ". " + s.spot + ". " + getTourStopMeta(s);
     }
   }
 
@@ -1192,7 +1365,7 @@
       if (!btn) return;
       const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
       manualOverrideUntil = Date.now() + 4000;
-      renderTourStop(idx, idx);
+      renderTourStop(idx, idx, true);
     });
   }
 
@@ -1224,26 +1397,28 @@
   async function loadTourStops() {
     try {
       const res = await fetch("/api/locations");
+      if (!res.ok) throw new Error("HTTP " + res.status);
       const json = await res.json();
-      if (!json.success || !Array.isArray(json.data.locations) || !json.data.locations.length) return;
+      if (!json.success || !json.data || !Array.isArray(json.data.locations) || !json.data.locations.length) {
+        throw new Error("Ungültige Standortdaten");
+      }
       const locations = json.data.locations;
       TOUR_STOPS = locations.map((l) => ({
+        id: l.id,
         plz: l.plz,
         quarter: l.quarter,
         spot: l.spotName,
-        meta: (l.status === "live_now" ? "HEUTE LIVE" : l.dayLabel) + " · " + l.hours + " · " + l.address
+        dayLabel: l.dayLabel,
+        hours: l.hours,
+        address: l.address
       }));
-      const live = locations.find((l) => l.status === "live_now");
-      if (navLiveSpot) {
-        navLiveSpot.textContent = live ? "HEUTE LIVE: " + live.plz + " " + live.quarter : "TRUCK MACHT PAUSE";
-      }
-      if (navLiveDot) navLiveDot.style.opacity = live ? "1" : "0.25";
+      updateLiveLocationState(json.data);
       renderHoodPills();
       activeIdx = -1;
       syncScrollVerifyStates();
       if (activeIdx === -1) renderTourStop(0, 0);
-    } catch {
-      // API not reachable: the fallback stops stay on screen.
+    } catch (error) {
+      console.error("[holy-basil] Live-Standort konnte nicht geladen werden:", error);
     }
   }
 

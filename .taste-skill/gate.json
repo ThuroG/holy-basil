@@ -1,0 +1,2615 @@
+{
+ "start": "2026-11-16T17:25:05.397Z",
+ "round": 3,
+ "idle": 0,
+ "errors": 0,
+ "status": "open",
+ "history": [
+  {
+   "at": "2026-11-16T17:39:55.108Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 72,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-16T17:43:30.269Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 68,
+   "round": 2,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-16T17:47:37.096Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 68,
+   "round": 2,
+   "reused": true,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-16T17:51:39.691Z",
+   "mode": "manual",
+   "status": "open",
+   "fails": 66,
+   "round": 3,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "scrollcraft/builds/holy-basil/index.html",
+  "url": null,
+  "root": "scrollcraft/builds/holy-basil",
+  "kind": "place",
+  "category": "Pad Krapao street food",
+  "primary": "Order Pad Krapao",
+  "rounds": 3,
+  "start": "2026-11-16T17:25:05.397Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "0d68383c7024a456:da39a3ee",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "0d68383c7024a456",
+ "page": "scrollcraft/builds/holy-basil/index.html",
+ "found": {
+  "fails": [
+   {
+    "check": "assets",
+    "where": "(the page)",
+    "msg": "the image qr.svg did not load (404)",
+    "fix": "fix the path, or remove the reference",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "assets"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "div#heroStage > div.hb-plane.hb-plane--subject > picture > img \"img: Pad Krapao mit Reis, Basilikum und \"",
+    "msg": "runs 29px past the right edge of the panel it sits on (div#heroStage > div.hb-plane.hb-plane--aura)",
+    "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "div#heroStage > div.hb-plane.hb-plane--subject > picture > img \"img: Pad Krapao mit Reis, Basilikum und \""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "starts \"opacity\" (0.6 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "main#top > section.hb-close-section > div.hb-close-grid > div.sc-stack.sc-in \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+    "msg": "starts \"opacity\" (0.6 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "main#top > section.hb-close-section > div.hb-close-grid > div.sc-stack.sc-in \"READY FOR PICKUP · MOBILE ORDER APP Hol \""
+    ]
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "main#top > section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in \"QR-Scan oder Direktklick Kein App-Store-\"",
+    "msg": "starts \"opacity\" (0.6 s) the moment it is scrolled into view (an IntersectionObserver)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "scroll-reveal"
+    ],
+    "wheres": [
+     "main#top > section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in \"QR-Scan oder Direktklick Kein App-Store-\""
+    ]
+   },
+   {
+    "check": "pinned",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "msg": "held on screen for 2.6 screens of scroll (position: sticky) while the page moves on",
+    "fix": "let the section scroll with the page",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "pinned"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \""
+    ]
+   },
+   {
+    "check": "pinned",
+    "where": "div#tourStage \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+    "msg": "held on screen for 1.5 screens of scroll (position: sticky) while the page moves on",
+    "fix": "let the section scroll with the page",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "pinned"
+    ],
+    "wheres": [
+     "div#tourStage \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "pictures, effects and mocks cover 12% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "section#tour \"Wo steht der Holy Basil Foodtruck?\"",
+    "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#tour \"Wo steht der Holy Basil Foodtruck?\""
+    ]
+   },
+   {
+    "check": "text-only",
+    "where": "main#top > section.hb-close-section \"Hol dir deinen Züri-Code in 20 Sekunden.\"",
+    "msg": "the closing section is only text: no picture, icon, mock or effect in it",
+    "fix": "give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "text-only"
+    ],
+    "wheres": [
+     "main#top > section.hb-close-section \"Hol dir deinen Züri-Code in 20 Sekunden.\""
+    ]
+   },
+   {
+    "check": "button-styles",
+    "where": "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta.hb-cta--xl \"Jetzt vorbestellen\"",
+    "msg": "one button style (pill, fill #52c45a, outline #52c45a) in 2 heights: 49, 65px (\"Jetzt vorbestellen\" 65px, \"Jetzt vorbestellen\" 49px)",
+    "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "button-styles"
+    ],
+    "wheres": [
+     "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta.hb-cta--xl \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "button-styles",
+    "where": "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta-ghost \"Live Pickup Board\"",
+    "msg": "one button style (pill, fill #141d16, outline #52c45a) in 3 heights: 44, 49, 65px (\"Live Pickup Board\" 65px, \"Catering anfragen\" 44px)",
+    "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "button-styles"
+    ],
+    "wheres": [
+     "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta-ghost \"Live Pickup Board\""
+    ]
+   },
+   {
+    "check": "same-action",
+    "where": "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "\"Jetzt vorbestellen\" appears 9 times in different looks: 49px and 65px tall, labels at 15px and 18px",
+    "fix": "draw one action the same way everywhere (only the nav copy may be one size smaller)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "same-action"
+    ],
+    "wheres": [
+     "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "heading-scale",
+    "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "an h2 at 80px, as large as the h1 (48px) or larger (and 2 more like it: \"Drei Pad-Krapao-Variante\", \"Hol dir deinen Züri-Code\")",
+    "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-scale"
+    ],
+    "wheres": [
+     "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "left edge at 136px, 24px off a common edge of its section at 160px (6 elements); 1 more in this section off the grid too (p.sc-body.sc-in at 136px)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(1) / main#top > section.sc-section.hb-act2",
+    "msg": "1312px between these sections (never on one screen), +141% against the median 544px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-gaps"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(1) / main#top > section.sc-section.hb-act2"
+    ]
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#top > section.sc-section.hb-act2 / main#top > section.sc-act--pinned:nth-of-type(3)",
+    "msg": "149px between these sections, -73% against the median 544px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-gaps"
+    ],
+    "wheres": [
+     "main#top > section.sc-section.hb-act2 / main#top > section.sc-act--pinned:nth-of-type(3)"
+    ]
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) / section#tour",
+    "msg": "197px between these sections, -64% against the median 544px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-gaps"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) / section#tour"
+    ]
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#tour / main#top > section.hb-close-section",
+    "msg": "891px between these sections (never on one screen), +64% against the median 544px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-gaps"
+    ],
+    "wheres": [
+     "section#tour / main#top > section.hb-close-section"
+    ]
+   },
+   {
+    "check": "empty-area",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(1) \"Pad Krapao aus dem heissen Wok für Züric\"",
+    "msg": "55% of the section is empty: 1152px under its last (div.hb-fg-badge:nth-of-type(1)), in its 2070px of rows (WARN over 35%, FAIL over 50%)",
+    "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "empty-area"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(1) \"Pad Krapao aus dem heissen Wok für Züric\""
+    ]
+   },
+   {
+    "check": "empty-area",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\"",
+    "msg": "74% of the section is empty: 2400px under its last (article.hb-dish-card:nth-of-type(3)), in its 3240px of rows (WARN over 35%, FAIL over 50%)",
+    "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "empty-area"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\""
+    ]
+   },
+   {
+    "check": "empty-area",
+    "where": "section#tour \"Wo steht der Holy Basil Foodtruck?\"",
+    "msg": "59% of the section is empty: 1328px under its last (div#tourStage), in its 2250px of rows (WARN over 35%, FAIL over 50%)",
+    "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "empty-area"
+    ],
+    "wheres": [
+     "section#tour \"Wo steht der Holy Basil Foodtruck?\""
+    ]
+   },
+   {
+    "check": "field-label",
+    "where": "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(1)",
+    "msg": "a input[type=text] without a label you can see: only a placeholder (\"Firma / Team\") names it",
+    "fix": "put a <label for> with the field's name above it (references/system.md, Forms); a placeholder is no label",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "field-label"
+    ],
+    "wheres": [
+     "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(1)"
+    ]
+   },
+   {
+    "check": "field-label",
+    "where": "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(2)",
+    "msg": "a input[type=email] without a label you can see: only a placeholder (\"Geschäfts-E-Mail\") names it",
+    "fix": "put a <label for> with the field's name above it (references/system.md, Forms); a placeholder is no label",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "field-label"
+    ],
+    "wheres": [
+     "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(2)"
+    ]
+   },
+   {
+    "check": "field-label",
+    "where": "form#b2bForm > div:nth-of-type(2) > input.hb-input",
+    "msg": "a input[type=number] without a label you can see: only a placeholder (\"Anzahl Gäste (ab 10 Pers.)\") names it",
+    "fix": "put a <label for> with the field's name above it (references/system.md, Forms); a placeholder is no label",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "field-label"
+    ],
+    "wheres": [
+     "form#b2bForm > div:nth-of-type(2) > input.hb-input"
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "Tab stop 6, a \"Jetzt vorbestellen\": the focus lands on something you cannot see",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"Speisekarte. Mit Wischen oder Pfeiltaste\"",
+    "msg": "Tab stop 7, div \"Speisekarte. Mit Wischen oder Pfeiltasten durch di\": the focus lands on something you cannot see",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"Speisekarte. Mit Wischen oder Pfeiltaste\""
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "div.hb-rail > div.hb-rail-lead > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "Tab stop 8, a \"Jetzt vorbestellen\": the focus lands on something you cannot see",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "div.hb-rail > div.hb-rail-lead > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "focus-visible",
+    "where": "div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(1) > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "Tab stop 9, a \"Jetzt vorbestellen\": the focus lands on something you cannot see",
+    "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "focus-visible"
+    ],
+    "wheres": [
+     "div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(1) > a.hb-cta \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "moment-none",
+    "where": "(the page)",
+    "msg": "a place page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+    "fix": "deal one (moments.mjs pick --page place --photo) and mount it in its own section",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "moment-none"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "hidden-content",
+    "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "with scripts switched off (a blocked or failed script) 8 lines stay hidden on the first screen, 1.5 s after load (opacity 0): \"In den meisten Resta\", \"1. Radikaler Monopro\", \"Kein Pad Thai, kein \": the page shows it only when a script reveals it",
+    "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hidden-content"
+    ],
+    "wheres": [
+     "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "hidden-content",
+    "where": "div.hb-tour-grid > div.hb-flap-board > div:nth-of-type(1) > span.hb-tag-pill \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+    "msg": "with scripts switched off (a blocked or failed script) 20 lines stay hidden on screen 3, 1.5 s after load (opacity 0): \"Wo steht der Holy Ba\", \"Wir haben keinen fix\", \"Beispiel-Tourplan: S\": the page shows it only when a script reveals it",
+    "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hidden-content"
+    ],
+    "wheres": [
+     "div.hb-tour-grid > div.hb-flap-board > div:nth-of-type(1) > span.hb-tag-pill \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+    ]
+   },
+   {
+    "check": "hidden-content",
+    "where": "section.hb-close-section > div.hb-close-grid > div.sc-stack > span.hb-tag-pill \"READY FOR PICKUP · MOBILE ORDER APP\"",
+    "msg": "with scripts switched off (a blocked or failed script) 9 lines stay hidden on screen 4, 1.5 s after load (opacity 0): \"Hol dir deinen Züri-\", \"Öffne unsere Web-App\", \"Jetzt vorbestellen\": the page shows it only when a script reveals it",
+    "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hidden-content"
+    ],
+    "wheres": [
+     "section.hb-close-section > div.hb-close-grid > div.sc-stack > span.hb-tag-pill \"READY FOR PICKUP · MOBILE ORDER APP\""
+    ]
+   },
+   {
+    "check": "hidden-content",
+    "where": "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "with reduced motion asked for it stays hidden on the first screen, 0.7 s after it was scrolled to (opacity 0): the page shows it only when a script reveals it",
+    "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hidden-content"
+    ],
+    "wheres": [
+     "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "hidden-content",
+    "where": "div#flapSpot \"Hirschenplatz / Züri Altstadt Pop-up\"",
+    "msg": "with reduced motion asked for 11 lines stay hidden on screen 10, 0.7 s after it was scrolled to (opacity 0): \"TOURPLAN · SONNTAG ·\", \"8005 ZÜRI WEST\", \"8004 LANGSTRASSE\": the page shows it only when a script reveals it",
+    "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hidden-content"
+    ],
+    "wheres": [
+     "div#flapSpot \"Hirschenplatz / Züri Altstadt Pop-up\""
+    ]
+   },
+   {
+    "check": "hero-screen",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(1) \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\"",
+    "msg": "the hero ends at 2070px on a 900px screen, 1170px below the fold: it ends at the fold, 1px either way (SR-1)",
+    "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "hero-screen"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(1) \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "msg": "the section is 3240px tall (3.6 screens), 1440px over two screens (1800px): every section after the hero is one screen or two, 2px either way (SR-2)",
+    "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+     "main#top > section.hb-close-section \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+     "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+    "msg": "the section is 2250px tall (2.5 screens), 450px over two screens (1800px): every section after the hero is one screen or two, 2px either way (SR-2)",
+    "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+    "msg": "the section shows no content: its content fills 0% of its 2250px (55% or more) (SR-3)",
+    "fix": "fill the section to 55%: more content, a picture or a background layer, or merge it into the section above as its last block",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "msg": "the content fills 25.3% of the section's height (821 of 3240px): 55% or more (40% WARN) (SR-3)",
+    "fix": "fill the section to 55%: more content, a picture or a background layer, or merge it into the section above as its last block",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \""
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in > hr.sc-in",
+    "msg": "a rule (<hr>) between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+    "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in > hr.sc-in"
+    ]
+   },
+   {
+    "check": "section-air",
+    "where": "main#top > section.hb-close-section > footer.hb-foot \"© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO ST\"",
+    "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+    "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-air"
+    ],
+    "wheres": [
+     "main#top > section.hb-close-section > footer.hb-foot \"© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO ST\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "the screen at scroll 2700px (stride 3) shows 204px of section 2 and the content of 2 sections, over 24px each beside section 3: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+    "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+     "main#top > section.sc-act--pinned:nth-of-type(1) \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+    "msg": "the screen at scroll 8362px (the top of section 5) shows 83px of section 4 beside section 5: a screen shows one section (another may peek 8px, 24px WARN) (and 1 more like it: scroll 5400px) (SR-4)",
+    "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+    ]
+   },
+   {
+    "check": "one-section",
+    "where": "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\"",
+    "msg": "a band: a box 100% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (SR-4)",
+    "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-section"
+    ],
+    "wheres": [
+     "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "main#top > section.hb-close-section \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+    "msg": "the content of section 5 runs 120px from the left and 120px from the right (read from its outermost blocks: no .wrap): the page's container starts at 43px (one container, equal margins, 2px either way) (SR-6)",
+    "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "main#top > section.hb-close-section \"READY FOR PICKUP · MOBILE ORDER APP Hol \""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "header.site-bar \"HOLY BASIL TOURPLAN · NICHT LIVE BESTÄTI\"",
+    "msg": "the nav's content runs 72px from the left and 72px from the right (read from its outermost blocks: no .wrap): the page's container starts at 43px (one container, equal margins, 2px either way) (and 3 more like it: \"THE WOK LINEUP · STANDAR\", \"PAD KRAPAOZÜRICH 100% VE\", \"Warum kostet Streetfood \") (SR-6)",
+    "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "header.site-bar \"HOLY BASIL TOURPLAN · NICHT LIVE BESTÄTI\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div.sc-grain",
+    "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+    "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div.sc-grain"
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\"",
+    "msg": "a box runs 0-1440px, outside the container lines of section 1 at 43-1397px: full width is for background layers and grounds only (SR-6)",
+    "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "div#heroStage > div.hb-plane.hb-plane--far",
+    "msg": "a box runs 0-1440px, outside the container lines of section 1 at 43-1397px: full width is for background layers and grounds only (and 4 more like it: div#heroStage > div.hb-hero-scrim, div#heroStage > div.hb-floor-fade, \"ผัดกะเพราหมู CHF 15 STRE\") (SR-6)",
+    "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "div#heroStage > div.hb-plane.hb-plane--far"
+    ]
+   },
+   {
+    "check": "container-edges",
+    "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "2 text blocks start on a left line at x 115, 72px from the container's left: text starts on the container's left, or on one split line (x 617, 732, 847) (also \"In den meisten Restaurants ist P\") (and 3 more like it: \"Warum kostet Streetfood \", \"Pad Krapao aus dem heiss\", \"Drei Pad-Krapao-Variante\") (SR-6)",
+    "fix": "start the text on the container's left, or on the one split line every split shares",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "container-edges"
+    ],
+    "wheres": [
+     "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "msg": "a clipped carousel: its window runs 0-1440px, not on the container at 72-1388px; 1 item cut at rest (SR-7)",
+    "fix": "show every item inside the container, or stack them: no sideways scroller, no half-cut carousel",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "section.sc-act--pinned:nth-of-type(3) > div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(3) \"ผัดกะเพราหมู CHF 15 STREET HEAVY HIT Hol\"",
+    "msg": "a row item is cut by a frame round it: 24 x 821px of its 410 x 821px shows (SR-7)",
+    "fix": "show the row item whole: no frame cutting it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "section.sc-act--pinned:nth-of-type(3) > div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(3) \"ผัดกะเพราหมู CHF 15 STREET HEAVY HIT Hol\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(1) \"100% VEGANE SAUCENBASIS · KEINE FISCHSAU\"",
+    "msg": "a row item is cut by a frame round it: 360 x 46px of its 360 x 49px shows (SR-7)",
+    "fix": "show the row item whole: no frame cutting it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(1) \"100% VEGANE SAUCENBASIS · KEINE FISCHSAU\""
+    ]
+   },
+   {
+    "check": "row-lines",
+    "where": "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(2) \"ZÜRI-CODE PICKUP · 8004 LANGSTRASSE\"",
+    "msg": "a row item is cut by a frame round it: 306 x 46px of its 306 x 49px shows (SR-7)",
+    "fix": "show the row item whole: no frame cutting it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "row-lines"
+    ],
+    "wheres": [
+     "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(2) \"ZÜRI-CODE PICKUP · 8004 LANGSTRASSE\""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "the two columns of the split start 116px apart at the top (centred on each other): a split's columns are top-aligned, 8px either way (SR-8)",
+    "fix": "top-align both columns of the split (align-items: start)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "main#top > section.hb-close-section > div.hb-close-grid \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+    "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 798, the first split's at 840; its right column starts at x 798, on none of the split lines 630 (k=5), 732 (k=6), 834 (k=7) (SR-8)",
+    "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "main#top > section.hb-close-section > div.hb-close-grid \"READY FOR PICKUP · MOBILE ORDER APP Hol \""
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "div#heroStage > div.hb-hero-scrim",
+    "msg": "runs 188px past the bottom edge of the panel it sits on (div#heroStage > div.hb-plane.hb-plane--aura)",
+    "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "div#heroStage > div.hb-hero-scrim"
+    ]
+   },
+   {
+    "check": "spill",
+    "where": "div#heroStage > div.sc-copy.sc-copy--lead:nth-of-type(8) > div.hb-hero-copy \"BANGKOK NIGHTMARKET ENERGY · ZÜRICH Pad \"",
+    "msg": "runs 377px past the bottom edge of the panel it sits on (div#heroStage > div.hb-plane.hb-plane--subject > picture > img)",
+    "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "spill"
+    ],
+    "wheres": [
+     "div#heroStage > div.sc-copy.sc-copy--lead:nth-of-type(8) > div.hb-hero-copy \"BANGKOK NIGHTMARKET ENERGY · ZÜRICH Pad \""
+    ]
+   },
+   {
+    "check": "no-visual",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\"",
+    "msg": "pictures, effects and mocks cover 1% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\""
+    ]
+   },
+   {
+    "check": "heading-scale",
+    "where": "div.hb-rail > article.hb-dish-card:nth-of-type(1) > div > h3 \"Holy Vegan\"",
+    "msg": "h3 headings in 3 sizes, 17.3px (\"1. Radikaler Monoprodukt\") to 24px (x1.39)",
+    "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "heading-scale"
+    ],
+    "wheres": [
+     "div.hb-rail > article.hb-dish-card:nth-of-type(1) > div > h3 \"Holy Vegan\""
+    ]
+   },
+   {
+    "check": "off-grid",
+    "where": "div.sc-stack.sc-in > div.hb-pillar-list.sc-in > div.hb-pillar:nth-of-type(1) > h3 \"1. Radikaler Monoprodukt-Fokus\"",
+    "msg": "left edge at 44px, 24px off the page margin at 20px (12 elements, like p.sc-body.sc-in); 5 more in this section off the grid too (p at 44px, h3 at 44px, p at 44px, h3 at 44px, ...)",
+    "fix": "move it onto the page margin, or the column edge its section uses",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-grid"
+    ],
+    "wheres": [
+     "div.sc-stack.sc-in > div.hb-pillar-list.sc-in > div.hb-pillar:nth-of-type(1) > h3 \"1. Radikaler Monoprodukt-Fokus\""
+    ]
+   },
+   {
+    "check": "collide",
+    "where": "header.site-bar \"HOLY BASIL Jetzt vorbestellen\"",
+    "msg": "at the top of the page the fixed bar covers \"BANGKOK NIGHTMARKET ENERGY · ZÜR\": nothing scrolls it out from under the bar",
+    "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+    "widths": [
+     320
+    ],
+    "from": "consistency",
+    "ids": [
+     "collide"
+    ],
+    "wheres": [
+     "header.site-bar \"HOLY BASIL Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "off-viewport",
+    "where": "header.site-bar > div.site-bar__actions \"Jetzt vorbestellen\"",
+    "msg": "at 320px wide it runs 20px past the screen's right edge (the page is 360px wide and scrolls sideways)",
+    "fix": "keep it inside the screen at this width: let it shrink, wrap or stack",
+    "widths": [
+     320
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-viewport"
+    ],
+    "wheres": [
+     "header.site-bar > div.site-bar__actions \"Jetzt vorbestellen\""
+    ]
+   },
+   {
+    "check": "off-viewport",
+    "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "at 320px wide it runs 40px past the screen's right edge (the page is 360px wide and scrolls sideways)",
+    "fix": "keep it inside the screen at this width: let it shrink, wrap or stack",
+    "widths": [
+     320
+    ],
+    "from": "consistency",
+    "ids": [
+     "off-viewport"
+    ],
+    "wheres": [
+     "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\""
+    ]
+   },
+   {
+    "check": "container",
+    "where": "page",
+    "msg": "no .wrap",
+    "fix": "put the content in one .wrap",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "container"
+    ],
+    "wheres": [
+     "page"
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "assets",
+    "where": "(the page)",
+    "msg": "the data file api/locations did not load (404)",
+    "fix": "fix the path, or remove the reference",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cut-text",
+    "where": "div.hb-rail > article.hb-dish-card:nth-of-type(3) > div > h3 \"Holy Pork / Mix\"",
+    "msg": "cut 162px at the right by the overflow of main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage (inside a held section or scroll scene, whose motion --quick does not check)",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cut-text",
+    "where": "div.hb-rail > article.hb-dish-card:nth-of-type(3) > div > p \"Kräftig gehacktes Schweinefleisch-Rind-M\"",
+    "msg": "cut 323px by the right edge of the screen (inside a held section or scroll scene, whose motion --quick does not check)",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "no-visual",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\"",
+    "msg": "pictures, effects and mocks cover 18% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#tour \"Wo steht der Holy Basil Foodtruck?\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-headings",
+    "where": "div.hb-rail > article.hb-dish-card:nth-of-type(3) > div > h3 \"Holy Pork / Mix\"",
+    "msg": "the card title \"Holy Pork / Mix\" names no product, part, place or section (3 card titles like it) (and 2 more like it: \"+ Kai Dao & Drinks\", \"QR-Scan oder Direktklick\")",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-buttons",
+    "where": "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "\"Jetzt vorbestellen\" does not start with a verb (book, buy, try, start, get, see...) (and 3 more like it: \"Wo steht der Truck?\", \"Live Pickup Board\", \"Catering anfragen\")",
+    "fix": "label buttons with a verb and what the visitor gets (\"Book a room\", \"Start free trial\")",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-actions",
+    "where": "(the page)",
+    "msg": "the main action \"Order Pad Krapao\" does not read word for word the same in the nav or hero and the closing section",
+    "fix": "few actions, one wording: at most 2 in the hero, the main action word for word in nav, hero and close",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "col-edge",
+    "where": "main#top > section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in \"QR-Scan oder Direktklick Kein App-Store-\"",
+    "msg": "the second column starts at 3 places: 798px (section.hb-close-section), 840px (section.sc-section.hb-act2), 1090px (section.sc-act--pinned:nth-of-type(1))",
+    "fix": "start the second column of every split on the same one or two grid columns",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "contrast",
+    "where": "div#heroStage > div.hb-plane.hb-plane--backtype \"PAD KRAPAO ZÜRICH\"",
+    "msg": "large text over a effect reads at 1.1:1 at its worst tenth (needs 3:1), on a busy ground",
+    "fix": "put the text on a calm part of the picture, or on a solid panel",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "body-size",
+    "where": "div.hb-tour-grid > div.hb-flap-board > div:nth-of-type(1) > p.hb-tour-disclaimer \"Beispiel-Tourplan: Stopps und Zeiten sin\"",
+    "msg": "8 of 14 paragraphs of running text are set under 16px (14, 14.7, 15px)",
+    "fix": "set running text at 16px or more",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "links",
+    "where": "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "\"Jetzt vorbestellen\" goes to /order, which does not exist here",
+    "fix": "point every link at a real section, page or file",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "links",
+    "where": "form#newsletterForm > p > a \"Datenschutz\"",
+    "msg": "\"Datenschutz\" goes to /datenschutz, which does not exist here",
+    "fix": "point every link at a real section, page or file",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "links",
+    "where": "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta-ghost \"Live Pickup Board\"",
+    "msg": "\"Live Pickup Board\" goes to /board, which does not exist here",
+    "fix": "point every link at a real section, page or file",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "links",
+    "where": "section.hb-close-section > footer.hb-foot > div:nth-of-type(2) > a:nth-of-type(3) \"Impressum\"",
+    "msg": "\"Impressum\" goes to /impressum, which does not exist here",
+    "fix": "point every link at a real section, page or file",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-credit",
+    "where": "(the page text)",
+    "msg": "1 library source (wikimedia): the page credits wikimedia; confirm each shows the client's own product, place or people",
+    "fix": "confirm the library photograph shows the client's own product, place or people; otherwise replace it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-family",
+    "where": "header.site-bar",
+    "msg": "the nav's links and actions use 2 type families (Plus Jakarta Sans, Space Grotesk)",
+    "fix": "keep one nav on every screen: the same bar, fill, links and type",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "header.site-bar > div.site-bar__actions > a.hb-nav-link \"Tour-Plan\"",
+    "msg": "\"Tour-Plan\" opens a section headed \"Wo steht der Holy Basil Foodtruck?\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "stranded-action",
+    "where": "div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(1) > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "stands 376px down from the nearest text of its block (\"Knusprig im Wok gebratenes Soj\") (inside a held section or scroll scene, whose motion --quick does not check) (and 4 more like it: \"Jetzt vorbestellen\", \"Jetzt vorbestellen\", \"Jetzt vorbestellen\", \"Jetzt vorbestellen\")",
+    "fix": "put the button under or beside the text it belongs to",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-length",
+    "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "a section heading of 7 words on 4 lines at 80px: a paragraph set in display type",
+    "fix": "cut the heading to one short line (2 to 12 words) and move the rest into the text under it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "split-align",
+    "where": "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "the picture beside \"Warum kostet Streetfood in Zür\" sits centred on a text column 296px taller: its top and bottom line up with nothing",
+    "fix": "set the picture's top on the heading's top (align-items: start), or let it run the column's full height",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "skip-link",
+    "where": "header.site-bar > a.site-bar__brand \"Holy Basil Logo HOLY BASIL\"",
+    "msg": "the first Tab stop is \"Holy Basil Logo HOLY BASIL\", not a skip link: a keyboard user tabs through the whole nav on every visit",
+    "fix": "add the starter's skip link as the header's first child: <a class=\"skip-link\" href=\"#top\">Skip to content</a>",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "share-meta",
+    "where": "head",
+    "msg": "the head lacks og:title, og:description, og:image, twitter:card, theme-color: a shared link shows no picture or title of its own",
+    "fix": "copy the head block of starter.html: og tags, twitter:card, the icon and theme-color (references/system.md, Head)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "form-fields",
+    "where": "input#nlEmail",
+    "msg": "the email field lacks autocomplete=\"email\": the phone shows the wrong keyboard and nothing fills it in",
+    "fix": "give each field its type, autocomplete and inputmode, never block paste or disable the button before a submit, and add the status line (references/system.md, Forms)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "form-fields",
+    "where": "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(2)",
+    "msg": "the email field lacks autocomplete=\"email\": the phone shows the wrong keyboard and nothing fills it in",
+    "fix": "give each field its type, autocomplete and inputmode, never block paste or disable the button before a submit, and add the status line (references/system.md, Forms)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "row-lines",
+    "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage > div.hb-rail \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "msg": "a row of 6 items: its last item ends at 2702px, the container's right line at 1388px (2px either way) (it sits in a part held on screen as the page scrolls: told as a WARN) (SR-7)",
+    "fix": "start the row's first item on the container's left line and end its last on the right line, every item one height",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "overlap-text",
+    "where": "section.sc-act--pinned:nth-of-type(3) > div.sc-stage > div.hb-rail > div.hb-rail-lead \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "msg": "lies over the text \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\" (div:nth-of-type(1) > span.hb-tag-pill) (inside a held section or scroll scene, whose motion --quick does not check)",
+    "fix": "move the box off the text (or the text off the box)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "header.site-bar > a.site-bar__brand \"HOLY BASIL\"",
+    "msg": "a 134x38px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\"",
+    "msg": "a 152x42px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div#hoodPills > button.hb-hood-pill:nth-of-type(1) \"8005 ZÜRI WEST\"",
+    "msg": "a 132x37px tap target (and 4 more like it on this screen): under the 44px a phone needs (inside a held section or scroll scene, whose motion --quick does not check)",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cut-text",
+    "where": "div#heroStage > div.hb-plane.hb-plane--backtype \"PAD KRAPAO ZÜRICH\"",
+    "msg": "sits across the edge of a panel behind it",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cut-text",
+    "where": "div.hb-tour-grid > div.hb-flap-board > div:nth-of-type(1) > p.hb-tour-disclaimer \"Beispiel-Tourplan: Stopps und Zeiten sin\"",
+    "msg": "cut 15px at the top by the overflow of div#tourStage (inside a held section or scroll scene, whose motion --quick does not check)",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "right-edge",
+    "where": "section.hb-close-section > div.hb-close-grid > div.sc-stack.sc-in > span.hb-tag-pill.sc-in \"READY FOR PICKUP · MOBILE ORDER APP\"",
+    "msg": "its right edge stops 43px short of the content's right edge (370px), which div.hb-qr-box.sc-in reaches",
+    "fix": "end it on the content's right edge, like the other blocks of its section",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#top > section.sc-section.hb-act2 / main#top > section.sc-act--pinned:nth-of-type(3)",
+    "msg": "233px between these sections, -43% against the median 412px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#tour / main#top > section.hb-close-section",
+    "msg": "591px between these sections (never on one screen), +43% against the median 412px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "orphan",
+    "where": "div.hb-rail > article.hb-dish-card.hb-dish-card--gold > div > p \"Kröne dein Krapao mit einem knusprigen T\"",
+    "msg": "its last line holds only \"4.50).\" (inside a held section or scroll scene, whose motion --quick does not check)",
+    "fix": "rebalance the text (text-wrap: pretty, or a shorter line) so the last line holds more than one short word",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "empty-area",
+    "where": "section#tour \"Wo steht der Holy Basil Foodtruck?\"",
+    "msg": "43% of the section is empty: 912px under its last (div.hb-newsletter-card), in its 2110px of rows (WARN over 35%, FAIL over 50%)",
+    "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 135,
+   "layout": 14
+  }
+ },
+ "open": [
+  {
+   "check": "assets",
+   "where": "(the page)",
+   "msg": "the image qr.svg did not load (404)",
+   "fix": "fix the path, or remove the reference",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "assets"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "div#heroStage > div.hb-plane.hb-plane--subject > picture > img \"img: Pad Krapao mit Reis, Basilikum und \"",
+   "msg": "runs 29px past the right edge of the panel it sits on (div#heroStage > div.hb-plane.hb-plane--aura)",
+   "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "div#heroStage > div.hb-plane.hb-plane--subject > picture > img \"img: Pad Krapao mit Reis, Basilikum und \""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "starts \"opacity\" (0.6 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "main#top > section.hb-close-section > div.hb-close-grid > div.sc-stack.sc-in \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+   "msg": "starts \"opacity\" (0.6 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "main#top > section.hb-close-section > div.hb-close-grid > div.sc-stack.sc-in \"READY FOR PICKUP · MOBILE ORDER APP Hol \""
+   ]
+  },
+  {
+   "check": "scroll-reveal",
+   "where": "main#top > section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in \"QR-Scan oder Direktklick Kein App-Store-\"",
+   "msg": "starts \"opacity\" (0.6 s) the moment it is scrolled into view (an IntersectionObserver)",
+   "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "scroll-reveal"
+   ],
+   "wheres": [
+    "main#top > section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in \"QR-Scan oder Direktklick Kein App-Store-\""
+   ]
+  },
+  {
+   "check": "pinned",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+   "msg": "held on screen for 2.6 screens of scroll (position: sticky) while the page moves on",
+   "fix": "let the section scroll with the page",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "pinned"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \""
+   ]
+  },
+  {
+   "check": "pinned",
+   "where": "div#tourStage \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+   "msg": "held on screen for 1.5 screens of scroll (position: sticky) while the page moves on",
+   "fix": "let the section scroll with the page",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "pinned"
+   ],
+   "wheres": [
+    "div#tourStage \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "pictures, effects and mocks cover 12% of this section; a feature section needs a visual (about 25% or more)",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "section#tour \"Wo steht der Holy Basil Foodtruck?\"",
+   "msg": "no picture, effect or mock in this section; a feature section needs a visual",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#tour \"Wo steht der Holy Basil Foodtruck?\""
+   ]
+  },
+  {
+   "check": "text-only",
+   "where": "main#top > section.hb-close-section \"Hol dir deinen Züri-Code in 20 Sekunden.\"",
+   "msg": "the closing section is only text: no picture, icon, mock or effect in it",
+   "fix": "give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "text-only"
+   ],
+   "wheres": [
+    "main#top > section.hb-close-section \"Hol dir deinen Züri-Code in 20 Sekunden.\""
+   ]
+  },
+  {
+   "check": "button-styles",
+   "where": "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta.hb-cta--xl \"Jetzt vorbestellen\"",
+   "msg": "one button style (pill, fill #52c45a, outline #52c45a) in 2 heights: 49, 65px (\"Jetzt vorbestellen\" 65px, \"Jetzt vorbestellen\" 49px)",
+   "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "button-styles"
+   ],
+   "wheres": [
+    "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta.hb-cta--xl \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "button-styles",
+   "where": "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta-ghost \"Live Pickup Board\"",
+   "msg": "one button style (pill, fill #141d16, outline #52c45a) in 3 heights: 44, 49, 65px (\"Live Pickup Board\" 65px, \"Catering anfragen\" 44px)",
+   "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "button-styles"
+   ],
+   "wheres": [
+    "div.hb-close-grid > div.sc-stack.sc-in > div.hb-btn-row.sc-in > a.hb-cta-ghost \"Live Pickup Board\""
+   ]
+  },
+  {
+   "check": "same-action",
+   "where": "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\"",
+   "msg": "\"Jetzt vorbestellen\" appears 9 times in different looks: 49px and 65px tall, labels at 15px and 18px",
+   "fix": "draw one action the same way everywhere (only the nav copy may be one size smaller)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "same-action"
+   ],
+   "wheres": [
+    "header.site-bar > div.site-bar__actions > a.hb-cta \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "heading-scale",
+   "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "an h2 at 80px, as large as the h1 (48px) or larger (and 2 more like it: \"Drei Pad-Krapao-Variante\", \"Hol dir deinen Züri-Code\")",
+   "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-scale"
+   ],
+   "wheres": [
+    "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "left edge at 136px, 24px off a common edge of its section at 160px (6 elements); 1 more in this section off the grid too (p.sc-body.sc-in at 136px)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "section-gaps",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(1) / main#top > section.sc-section.hb-act2",
+   "msg": "1312px between these sections (never on one screen), +141% against the median 544px",
+   "fix": "use one gap between sections (all within 25% of each other)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-gaps"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(1) / main#top > section.sc-section.hb-act2"
+   ]
+  },
+  {
+   "check": "section-gaps",
+   "where": "main#top > section.sc-section.hb-act2 / main#top > section.sc-act--pinned:nth-of-type(3)",
+   "msg": "149px between these sections, -73% against the median 544px",
+   "fix": "use one gap between sections (all within 25% of each other)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-gaps"
+   ],
+   "wheres": [
+    "main#top > section.sc-section.hb-act2 / main#top > section.sc-act--pinned:nth-of-type(3)"
+   ]
+  },
+  {
+   "check": "section-gaps",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) / section#tour",
+   "msg": "197px between these sections, -64% against the median 544px",
+   "fix": "use one gap between sections (all within 25% of each other)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-gaps"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) / section#tour"
+   ]
+  },
+  {
+   "check": "section-gaps",
+   "where": "section#tour / main#top > section.hb-close-section",
+   "msg": "891px between these sections (never on one screen), +64% against the median 544px",
+   "fix": "use one gap between sections (all within 25% of each other)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-gaps"
+   ],
+   "wheres": [
+    "section#tour / main#top > section.hb-close-section"
+   ]
+  },
+  {
+   "check": "empty-area",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(1) \"Pad Krapao aus dem heissen Wok für Züric\"",
+   "msg": "55% of the section is empty: 1152px under its last (div.hb-fg-badge:nth-of-type(1)), in its 2070px of rows (WARN over 35%, FAIL over 50%)",
+   "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "empty-area"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(1) \"Pad Krapao aus dem heissen Wok für Züric\""
+   ]
+  },
+  {
+   "check": "empty-area",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\"",
+   "msg": "74% of the section is empty: 2400px under its last (article.hb-dish-card:nth-of-type(3)), in its 3240px of rows (WARN over 35%, FAIL over 50%)",
+   "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "empty-area"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\""
+   ]
+  },
+  {
+   "check": "empty-area",
+   "where": "section#tour \"Wo steht der Holy Basil Foodtruck?\"",
+   "msg": "59% of the section is empty: 1328px under its last (div#tourStage), in its 2250px of rows (WARN over 35%, FAIL over 50%)",
+   "fix": "fill the section: a picture or a second column beside the words, or more of its own content; the section stays one or two screens tall (T-height)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "empty-area"
+   ],
+   "wheres": [
+    "section#tour \"Wo steht der Holy Basil Foodtruck?\""
+   ]
+  },
+  {
+   "check": "field-label",
+   "where": "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(1)",
+   "msg": "a input[type=text] without a label you can see: only a placeholder (\"Firma / Team\") names it",
+   "fix": "put a <label for> with the field's name above it (references/system.md, Forms); a placeholder is no label",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "field-label"
+   ],
+   "wheres": [
+    "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(1)"
+   ]
+  },
+  {
+   "check": "field-label",
+   "where": "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(2)",
+   "msg": "a input[type=email] without a label you can see: only a placeholder (\"Geschäfts-E-Mail\") names it",
+   "fix": "put a <label for> with the field's name above it (references/system.md, Forms); a placeholder is no label",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "field-label"
+   ],
+   "wheres": [
+    "form#b2bForm > div:nth-of-type(1) > input.hb-input:nth-of-type(2)"
+   ]
+  },
+  {
+   "check": "field-label",
+   "where": "form#b2bForm > div:nth-of-type(2) > input.hb-input",
+   "msg": "a input[type=number] without a label you can see: only a placeholder (\"Anzahl Gäste (ab 10 Pers.)\") names it",
+   "fix": "put a <label for> with the field's name above it (references/system.md, Forms); a placeholder is no label",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "field-label"
+   ],
+   "wheres": [
+    "form#b2bForm > div:nth-of-type(2) > input.hb-input"
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\"",
+   "msg": "Tab stop 6, a \"Jetzt vorbestellen\": the focus lands on something you cannot see",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"Speisekarte. Mit Wischen oder Pfeiltaste\"",
+   "msg": "Tab stop 7, div \"Speisekarte. Mit Wischen oder Pfeiltasten durch di\": the focus lands on something you cannot see",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"Speisekarte. Mit Wischen oder Pfeiltaste\""
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "div.hb-rail > div.hb-rail-lead > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\"",
+   "msg": "Tab stop 8, a \"Jetzt vorbestellen\": the focus lands on something you cannot see",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "div.hb-rail > div.hb-rail-lead > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "focus-visible",
+   "where": "div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(1) > a.hb-cta \"Jetzt vorbestellen\"",
+   "msg": "Tab stop 9, a \"Jetzt vorbestellen\": the focus lands on something you cannot see",
+   "fix": "keep the kit's ring (system.css :focus-visible, 2px in --action, there at once); a control that hides itself shows on focus",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "focus-visible"
+   ],
+   "wheres": [
+    "div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(1) > a.hb-cta \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "moment-none",
+   "where": "(the page)",
+   "msg": "a place page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+   "fix": "deal one (moments.mjs pick --page place --photo) and mount it in its own section",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "moment-none"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "hidden-content",
+   "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "with scripts switched off (a blocked or failed script) 8 lines stay hidden on the first screen, 1.5 s after load (opacity 0): \"In den meisten Resta\", \"1. Radikaler Monopro\", \"Kein Pad Thai, kein \": the page shows it only when a script reveals it",
+   "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hidden-content"
+   ],
+   "wheres": [
+    "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "hidden-content",
+   "where": "div.hb-tour-grid > div.hb-flap-board > div:nth-of-type(1) > span.hb-tag-pill \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+   "msg": "with scripts switched off (a blocked or failed script) 20 lines stay hidden on screen 3, 1.5 s after load (opacity 0): \"Wo steht der Holy Ba\", \"Wir haben keinen fix\", \"Beispiel-Tourplan: S\": the page shows it only when a script reveals it",
+   "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hidden-content"
+   ],
+   "wheres": [
+    "div.hb-tour-grid > div.hb-flap-board > div:nth-of-type(1) > span.hb-tag-pill \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+   ]
+  },
+  {
+   "check": "hidden-content",
+   "where": "section.hb-close-section > div.hb-close-grid > div.sc-stack > span.hb-tag-pill \"READY FOR PICKUP · MOBILE ORDER APP\"",
+   "msg": "with scripts switched off (a blocked or failed script) 9 lines stay hidden on screen 4, 1.5 s after load (opacity 0): \"Hol dir deinen Züri-\", \"Öffne unsere Web-App\", \"Jetzt vorbestellen\": the page shows it only when a script reveals it",
+   "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hidden-content"
+   ],
+   "wheres": [
+    "section.hb-close-section > div.hb-close-grid > div.sc-stack > span.hb-tag-pill \"READY FOR PICKUP · MOBILE ORDER APP\""
+   ]
+  },
+  {
+   "check": "hidden-content",
+   "where": "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\"",
+   "msg": "with reduced motion asked for it stays hidden on the first screen, 0.7 s after it was scrolled to (opacity 0): the page shows it only when a script reveals it",
+   "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hidden-content"
+   ],
+   "wheres": [
+    "div.sc-copy.sc-copy--lead:nth-of-type(9) > div.hb-hero-copy > div.hb-btn-row > a.hb-cta \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "hidden-content",
+   "where": "div#flapSpot \"Hirschenplatz / Züri Altstadt Pop-up\"",
+   "msg": "with reduced motion asked for 11 lines stay hidden on screen 10, 0.7 s after it was scrolled to (opacity 0): \"TOURPLAN · SONNTAG ·\", \"8005 ZÜRI WEST\", \"8004 LANGSTRASSE\": the page shows it only when a script reveals it",
+   "fix": "show the content at rest: the hidden state only under a class the script adds on its live path, never in the plain CSS (prefers-reduced-motion and a script that never runs show the finished page)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hidden-content"
+   ],
+   "wheres": [
+    "div#flapSpot \"Hirschenplatz / Züri Altstadt Pop-up\""
+   ]
+  },
+  {
+   "check": "hero-screen",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(1) \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\"",
+   "msg": "the hero ends at 2070px on a 900px screen, 1170px below the fold: it ends at the fold, 1px either way (SR-1)",
+   "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "hero-screen"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(1) \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+   "msg": "the section is 3240px tall (3.6 screens), 1440px over two screens (1800px): every section after the hero is one screen or two, 2px either way (SR-2)",
+   "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+    "main#top > section.hb-close-section \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+    "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+   "msg": "the section is 2250px tall (2.5 screens), 450px over two screens (1800px): every section after the hero is one screen or two, 2px either way (SR-2)",
+   "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+   "msg": "the section shows no content: its content fills 0% of its 2250px (55% or more) (SR-3)",
+   "fix": "fill the section to 55%: more content, a picture or a background layer, or merge it into the section above as its last block",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+   "msg": "the content fills 25.3% of the section's height (821 of 3240px): 55% or more (40% WARN) (SR-3)",
+   "fix": "fill the section to 55%: more content, a picture or a background layer, or merge it into the section above as its last block",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \""
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in > hr.sc-in",
+   "msg": "a rule (<hr>) between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+   "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "section.hb-close-section > div.hb-close-grid > div.hb-qr-box.sc-in > hr.sc-in"
+   ]
+  },
+  {
+   "check": "section-air",
+   "where": "main#top > section.hb-close-section > footer.hb-foot \"© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO ST\"",
+   "msg": "a top border across 100% of the container, between the section's content: sections and their parts are told apart by air and ground, not lines (SR-3)",
+   "fix": "take the rule out: sections and their parts are parted by their ground and the air between them",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-air"
+   ],
+   "wheres": [
+    "main#top > section.hb-close-section > footer.hb-foot \"© 2026 HOLY BASIL ZÜRICH · PAD KRAPAO ST\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "the screen at scroll 2700px (stride 3) shows 204px of section 2 and the content of 2 sections, over 24px each beside section 3: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+   "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "main#top > section.sc-section.hb-act2 \"Warum kostet Streetfood in Zürich 25 Fra\"",
+    "main#top > section.sc-act--pinned:nth-of-type(1) \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\"",
+   "msg": "the screen at scroll 8362px (the top of section 5) shows 83px of section 4 beside section 5: a screen shows one section (another may peek 8px, 24px WARN) (and 1 more like it: scroll 5400px) (SR-4)",
+   "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "section#tour \"SIGNATURE TOUR TRACKER · SCROLL ODER KLI\""
+   ]
+  },
+  {
+   "check": "one-section",
+   "where": "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\"",
+   "msg": "a band: a box 100% of the section wide on a ground of its own that holds the heading or the intro: the section's own ground is the band (SR-4)",
+   "fix": "put every block of <main> in a <section>, and give a band its own section instead of a ground inside one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-section"
+   ],
+   "wheres": [
+    "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "main#top > section.hb-close-section \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+   "msg": "the content of section 5 runs 120px from the left and 120px from the right (read from its outermost blocks: no .wrap): the page's container starts at 43px (one container, equal margins, 2px either way) (SR-6)",
+   "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "main#top > section.hb-close-section \"READY FOR PICKUP · MOBILE ORDER APP Hol \""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "header.site-bar \"HOLY BASIL TOURPLAN · NICHT LIVE BESTÄTI\"",
+   "msg": "the nav's content runs 72px from the left and 72px from the right (read from its outermost blocks: no .wrap): the page's container starts at 43px (one container, equal margins, 2px either way) (and 3 more like it: \"THE WOK LINEUP · STANDAR\", \"PAD KRAPAOZÜRICH 100% VE\", \"Warum kostet Streetfood \") (SR-6)",
+   "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "header.site-bar \"HOLY BASIL TOURPLAN · NICHT LIVE BESTÄTI\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div.sc-grain",
+   "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+   "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div.sc-grain"
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\"",
+   "msg": "a box runs 0-1440px, outside the container lines of section 1 at 43-1397px: full width is for background layers and grounds only (SR-6)",
+   "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div#heroStage \"PAD KRAPAOZÜRICH 100% VEGANE SAUCENBASIS\""
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "div#heroStage > div.hb-plane.hb-plane--far",
+   "msg": "a box runs 0-1440px, outside the container lines of section 1 at 43-1397px: full width is for background layers and grounds only (and 4 more like it: div#heroStage > div.hb-hero-scrim, div#heroStage > div.hb-floor-fade, \"ผัดกะเพราหมู CHF 15 STRE\") (SR-6)",
+   "fix": "keep it inside the container lines (.wrap): full width is for background layers and grounds only",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "div#heroStage > div.hb-plane.hb-plane--far"
+   ]
+  },
+  {
+   "check": "container-edges",
+   "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "2 text blocks start on a left line at x 115, 72px from the container's left: text starts on the container's left, or on one split line (x 617, 732, 847) (also \"In den meisten Restaurants ist P\") (and 3 more like it: \"Warum kostet Streetfood \", \"Pad Krapao aus dem heiss\", \"Drei Pad-Krapao-Variante\") (SR-6)",
+   "fix": "start the text on the container's left, or on the one split line every split shares",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "container-edges"
+   ],
+   "wheres": [
+    "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in > h2.sc-display.sc-display--lg \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \"",
+   "msg": "a clipped carousel: its window runs 0-1440px, not on the container at 72-1388px; 1 item cut at rest (SR-7)",
+   "fix": "show every item inside the container, or stack them: no sideways scroller, no half-cut carousel",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) > div.sc-stage \"THE WOK LINEUP · STANDARDSCHÄRFE LEICHT \""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "section.sc-act--pinned:nth-of-type(3) > div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(3) \"ผัดกะเพราหมู CHF 15 STREET HEAVY HIT Hol\"",
+   "msg": "a row item is cut by a frame round it: 24 x 821px of its 410 x 821px shows (SR-7)",
+   "fix": "show the row item whole: no frame cutting it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "section.sc-act--pinned:nth-of-type(3) > div.sc-stage > div.hb-rail > article.hb-dish-card:nth-of-type(3) \"ผัดกะเพราหมู CHF 15 STREET HEAVY HIT Hol\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(1) \"100% VEGANE SAUCENBASIS · KEINE FISCHSAU\"",
+   "msg": "a row item is cut by a frame round it: 360 x 46px of its 360 x 49px shows (SR-7)",
+   "fix": "show the row item whole: no frame cutting it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(1) \"100% VEGANE SAUCENBASIS · KEINE FISCHSAU\""
+   ]
+  },
+  {
+   "check": "row-lines",
+   "where": "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(2) \"ZÜRI-CODE PICKUP · 8004 LANGSTRASSE\"",
+   "msg": "a row item is cut by a frame round it: 306 x 46px of its 306 x 49px shows (SR-7)",
+   "fix": "show the row item whole: no frame cutting it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "row-lines"
+   ],
+   "wheres": [
+    "div#heroStage > div.hb-plane.hb-plane--front > div.hb-fg-badge:nth-of-type(2) \"ZÜRI-CODE PICKUP · 8004 LANGSTRASSE\""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "the two columns of the split start 116px apart at the top (centred on each other): a split's columns are top-aligned, 8px either way (SR-8)",
+   "fix": "top-align both columns of the split (align-items: start)",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "main#top > section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "main#top > section.hb-close-section > div.hb-close-grid \"READY FOR PICKUP · MOBILE ORDER APP Hol \"",
+   "msg": "the split's columns are off the page's one pair of lines: its right column starts at x 798, the first split's at 840; its right column starts at x 798, on none of the split lines 630 (k=5), 732 (k=6), 834 (k=7) (SR-8)",
+   "fix": "start every split's right column on one shared line (wrap.left + k x (width + 24) / 12, k 5, 6 or 7; 6 on a place page) and end the left one 24px before it",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "main#top > section.hb-close-section > div.hb-close-grid \"READY FOR PICKUP · MOBILE ORDER APP Hol \""
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "div#heroStage > div.hb-hero-scrim",
+   "msg": "runs 188px past the bottom edge of the panel it sits on (div#heroStage > div.hb-plane.hb-plane--aura)",
+   "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "div#heroStage > div.hb-hero-scrim"
+   ]
+  },
+  {
+   "check": "spill",
+   "where": "div#heroStage > div.sc-copy.sc-copy--lead:nth-of-type(8) > div.hb-hero-copy \"BANGKOK NIGHTMARKET ENERGY · ZÜRICH Pad \"",
+   "msg": "runs 377px past the bottom edge of the panel it sits on (div#heroStage > div.hb-plane.hb-plane--subject > picture > img)",
+   "fix": "keep the box inside the panel it starts on: shrink it, or grow the panel to hold it",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "spill"
+   ],
+   "wheres": [
+    "div#heroStage > div.sc-copy.sc-copy--lead:nth-of-type(8) > div.hb-hero-copy \"BANGKOK NIGHTMARKET ENERGY · ZÜRICH Pad \""
+   ]
+  },
+  {
+   "check": "no-visual",
+   "where": "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\"",
+   "msg": "pictures, effects and mocks cover 1% of this section; a feature section needs a visual (about 25% or more)",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "main#top > section.sc-act--pinned:nth-of-type(3) \"Drei Pad-Krapao-Varianten aus dem heisse\""
+   ]
+  },
+  {
+   "check": "heading-scale",
+   "where": "div.hb-rail > article.hb-dish-card:nth-of-type(1) > div > h3 \"Holy Vegan\"",
+   "msg": "h3 headings in 3 sizes, 17.3px (\"1. Radikaler Monoprodukt\") to 24px (x1.39)",
+   "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "heading-scale"
+   ],
+   "wheres": [
+    "div.hb-rail > article.hb-dish-card:nth-of-type(1) > div > h3 \"Holy Vegan\""
+   ]
+  },
+  {
+   "check": "off-grid",
+   "where": "div.sc-stack.sc-in > div.hb-pillar-list.sc-in > div.hb-pillar:nth-of-type(1) > h3 \"1. Radikaler Monoprodukt-Fokus\"",
+   "msg": "left edge at 44px, 24px off the page margin at 20px (12 elements, like p.sc-body.sc-in); 5 more in this section off the grid too (p at 44px, h3 at 44px, p at 44px, h3 at 44px, ...)",
+   "fix": "move it onto the page margin, or the column edge its section uses",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-grid"
+   ],
+   "wheres": [
+    "div.sc-stack.sc-in > div.hb-pillar-list.sc-in > div.hb-pillar:nth-of-type(1) > h3 \"1. Radikaler Monoprodukt-Fokus\""
+   ]
+  },
+  {
+   "check": "collide",
+   "where": "header.site-bar \"HOLY BASIL Jetzt vorbestellen\"",
+   "msg": "at the top of the page the fixed bar covers \"BANGKOK NIGHTMARKET ENERGY · ZÜR\": nothing scrolls it out from under the bar",
+   "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+   "widths": [
+    320
+   ],
+   "from": "consistency",
+   "ids": [
+    "collide"
+   ],
+   "wheres": [
+    "header.site-bar \"HOLY BASIL Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "off-viewport",
+   "where": "header.site-bar > div.site-bar__actions \"Jetzt vorbestellen\"",
+   "msg": "at 320px wide it runs 20px past the screen's right edge (the page is 360px wide and scrolls sideways)",
+   "fix": "keep it inside the screen at this width: let it shrink, wrap or stack",
+   "widths": [
+    320
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-viewport"
+   ],
+   "wheres": [
+    "header.site-bar > div.site-bar__actions \"Jetzt vorbestellen\""
+   ]
+  },
+  {
+   "check": "off-viewport",
+   "where": "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\"",
+   "msg": "at 320px wide it runs 40px past the screen's right edge (the page is 360px wide and scrolls sideways)",
+   "fix": "keep it inside the screen at this width: let it shrink, wrap or stack",
+   "widths": [
+    320
+   ],
+   "from": "consistency",
+   "ids": [
+    "off-viewport"
+   ],
+   "wheres": [
+    "section.sc-section.hb-act2 > div.sc-wrap.hb-split-grid > div.sc-stack.sc-in \"Warum kostet Streetfood in Zürich 25 Fra\""
+   ]
+  },
+  {
+   "check": "container",
+   "where": "page",
+   "msg": "no .wrap",
+   "fix": "put the content in one .wrap",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "container"
+   ],
+   "wheres": [
+    "page"
+   ]
+  }
+ ],
+ "waived": [],
+ "warnCount": 38,
+ "at": "2026-11-16T17:51:39.692Z",
+ "openTold": true
+}

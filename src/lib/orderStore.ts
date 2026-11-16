@@ -59,6 +59,7 @@ export const ARCHIVE_AFTER_MS = 12 * 60 * 60 * 1000;
 const MAX_NOTE_LENGTH = 200;
 const MAX_DRINKS_PER_LINE = 20;
 const MAX_PROCESSED_EVENTS = 2000;
+const LIVE_LOCATION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
 const UNPAID_STATUSES: readonly OrderStatus[] = [
   'pending_cash',
@@ -95,7 +96,8 @@ let b2bInquiriesStore: B2BInquiry[] = [];
 let processedPaymentEvents: string[] = [];
 const inFlightByIdempotencyKey = new Map<string, Promise<Order>>();
 
-let liveLocationId: string | null = 'loc_1';
+let liveLocationId: string | null = null;
+let liveLocationUpdatedAt: string | null = null;
 
 function persistOrders(): void {
   writeJsonAtomic('orders', ordersStore);
@@ -105,6 +107,7 @@ function persistSettings(): void {
   const flags = getFeatureFlags();
   writeJsonAtomic('settings', {
     liveLocationId,
+    liveLocationUpdatedAt,
     enableCustomSpiceLevels: flags.enableCustomSpiceLevels,
     enableHolyGains: flags.enableHolyGains,
     ordersPaused: flags.ordersPaused,
@@ -121,6 +124,7 @@ export function loadStoreFromDisk(): { orders: number; subscribers: number; inqu
   const events = readJson<string[]>('payment-events', []);
   const settings = readJson<{
     liveLocationId?: string | null;
+    liveLocationUpdatedAt?: string | null;
     enableCustomSpiceLevels?: boolean;
     enableHolyGains?: boolean;
     ordersPaused?: boolean;
@@ -139,14 +143,18 @@ export function loadStoreFromDisk(): { orders: number; subscribers: number; inqu
   }
 
   if (settings && typeof settings === 'object') {
-    if (settings.liveLocationId === null) {
-      liveLocationId = null;
-    } else if (
+    const updatedAtMs = typeof settings.liveLocationUpdatedAt === 'string'
+      ? Date.parse(settings.liveLocationUpdatedAt)
+      : Number.NaN;
+    liveLocationUpdatedAt = Number.isFinite(updatedAtMs)
+      ? new Date(updatedAtMs).toISOString()
+      : null;
+    liveLocationId =
+      liveLocationUpdatedAt &&
       typeof settings.liveLocationId === 'string' &&
       defaultTruckLocations.some((l) => l.id === settings.liveLocationId)
-    ) {
-      liveLocationId = settings.liveLocationId;
-    }
+        ? settings.liveLocationId
+        : null;
     if (typeof settings.enableCustomSpiceLevels === 'boolean') {
       setCustomSpiceLevelsEnabled(settings.enableCustomSpiceLevels);
     }
@@ -350,7 +358,7 @@ async function createOrderInternal(
   }
 
   // Fail closed: without a declared meat origin for this stop the cart cannot be sold.
-  const stopId = liveLocationId;
+  const stopId = getLiveLocationId();
   const declaration = buildCheckoutDeclaration(
     { portions: normalizedPortions, drinks: normalizedDrinks },
     stopId
@@ -924,16 +932,35 @@ export function getB2BInquiries(): B2BInquiry[] {
   return [...b2bInquiriesStore];
 }
 
-/** Tour stops with the stop the crew marked as live. `null` live id means the truck is closed. */
+function hasCurrentLiveLocation(): boolean {
+  if (!liveLocationId || !liveLocationUpdatedAt) return false;
+  const updatedAtMs = Date.parse(liveLocationUpdatedAt);
+  const now = Date.now();
+  if (!Number.isFinite(updatedAtMs) || updatedAtMs > now || now - updatedAtMs > LIVE_LOCATION_MAX_AGE_MS) {
+    return false;
+  }
+  const zurichDate = new Intl.DateTimeFormat('de-CH', {
+    dateStyle: 'short',
+    timeZone: 'Europe/Zurich',
+  });
+  return zurichDate.format(new Date(updatedAtMs)) === zurichDate.format(new Date(now));
+}
+
+/** Tour stops with only a recent crew-confirmed location marked live. */
 export function getTruckLocations(): TruckLocationStop[] {
+  const currentLocationId = hasCurrentLiveLocation() ? liveLocationId : null;
   return defaultTruckLocations.map((l) => ({
     ...l,
-    status: l.id === liveLocationId ? 'live_now' : 'upcoming',
+    status: l.id === currentLocationId ? 'live_now' : 'upcoming',
   }));
 }
 
 export function getLiveLocationId(): string | null {
-  return liveLocationId;
+  return hasCurrentLiveLocation() ? liveLocationId : null;
+}
+
+export function getLiveLocationUpdatedAt(): string | null {
+  return liveLocationUpdatedAt;
 }
 
 /** Marks one stop as live. Pass `null` when the truck is closed. */
@@ -942,6 +969,7 @@ export function setLiveTruckLocation(locationId: string | null): TruckLocationSt
     throw new Error('LOCATION_NOT_FOUND');
   }
   liveLocationId = locationId;
+  liveLocationUpdatedAt = new Date().toISOString();
   persistSettings();
   return getTruckLocations();
 }
@@ -950,7 +978,8 @@ export function resetOrderStore(): void {
   ordersStore = [];
   b2bInquiriesStore = [];
   processedPaymentEvents = [];
-  liveLocationId = 'loc_1';
+  liveLocationId = null;
+  liveLocationUpdatedAt = null;
   inFlightByIdempotencyKey.clear();
   resetZueriCodeAllocations();
   resetNewsletter();

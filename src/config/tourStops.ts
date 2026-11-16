@@ -11,7 +11,7 @@ export const defaultTruckLocations: TruckLocationStop[] = [
     spotName: 'Prime Tower / Hardbrücke Vorplatz',
     address: 'Hardstrasse 201, 8005 Zürich',
     hours: '11:30 – 14:30 Uhr',
-    status: 'live_now',
+    status: 'upcoming',
     vibeNote: 'Mittags-Service · Heisser Wok & frischer Thai Iced Tea',
   },
   {

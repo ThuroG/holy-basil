@@ -8,6 +8,7 @@ import {
   getB2BInquiries,
   getTruckLocations,
   getLiveLocationId,
+  getLiveLocationUpdatedAt,
   setLiveTruckLocation,
   getActiveOrders,
   getBoardEntries,
@@ -483,7 +484,11 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
     if (pathname === '/api/locations') {
       if (method === 'GET') {
         return createSuccessResponse(
-          { locations: getTruckLocations(), liveLocationId: getLiveLocationId() },
+          {
+            locations: getTruckLocations(),
+            liveLocationId: getLiveLocationId(),
+            liveLocationUpdatedAt: getLiveLocationUpdatedAt(),
+          },
           startTime,
           correlationId
         );
@@ -503,7 +508,11 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
         }
         const locations = setLiveTruckLocation(locationId);
         return createSuccessResponse(
-          { locations, liveLocationId: getLiveLocationId() },
+          {
+            locations,
+            liveLocationId: getLiveLocationId(),
+            liveLocationUpdatedAt: getLiveLocationUpdatedAt(),
+          },
           startTime,
           correlationId
         );

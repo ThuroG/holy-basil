@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { handleApiRequest as rawHandleApiRequest, ApiRequestInput } from '../../src/lib/apiHandler.js';
 import { resetOrderStore, calculateOrderTotal } from '../../src/lib/orderStore.js';
 import { resetFeatureFlags, setDemoPaymentsEnabled } from '../../src/config/features.js';
@@ -16,6 +16,28 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
     setDemoPaymentsEnabled(true); // TWINT / card are simulated and only exist in demo mode
     resetOrderStore();
     resetSlaMetrics();
+  });
+
+  it('stops advertising a crew-confirmed location after it becomes stale', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-15T10:00:00.000Z'));
+    try {
+      await handleApiRequest({
+        method: 'PATCH',
+        pathname: '/api/locations',
+        body: { locationId: 'loc_2' },
+      });
+
+      vi.setSystemTime(new Date('2026-01-15T23:00:00.000Z'));
+      const response = await handleApiRequest({ method: 'GET', pathname: '/api/locations' });
+      const data = (response.body as any).data;
+
+      expect(data.liveLocationId).toBeNull();
+      expect(data.liveLocationUpdatedAt).toBe('2026-01-15T10:00:00.000Z');
+      expect(data.locations.every((stop: { status: string }) => stop.status === 'upcoming')).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('completes full 4-station lifecycle for a 10-portion group order under 1000ms SLA', async () => {
@@ -330,6 +352,10 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
     // Locations GET, PATCH valid, PATCH missing, PATCH not found
     const getLocRes = await handleApiRequest({ method: 'GET', pathname: '/api/locations' });
     expect(getLocRes.statusCode).toBe(200);
+    const initialLocations = (getLocRes.body as any).data;
+    expect(initialLocations.liveLocationId).toBeNull();
+    expect(initialLocations.liveLocationUpdatedAt).toBeNull();
+    expect(initialLocations.locations.every((stop: { status: string }) => stop.status === 'upcoming')).toBe(true);
 
     const locRes = await handleApiRequest({
       method: 'PATCH',
@@ -337,6 +363,10 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
       body: { locationId: 'loc_2' },
     });
     expect(locRes.statusCode).toBe(200);
+    const updatedLocations = (locRes.body as any).data;
+    expect(updatedLocations.liveLocationId).toBe('loc_2');
+    expect(Number.isFinite(Date.parse(updatedLocations.liveLocationUpdatedAt))).toBe(true);
+    expect(updatedLocations.locations.find((stop: { id: string }) => stop.id === 'loc_2').status).toBe('live_now');
 
     const missingLocId = await handleApiRequest({
       method: 'PATCH',

@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HOLY BASIL ZÜRICH · Pad Krapao Streetfood &amp; Foodtruck: photograph credits</title>
+<meta name="description" content="The photographers, licences and source pages of the photographs on the HOLY BASIL ZÜRICH · Pad Krapao Streetfood &amp; Foodtruck website.">
+<link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="scrollcraft.css">
+<style>
+  :root {
+    /* Unverhandelbares Design-System gemäss README_DESIGN.md */
+    --bg-primary:    #0A0A0A;
+    --bg-elevated:   #161816;
+    --bg-surface:    #1F2420;
+    --green-deep:    #1B4D2E;
+    --green-core:    #2E7D32;
+    --green-highlight: #52C45A;
+    --green-sunlight:  #69F0AE;
+    --halo-accent:   #FFD54F;
+    --chili-accent:  #E53935;
+    --text-primary:  #F5F7F5;
+    --text-secondary: #B8C4B9; /* Outdoor-optimiert (11.01:1 auf #0A0A0A, 9.97:1 auf #161816) */
+    --text-muted-indoor: #9EA79E;
+    --border-bold:   2.5px solid #52C45A;
+
+    /* ScrollCraft Mapping */
+    --sc-canvas:     var(--bg-primary);
+    --sc-surface:    var(--bg-elevated);
+    --sc-ink:        var(--text-primary);
+    --sc-ink-soft:   var(--text-secondary);
+    --sc-accent:     var(--green-highlight);
+    --sc-accent-ink: #061008;
+    --sc-font-display: "Space Grotesk", system-ui, sans-serif;
+    --sc-font-text:    "Plus Jakarta Sans", "Space Grotesk", system-ui, sans-serif;
+    --hb-gold:       var(--halo-accent);
+    --hb-deep-green: var(--green-deep);
+    --hb-core-green: var(--green-core);
+    --hb-chili:      var(--chili-accent);
+    --hb-mono:       "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --sc-ink: #FFFFFF;
+      --sc-ink-soft: #E2ECE3;
+      --sc-accent: #69F0AE;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--sc-canvas);
+    color: var(--sc-ink);
+    overflow-x: hidden;
+  }
+
+  /* Persistent Top Navigation Bar */
+  .site-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem var(--sc-gutter);
+    background: rgba(10, 12, 10, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(82, 196, 90, 0.22);
+  }
+
+  .site-bar__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--sc-ink);
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
+
+  .site-bar__brand img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+
+  .site-bar__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: #122116;
+    border: 1px solid rgba(82, 196, 90, 0.45);
+    font-family: var(--hb-mono);
+    font-size: 0.75rem;
+    color: var(--sc-ink);
+  }
+
+  .site-bar__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sc-accent);
+    box-shadow: 0 0 8px var(--sc-accent);
+    opacity: 0.3;
+    transition: opacity 180ms ease;
+  }
+
+  .site-bar__dot.is-live {
+    opacity: 1;
+  }
+
+  .site-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hb-nav-link {
+    color: var(--sc-ink);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+  }
+
+  .hb-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    background: var(--sc-accent);
+    color: var(--sc-accent-ink);
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: 0.92rem;
+    text-decoration: none;
+    border: 2px solid var(--sc-accent);
+    cursor: pointer;
+  }
+
+  .hb-cta--xl {
+    padding: 1rem 2rem;
+    font-size: 1.12rem;
+  }
+
+  .hb-cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.2rem;
+    border-radius: 999px;
+    background: #141D16;
+    color: var(--sc-ink);
+    border: 1.5px solid rgba(82, 196, 90, 0.55);
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+  }
+
+  /* ACT 1: DIMENSIONAL LAYERED HERO (60FPS COMPOSITOR PIPELINE) */
+  .hb-hero-stage {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-primary);
+    contain: layout style paint;
+  }
+
+  .hb-plane {
+    position: absolute;
+    pointer-events: none;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+
+  /* Plane 1: Far Asphalt & Urban Street Grid */
+  .hb-plane--far {
+    inset: -12% -6%;
+    background:
+      radial-gradient(circle at 72% 38%, rgba(46, 125, 50, 0.26) 0%, rgba(10, 12, 10, 0.95) 62%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 48px);
+    z-index: 1;
+  }
+
+  /* Plane 2: Mid-Rear Street Gold Halo Aura & Wok Steam */
+  .hb-plane--aura {
+    top: 6%;
+    right: 6%;
+    width: 560px;
+    height: 560px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 213, 79, 0.24) 0%, rgba(82, 196, 90, 0.16) 42%, rgba(10, 12, 10, 0) 72%);
+    z-index: 2;
+  }
+
+  /* Plane 3: Inter-Plane Giant Street Typography behind Subject */
+  .hb-plane--backtype {
+    top: 16%;
+    right: 3%;
+    z-index: 3;
+    font-family: var(--sc-font-display);
+    font-weight: 800;
+    font-size: clamp(4.2rem, 11vw, 9.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    color: rgba(82, 196, 90, 0.11);
+    text-transform: uppercase;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  /* Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker) */
+  .hb-plane--subject {
+    top: 11%;
+    right: 4%;
+    width: clamp(320px, 42vw, 600px);
+    max-width: none;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hb-plane--subject img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    aspect-ratio: 5 / 3;
+    object-fit: cover;
+    border: 3px solid rgba(82, 196, 90, 0.8);
+    border-radius: 16px;
+    transform: translateZ(0);
+  }
+
+  .hb-plane--subject picture {
+    display: block;
+    width: 100%;
+  }
+
+  .hb-hero-calligraphy {
+    display: block;
+    width: clamp(220px, 42vw, 340px);
+    height: auto;
+    margin: 0.35rem 0 0.5rem 0;
+  }
+
+  /* Plane 5: Foreground Herb & Chili Accents (dips in center to keep CTA clear) */
+  .hb-plane--front {
+    bottom: -30px;
+    left: 0;
+    right: 0;
+    height: 190px;
+    z-index: 6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 3vw;
+  }
+
+  .hb-fg-badge {
+    background: #101912;
+    border: 2px solid var(--sc-accent);
+    border-radius: 16px;
+    padding: 0.75rem 1.15rem;
+    font-family: var(--hb-mono);
+    font-size: 0.8rem;
+    color: var(--sc-ink);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Section Floor Fade */
+  .hb-floor-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 180px;
+    background: linear-gradient(to bottom, rgba(10, 12, 10, 0) 0%, #0A0C0A 100%);
+    z-index: 7;
+    pointer-events: none;
+  }
+
+  /* Sibling Scrim protecting Hero Copy */
+  .hb-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(10, 12, 10, 0.96) 0%, rgba(10, 12, 10, 0.88) 48%, rgba(10, 12, 10, 0.25) 100%);
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .hb-hero-copy {
+    position: relative;
+    z-index: 8;
+    max-width: 38rem;
+    margin-top: 3.5rem;
+    background: rgba(12, 16, 13, 0.92);
+    border: 1.5px solid rgba(82, 196, 90, 0.4);
+    border-radius: 20px;
+    padding: 1.5rem 1.75rem;
+  }
+
+  .hb-hero-copy h1.sc-display--xl {
+    font-size: clamp(2.1rem, 3.6vw, 3rem);
+    line-height: 1.04;
+  }
+
+  .hb-tag-pill {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    background: #1B4D2E;
+    color: #F5F7F5;
+    font-family: var(--hb-mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--sc-accent);
+  }
+
+  .hb-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1.4rem;
+  }
+
+  /* ACT 2: MANIFESTO SPLIT */
+  .hb-act2 {
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+    background: #111612;
+  }
+
+  .hb-split-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .hb-pillar-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .hb-pillar {
+    background: #161E18;
+    border-left: 4px solid var(--sc-accent);
+    padding: 1rem 1.25rem;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .hb-pillar h3 {
+    font-family: var(--sc-font-display);
+    font-size: 1.08rem;
+    margin: 0 0 0.25rem 0;
+    color: var(--sc-ink);
+  }
+
+  .hb-pillar p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--sc-ink-soft);
+    line-height: 1.5;
+  }
+
+  .hb-emblem-card {
+    background: #0C100D;
+    border: 2px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .hb-emblem-card img {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    margin: 0 auto 1.25rem auto;
+    display: block;
+  }
+
+  .hb-price-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    border-top: 1px solid rgba(82, 196, 90, 0.3);
+    padding-top: 1rem;
+    font-family: var(--hb-mono);
+  }
+
+  .hb-price-cell {
+    background: #151D17;
+    padding: 0.6rem;
+    border-radius: 10px;
+  }
+
+  .hb-price-cell strong {
+    display: block;
+    color: var(--hb-gold);
+    font-size: 1.05rem;
+  }
+
+  .hb-price-cell span {
+    font-size: 0.75rem;
+    color: var(--sc-ink);
+  }
+
+  /* ACT 3: THE PEAK (HORIZONTAL PAN RAIL) */
+  .hb-rail {
+    display: flex;
+    align-items: stretch;
+    gap: 1.75rem;
+    padding: 0 var(--sc-gutter);
+    margin-top: 3.2rem;
+    width: max-content;
+  }
+
+  .hb-menu-scroll-hint {
+    display: none;
+  }
+
+  .hb-rail-lead {
+    width: 440px;
+    flex-shrink: 0;
+    background: #121A14;
+    border: 2px solid rgba(82, 196, 90, 0.45);
+    border-radius: 24px;
+    padding: 2.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hb-dish-card {
+    width: 410px;
+    flex-shrink: 0;
+    background: #131B15;
+    border: 2px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hb-dish-card--gold {
+    border-color: var(--hb-gold);
+  }
+
+  .hb-dish-visual {
+    height: 150px;
+    border-radius: 16px;
+    background: radial-gradient(circle at 50% 45%, #23472B 0%, #0D140F 100%);
+    border: 1px solid rgba(82, 196, 90, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .hb-dish-price {
+    font-family: var(--hb-mono);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--hb-gold);
+  }
+
+  .hb-dish-thai {
+    font-size: 1.35rem;
+    color: var(--sc-accent);
+    font-weight: 700;
+  }
+
+  .hb-dish-card h3 {
+    font-family: var(--sc-font-display);
+    font-size: 1.5rem;
+    margin: 0.35rem 0;
+    color: var(--sc-ink);
+  }
+
+  .hb-dish-card p {
+    font-size: 0.94rem;
+    color: var(--sc-ink-soft);
+    line-height: 1.55;
+    margin: 0 0 1.2rem 0;
+  }
+
+  /* ACT 4: SIGNATURE MOVE - ZÜRI-CODE SPLIT-FLAP HOOD DIAL & NEWSLETTER */
+  .hb-tour-stage {
+    background: #0E1410;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4.5rem var(--sc-gutter) 2rem var(--sc-gutter);
+  }
+
+  .hb-tour-grid {
+    width: 100%;
+    max-width: 1220px;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 2.25rem;
+    align-items: stretch;
+  }
+
+  .hb-flap-board {
+    background: #0A0D0B;
+    border: 2.5px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hb-flap-display {
+    position: relative;
+    background: var(--bg-surface);
+    border: 2px solid #2E7D32;
+    border-radius: 16px;
+    padding: 1.4rem;
+    margin: 1rem 0;
+    perspective: 700px;
+    overflow: hidden;
+    contain: layout paint;
+  }
+
+  /* Mechanical Split-Flap Hinge Line */
+  .hb-flap-display::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: rgba(10, 10, 10, 0.72);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+
+  @keyframes splitFlapFlip {
+    0% {
+      transform: rotateX(-78deg) scaleY(0.92);
+      opacity: 0.35;
+    }
+    60% {
+      transform: rotateX(10deg) scaleY(1.02);
+      opacity: 1;
+    }
+    100% {
+      transform: rotateX(0deg) scaleY(1);
+      opacity: 1;
+    }
+  }
+
+  .hb-flap-display.is-flipping .hb-flap-code,
+  .hb-flap-display.is-flipping .hb-flap-spot {
+    animation: splitFlapFlip 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+  }
+
+  .hb-flap-code {
+    font-family: var(--hb-mono);
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 800;
+    color: var(--hb-gold);
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+    will-change: transform, opacity;
+  }
+
+  .hb-flap-spot {
+    font-family: var(--sc-font-display);
+    font-size: 1.3rem;
+    color: var(--sc-ink);
+    margin-top: 0.45rem;
+    will-change: transform, opacity;
+  }
+
+  .hb-flap-meta {
+    font-family: var(--hb-mono);
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--green-sunlight);
+    margin-top: 0.35rem;
+  }
+
+  .hb-hood-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .hb-hood-pill {
+    font-family: var(--hb-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    background: #162018;
+    color: var(--sc-ink);
+    border: 1px solid rgba(82, 196, 90, 0.4);
+    cursor: pointer;
+  }
+
+  .hb-hood-pill.is-active {
+    background: var(--sc-accent);
+    color: var(--sc-accent-ink);
+    border-color: var(--sc-accent);
+  }
+
+  .hb-hood-pill:focus-visible {
+    outline: 3px solid var(--hb-gold);
+    outline-offset: 3px;
+  }
+
+  .hb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .hb-newsletter-card {
+    background: #141C16;
+    border: 2px solid rgba(255, 213, 79, 0.6);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .hb-input, .hb-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: #0A0D0B;
+    border: 1.5px solid rgba(82, 196, 90, 0.5);
+    color: var(--sc-ink);
+    font-family: var(--sc-font-text);
+    font-size: 0.94rem;
+    margin-top: 0.65rem;
+  }
+
+  .hb-status-msg {
+    font-family: var(--hb-mono);
+    font-size: 0.82rem;
+    color: var(--hb-gold);
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+  }
+
+  /* ACT 5: COMMITMENT & B2B GATEWAY */
+  .hb-close-section {
+    background: #0A0C0A;
+    padding: 4.5rem var(--sc-gutter) 3.5rem var(--sc-gutter);
+    border-top: 2px solid rgba(82, 196, 90, 0.3);
+  }
+
+  .hb-close-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .hb-qr-box {
+    background: #131A15;
+    border: 2px solid var(--sc-accent);
+    border-radius: 24px;
+    padding: 1.75rem;
+  }
+
+  .hb-qr-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hb-qr-svg {
+    width: 104px;
+    height: 104px;
+    background: #F5F7F5;
+    padding: 8px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .hb-foot {
+    max-width: 1200px;
+    margin: 3rem auto 0 auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--sc-ink-soft);
+  }
+
+  .hb-foot a {
+    color: var(--sc-accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Mobile Art Direction (< 760px) per hero-depth.md & taste.md */
+  @media (max-width: 760px) {
+    .site-bar__live,
+    .hb-nav-link {
+      display: none;
+    }
+    .site-bar__brand {
+      white-space: nowrap;
+      font-size: 1.02rem;
+    }
+    .site-bar .hb-cta {
+      padding: 0.5rem 0.95rem;
+      font-size: 0.84rem;
+      white-space: nowrap;
+    }
+    .hb-plane--backtype {
+      font-size: 3.4rem;
+      top: 10%;
+      right: 4%;
+    }
+    /* 60FPS Mobile GPU Optimization: disable expensive full-viewport SVG feTurbulence overlay & backdrop blur during scroll */
+    .sc-grain {
+      display: none !important;
+    }
+    .site-bar {
+      background: rgba(10, 10, 10, 0.96);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .hb-plane--subject {
+      width: min(88vw, 360px);
+      top: 9%;
+      right: 3%;
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+    .hb-plane--subject img {
+      aspect-ratio: 4 / 3;
+    }
+    .hb-plane--front {
+      display: none;
+    }
+    .hb-hero-copy {
+      margin-top: 2.5rem;
+      padding: 1.25rem;
+      max-width: 100%;
+    }
+    .hb-hero-copy h1.sc-display--xl {
+      font-size: var(--sc-t-2xl);
+    }
+    .hb-split-grid,
+    .hb-tour-grid,
+    .hb-close-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    .hb-rail-lead,
+    .hb-dish-card {
+      width: min(84vw, 340px);
+      padding: 1.35rem;
+    }
+    [data-sc-act="pan"] [data-sc-stage] {
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      scrollbar-color: var(--sc-accent) rgba(82, 196, 90, 0.16);
+      padding-block: 4.5rem 2rem;
+    }
+    [data-sc-act="pan"] [data-sc-pan] {
+      align-items: center;
+      height: 100%;
+      margin-top: 0;
+      padding-right: var(--sc-gutter);
+      transform: none !important;
+      will-change: auto;
+    }
+    [data-sc-act="pan"] [data-sc-pan] > * {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+    [data-sc-act="pan"] [data-sc-stage]::-webkit-scrollbar {
+      height: 8px;
+    }
+    [data-sc-act="pan"] [data-sc-stage]::-webkit-scrollbar-thumb {
+      background: var(--sc-accent);
+      border-radius: 999px;
+    }
+    .hb-menu-scroll-hint {
+      display: block;
+      margin: 0.85rem 0 0;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+    }
+    .hb-tour-stage {
+      padding: 3.5rem 1rem 1rem 1rem;
+      contain: layout style;
+    }
+    .hb-flap-board,
+    .hb-newsletter-card {
+      padding: 1.15rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="site-bar">
+  <a class="site-bar__brand" href="#top">
+    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" alt="Holy Basil Logo">
+    <span>HOLY BASIL</span>
+  </a>
+  <div class="site-bar__live">
+    <span class="site-bar__dot" aria-hidden="true"></span>
+    <span id="navLiveSpot" aria-live="polite" aria-atomic="true">TOURPLAN · NICHT LIVE BESTÄTIGT</span>
+  </div>
+  <div class="site-bar__actions">
+    <a class="hb-nav-link" href="#tour">Tour-Plan</a>
+    <a class="hb-cta" href="/order">Jetzt vorbestellen</a>
+  </div>
+</header>
+
+<main id="top">
+  <p><a class="link" href="index.html">HOLY BASIL ZÜRICH · Pad Krapao Streetfood &amp; Foodtruck</a></p>
+  <section class="credits-list" id="credits" aria-labelledby="credits-h">
+    <h1 id="credits-h">Photograph credits</h1>
+    <ul>
+      <li><a href="https://commons.wikimedia.org/wiki/File:Ka-phrao_mu_(basil_fried_pork)_with_rice_%26_egg,_Bangkok,_2019-03-31_(2).jpg">Bitterschoko</a>, <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0</a></li>
+    </ul>
+  </section>
+</main>
+
+<script src="scrollcraft.js"></script>
+<script>
+  ScrollCraft.mount(document.body);
+
+  // Bespoke Signature Move: Züri-Code Hood Split-Flap Scrubber driven by scroll & click
+  // Tour data comes from /api/locations (one source of truth, the crew sets the live stop in /admin).
+  // The stops below are only the fallback when the API cannot be reached.
+  const LIVE_LOCATION_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+  let liveLocationState = { id: null, updatedAt: null, isFresh: false };
+  let TOUR_STOPS = [
+    { id: "loc_1", plz: "8005", quarter: "ZÜRI WEST", dayLabel: "DIENSTAG", hours: "11:30 – 14:30 Uhr", address: "Hardstrasse 201, 8005 Zürich", spot: "Prime Tower / Hardbrücke Vorplatz" },
+    { id: "loc_2", plz: "8004", quarter: "LANGSTRASSE", dayLabel: "DONNERSTAG", hours: "17:30 – 22:30 Uhr", address: "Kanzleistrasse 56, 8004 Zürich", spot: "Kanzleiareal / Helvetiaplatz Pop-up" },
+    { id: "loc_3", plz: "8050", quarter: "OERLIKON", dayLabel: "FREITAG", hours: "11:30 – 14:30 Uhr", address: "Sophie-Taeuber-Strasse 4, 8050 Zürich", spot: "MFO-Park / Bahnhof Oerlikon Nord" },
+    { id: "loc_4", plz: "8400", quarter: "WINTI", dayLabel: "SAMSTAG", hours: "12:00 – 21:00 Uhr", address: "Lagerplatz 18, 8400 Winterthur", spot: "Lagerplatz / Sulzerareal Streetfood Corner" },
+    { id: "loc_5", plz: "8001", quarter: "NIEDERDORF", dayLabel: "SONNTAG", hours: "12:00 – 18:00 Uhr", address: "Hirschenplatz, 8001 Zürich", spot: "Hirschenplatz / Züri Altstadt Pop-up" }
+  ];
+
+  const tourSection = document.getElementById("tour");
+  const tourStage = document.getElementById("tourStage");
+  const heroSection = document.querySelector('[data-sc-act="pin"]');
+  const heroStage = document.getElementById("heroStage");
+  const flapCode = document.getElementById("flapCode");
+  const flapSpot = document.getElementById("flapSpot");
+  const flapMeta = document.getElementById("flapMeta");
+  const hoodPillBox = document.getElementById("hoodPills");
+  const tourAnnouncement = document.getElementById("tourAnnouncement");
+  const navLiveSpot = document.getElementById("navLiveSpot");
+  const navLiveDot = document.querySelector(".site-bar__dot");
+
+  let activeIdx = -1;
+  let manualOverrideUntil = 0;
+
+  function renderHoodPills() {
+    if (!hoodPillBox) return;
+    hoodPillBox.textContent = "";
+    TOUR_STOPS.forEach((s, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "hb-hood-pill";
+      btn.setAttribute("data-idx", String(i));
+      btn.setAttribute("aria-pressed", String(i === activeIdx));
+      btn.classList.toggle("is-active", i === activeIdx);
+      btn.textContent = s.plz + " " + s.quarter;
+      hoodPillBox.appendChild(btn);
+    });
+  }
+
+  const flapDisplay = document.querySelector(".hb-flap-display");
+  let lastHeroBucket = -1;
+  let lastTourBucket = -1;
+  let scrollTicking = false;
+
+  function formatLocationTime(value) {
+    return new Intl.DateTimeFormat("de-CH", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Europe/Zurich"
+    }).format(new Date(value));
+  }
+
+  function getTourStopMeta(stop) {
+    const schedule = [stop.dayLabel, stop.hours, stop.address].filter(Boolean).join(" · ");
+    if (liveLocationState.isFresh && liveLocationState.id === stop.id) {
+      return "TEAM-BESTÄTIGT · " + formatLocationTime(liveLocationState.updatedAt) + " · " + [stop.hours, stop.address].filter(Boolean).join(" · ");
+    }
+    return "TOURPLAN · " + schedule;
+  }
+
+  function updateLiveLocationState(data) {
+    const parsedUpdatedAt = typeof data.liveLocationUpdatedAt === "string"
+      ? Date.parse(data.liveLocationUpdatedAt)
+      : Number.NaN;
+    const now = Date.now();
+    const hasValidTime = Number.isFinite(parsedUpdatedAt) && parsedUpdatedAt <= now;
+    const sameZurichDay = hasValidTime
+      && new Intl.DateTimeFormat("de-CH", { dateStyle: "short", timeZone: "Europe/Zurich" }).format(new Date(parsedUpdatedAt))
+        === new Intl.DateTimeFormat("de-CH", { dateStyle: "short", timeZone: "Europe/Zurich" }).format(new Date(now));
+    const isFresh = hasValidTime && sameZurichDay && now - parsedUpdatedAt <= LIVE_LOCATION_MAX_AGE_MS;
+    const updatedAt = hasValidTime ? new Date(parsedUpdatedAt).toISOString() : null;
+    const id = typeof data.liveLocationId === "string" ? data.liveLocationId : null;
+    liveLocationState = { id, updatedAt, isFresh };
+
+    const liveStop = isFresh ? TOUR_STOPS.find((stop) => stop.id === id) : null;
+    if (navLiveSpot) {
+      if (liveStop) {
+        navLiveSpot.textContent = "BESTÄTIGT " + formatLocationTime(updatedAt) + " · " + liveStop.plz + " " + liveStop.quarter;
+      } else if (isFresh && data.liveLocationId === null) {
+        navLiveSpot.textContent = "TRUCK GESCHLOSSEN · " + formatLocationTime(updatedAt);
+      } else if (updatedAt) {
+        navLiveSpot.textContent = "TOURPLAN · ZULETZT " + formatLocationTime(updatedAt);
+      } else {
+        navLiveSpot.textContent = "TOURPLAN · NICHT LIVE BESTÄTIGT";
+      }
+    }
+    if (navLiveDot) navLiveDot.classList.toggle("is-live", Boolean(liveStop));
+  }
+
+  function renderTourStop(idx, progressBucket, announce = false) {
+    const safeIdx = Math.max(0, Math.min(TOUR_STOPS.length - 1, idx));
+    const s = TOUR_STOPS[safeIdx];
+    if (!s) return;
+    if (tourStage && progressBucket !== lastTourBucket) {
+      lastTourBucket = progressBucket;
+      tourStage.setAttribute("data-sc-verify-state", "flap:" + s.plz + ":" + progressBucket);
+    }
+    const stopChanged = safeIdx !== activeIdx;
+    if (stopChanged) {
+      activeIdx = safeIdx;
+      if (flapDisplay) {
+        flapDisplay.classList.remove("is-flipping");
+        requestAnimationFrame(() => {
+          flapDisplay.classList.add("is-flipping");
+        });
+      }
+      if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
+      if (flapSpot) flapSpot.textContent = s.spot;
+    }
+    if (flapMeta) flapMeta.textContent = getTourStopMeta(s);
+    if (hoodPillBox) {
+      [...hoodPillBox.querySelectorAll(".hb-hood-pill")].forEach((btn, i) => {
+        btn.classList.toggle("is-active", i === safeIdx);
+        btn.setAttribute("aria-pressed", String(i === safeIdx));
+      });
+    }
+    if (announce && tourAnnouncement) {
+      tourAnnouncement.textContent = s.plz + " " + s.quarter + ". " + s.spot + ". " + getTourStopMeta(s);
+    }
+  }
+
+  if (hoodPillBox) {
+    hoodPillBox.addEventListener("click", (event) => {
+      const btn = event.target.closest(".hb-hood-pill");
+      if (!btn) return;
+      const idx = parseInt(btn.getAttribute("data-idx") || "0", 10);
+      manualOverrideUntil = Date.now() + 4000;
+      renderTourStop(idx, idx, true);
+    });
+  }
+
+  function syncScrollVerifyStates() {
+    scrollTicking = false;
+    if (heroSection && heroStage) {
+      const hp = parseFloat(heroSection.style.getPropertyValue("--sc-p") || "0");
+      const heroBucket = Math.round(hp * 20);
+      if (heroBucket !== lastHeroBucket) {
+        lastHeroBucket = heroBucket;
+        heroStage.setAttribute("data-sc-verify-state", "hero:" + heroBucket);
+      }
+    }
+    if (tourSection && Date.now() > manualOverrideUntil) {
+      const tp = parseFloat(tourSection.style.getPropertyValue("--sc-p") || "0");
+      const bucket = Math.round(tp * 20);
+      const nextIdx = Math.min(TOUR_STOPS.length - 1, Math.floor(tp * TOUR_STOPS.length));
+      renderTourStop(nextIdx, bucket);
+    }
+  }
+
+  function onScrollTick() {
+    if (!scrollTicking) {
+      scrollTicking = true;
+      requestAnimationFrame(syncScrollVerifyStates);
+    }
+  }
+
+  async function loadTourStops() {
+    try {
+      const res = await fetch("/api/locations");
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      if (!json.success || !json.data || !Array.isArray(json.data.locations) || !json.data.locations.length) {
+        throw new Error("Ungültige Standortdaten");
+      }
+      const locations = json.data.locations;
+      TOUR_STOPS = locations.map((l) => ({
+        id: l.id,
+        plz: l.plz,
+        quarter: l.quarter,
+        spot: l.spotName,
+        dayLabel: l.dayLabel,
+        hours: l.hours,
+        address: l.address
+      }));
+      updateLiveLocationState(json.data);
+      renderHoodPills();
+      activeIdx = -1;
+      syncScrollVerifyStates();
+      if (activeIdx === -1) renderTourStop(0, 0);
+    } catch (error) {
+      console.error("[holy-basil] Live-Standort konnte nicht geladen werden:", error);
+    }
+  }
+
+  renderHoodPills();
+  renderTourStop(0, 0);
+  window.addEventListener("scroll", onScrollTick, { passive: true });
+  syncScrollVerifyStates();
+  loadTourStops();
+
+  // Newsletter Submission Handler
+  const nlForm = document.getElementById("newsletterForm");
+  const nlStatus = document.getElementById("nlStatus");
+  if (nlForm) {
+    nlForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const emailEl = document.getElementById("nlEmail");
+      const plzEl = document.getElementById("nlPlz");
+      const opt = plzEl.options[plzEl.selectedIndex];
+      const quarter = opt ? opt.getAttribute("data-quarter") : "LANGSTRASSE";
+      nlStatus.textContent = "Wird eingetragen...";
+      try {
+        const res = await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: emailEl.value,
+            preferredPlz: plzEl.value,
+            preferredQuarter: quarter
+          })
+        });
+        const json = await res.json();
+        if (json.success) {
+          nlStatus.textContent = "Fast geschafft: Bitte bestätige den Link in der E-Mail, die wir dir gerade geschickt haben.";
+          emailEl.value = "";
+        } else {
+          nlStatus.textContent = "Fehler: " + (json.error?.message || "Bitte E-Mail prüfen");
+        }
+      } catch {
+        nlStatus.textContent = "Keine Verbindung. Du bist noch nicht eingetragen, bitte nochmals versuchen.";
+      }
+    });
+  }
+
+  // B2B Catering Form Handler
+  const b2bForm = document.getElementById("b2bForm");
+  const b2bStatus = document.getElementById("b2bStatus");
+  if (b2bForm) {
+    b2bForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(b2bForm);
+      b2bStatus.textContent = "Anfrage wird gesendet...";
+      try {
+        const res = await fetch("/api/b2b", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            companyName: fd.get("companyName"),
+            email: fd.get("email"),
+            guestCount: Number(fd.get("guestCount")) || 30,
+            eventType: "catering"
+          })
+        });
+        const json = await res.json();
+        if (json.success) {
+          b2bStatus.textContent = "✓ Catering-Anfrage erhalten! Wir melden uns innert 24h.";
+          b2bForm.reset();
+        } else {
+          b2bStatus.textContent = "Bitte Firma und gültige E-Mail angeben.";
+        }
+      } catch {
+        b2bStatus.textContent = "Keine Verbindung. Die Anfrage wurde nicht gesendet, bitte nochmals versuchen.";
+      }
+    });
+  }
+</script>
+</body>
+</html>

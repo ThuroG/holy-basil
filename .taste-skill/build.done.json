@@ -1,0 +1,11 @@
+{
+ "page": "scrollcraft/builds/holy-basil/index.html",
+ "url": null,
+ "root": "scrollcraft/builds/holy-basil",
+ "kind": "place",
+ "category": "Pad Krapao street food",
+ "primary": "Order Pad Krapao",
+ "rounds": 3,
+ "start": "2026-11-16T17:25:05.397Z",
+ "by": "gate.mjs --start"
+}
