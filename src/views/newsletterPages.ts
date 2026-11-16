@@ -1,4 +1,10 @@
-import { FONT_LINK, LEGAL_LINKS_HTML, scriptJson } from './shared.js';
+import {
+  DESIGN_TOKENS_CSS,
+  FONT_LINK,
+  LEGAL_LINKS_HTML,
+  LOGO_STICKER_TRANSPARENT,
+  scriptJson,
+} from './shared.js';
 
 /**
  * Pages behind the links in the newsletter e-mails.
@@ -22,35 +28,36 @@ export function renderNewsletterActionHtml(action: 'confirm' | 'unsubscribe', to
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>HOLY BASIL · Tour-Alert</title>
-  <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+  <link rel="icon" href="${LOGO_STICKER_TRANSPARENT}" type="image/svg+xml">
   ${FONT_LINK}
   <style>
+    ${DESIGN_TOKENS_CSS}
     * { box-sizing: border-box; }
     body {
       margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: #0A0C0A; color: #F5F7F5; padding: 1rem;
-      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      background: var(--bg-primary); color: var(--text-primary); padding: 1rem;
+      font-family: var(--font-body);
     }
     .card {
-      width: 100%; max-width: 420px; background: #121814; border: 2px solid rgba(82, 196, 90, 0.45);
+      width: 100%; max-width: 420px; background: var(--bg-surface); border: 2px solid rgba(82, 196, 90, 0.45);
       border-radius: 20px; padding: 1.75rem; text-align: center;
     }
     img { width: 84px; height: 84px; }
-    h1 { font-family: "Space Grotesk", system-ui, sans-serif; font-size: 1.3rem; margin: 0.75rem 0 0.4rem 0; }
-    p { color: #9FB0A2; font-size: 0.92rem; margin: 0 0 1rem 0; }
+    h1 { font-family: var(--font-display); font-size: 1.3rem; margin: 0.75rem 0 0.4rem 0; }
+    p { color: var(--text-secondary); font-size: 0.92rem; margin: 0 0 1rem 0; }
     button {
-      width: 100%; min-height: 52px; border-radius: 12px; border: 0; background: #52C45A; color: #071209;
+      width: 100%; min-height: 52px; border-radius: 12px; border: 0; background: var(--green-neon); color: #071209;
       font-weight: 800; font-size: 1rem; cursor: pointer; font-family: inherit;
     }
     button:disabled { opacity: 0.6; cursor: wait; }
     #msg { min-height: 1.3rem; margin-top: 0.8rem; font-size: 0.92rem; font-weight: 700; }
     .foot { margin-top: 1.2rem; font-size: 0.75rem; }
-    a { color: #9FB0A2; }
+    a { color: var(--text-secondary); }
   </style>
 </head>
 <body>
   <div class="card">
-    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil">
+    <img src="${LOGO_STICKER_TRANSPARENT}" alt="Holy Basil">
     <h1>${isConfirm ? 'Tour-Alert bestätigen' : 'Tour-Alert abmelden'}</h1>
     <p>${
       isConfirm

@@ -381,4 +381,54 @@ describe('Full End-to-End Integration: API, 1-10 Portions, 4-Station Workflow & 
     expect(healthData.metrics.availabilityRate).toBeGreaterThanOrEqual(99.5);
     expect(healthData.metrics.paymentReliabilityRate).toBe(100); // no digital payment attempted
   });
+
+  it('supports Holy Gains toggle (+3.50 CHF for meat & vegan) and per-portion spice levels', async () => {
+    // When Holy Gains is disabled, requesting holyGains is ignored and not charged
+    const offRes = await handleApiRequest({
+      method: 'POST',
+      pathname: '/api/orders',
+      body: {
+        portions: [
+          { variant: 'chicken', holyGains: true, spiceLevel: 'mild' },
+          { variant: 'vegan', holyGains: true, spiceLevel: 'original_thai_spicy' },
+        ],
+        paymentMethod: 'cash',
+      },
+    });
+    expect(offRes.statusCode).toBe(201);
+    const offOrder = (offRes.body as any).data.order;
+    expect(offOrder.totalChf).toBe(27.0); // 15 + 12 (no holy gains)
+    expect(offOrder.portions[0].holyGains).toBeUndefined();
+    expect(offOrder.portions[0].spiceLevel).toBe('leicht_scharf'); // spice toggle is off
+
+    // Enable both toggles
+    const toggleRes = await handleApiRequest({
+      method: 'PATCH',
+      pathname: '/api/features',
+      body: { enableCustomSpiceLevels: true, enableHolyGains: true },
+    });
+    expect(toggleRes.statusCode).toBe(200);
+    expect((toggleRes.body as any).data.features.enableHolyGains).toBe(true);
+
+    // Now order with Holy Gains on both chicken and vegan + different spice per portion
+    const onRes = await handleApiRequest({
+      method: 'POST',
+      pathname: '/api/orders',
+      body: {
+        portions: [
+          { variant: 'chicken', addKaiDao: true, holyGains: true, spiceLevel: 'mild' },
+          { variant: 'vegan', holyGains: true, spiceLevel: 'original_thai_spicy' },
+        ],
+        paymentMethod: 'cash',
+      },
+    });
+    expect(onRes.statusCode).toBe(201);
+    const onOrder = (onRes.body as any).data.order;
+    // 15 + 2.50 + 3.50 + 12 + 3.50 = 36.50 CHF
+    expect(onOrder.totalChf).toBe(36.5);
+    expect(onOrder.portions[0].holyGains).toBe(true);
+    expect(onOrder.portions[1].holyGains).toBe(true);
+    expect(onOrder.portions[0].spiceLevel).toBe('mild');
+    expect(onOrder.portions[1].spiceLevel).toBe('original_thai_spicy');
+  });
 });

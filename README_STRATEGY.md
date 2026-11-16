@@ -37,10 +37,15 @@ Jede Portion wird frisch mit Duftreis (Jasminreis), unserer geheimen **100 % veg
 | **2. Holy Chicken** | Fein gehacktes / geschnittenes Pouletfleisch aus dem heissen Wok | **CHF 14.– bis 15.–** | Der Bestseller-Klassiker aus Bangkok |
 | **3. Holy Pork / Mixed** | Gehacktes Schweinefleisch oder kräftiger **Schwein-Rind-Mix** für maximales Aroma | **CHF 14.– bis 15.–** | Deftige Streetfood-Variante für Fleischliebhaber |
 
-###Gezielte Upselling-Extras (Für höheren Durchschnittsbon bei vollem Küchen-Speed)
-Um die Wok-Geschwindigkeit nicht durch komplizierte Sonderwünsche auszubremsen, gibt es im Bestellprozess bewusst nur **zwei schnelle, margenstarke Upgrades**:
-1. **Klassisches Thai-Upgrade – „Kai Dao" (+ CHF 2.– bis 3.–):** Ein knusprig im Wok ausgebackenes Spiegelei mit flüssigem Eigelb – das ultimative Original-Topping zu Pad Krapao.
-2. **Getränke-Kombis (Drink Bundles):** Passende Durstlöscher gegen die Krapao-Würze (z. B. hausgemachter *Thai Iced Tea*, Kokoswasser oder lokale Zürcher Kult-Drinks/Bier) als 1-Click-Kombi in der App.
+### Gezielte Upselling-Extras (Für höheren Durchschnittsbon bei vollem Küchen-Speed)
+Um die Wok-Geschwindigkeit nicht durch komplizierte Sonderwünsche auszubremsen, gibt es im Bestellprozess bewusst nur **drei schnelle, margenstarke Upgrades**:
+1. **Klassisches Thai-Upgrade – „Kai Dao" (+ CHF 2.50):** Ein knusprig im Wok ausgebackenes Spiegelei mit flüssigem Eigelb – das ultimative Original-Topping zu Pad Krapao.
+2. **Protein-Upgrade – „Holy Gains 💪" (+ CHF 3.50, per Feature-Toggle):** Extra Portion Fleisch bei *Holy Chicken* / *Holy Pork* sowie extra Bio-Soja- & Pilz-Mince (Plant-Protein) bei *Holy Vegan*. Ideal für Fitness-Gäste, Studierende und hungrige Mittagsgäste – steigert den Durchschnittsbon (AOV) ohne zusätzliche Wok-Komplexität.
+3. **Getränke-Kombis (Drink Bundles 🍹):** Passende Durstlöscher gegen die Krapao-Würze (z. B. hausgemachter *Thai Iced Tea*, Kokoswasser oder lokale Zürcher Kult-Drinks) als 1-Click-Kombi in der App.
+
+### Nährwert-Transparenz & Authentische Schärfe als Differenzierung
+- **Makro- & Kalorien-Schätzwerte:** Alle wählbaren Komponenten hinterlegen geschätzte Werte für Kalorien (kcal), Protein, Kohlenhydrate und Fett in Gramm. Die App summiert diese Werte für die gesamte Bestellung live auf – ein starkes Argument für die Zürcher Gym-, Tech- und Office-Zielgruppe.
+- **Authentische Thai-Schärfeskala:** Sofern per Feature-Toggle aktiviert, wählen Gäste pro Box zwischen *ไม่เผ็ด (Mai Phet – nicht scharf)*, *เผ็ดนิดหน่อย (Phet Nid Noy – leicht scharf)* und *เผ็ดมาก (Phet Mak – scharf)*.
 
 ### Warum funktioniert der Preis von 12–15 CHF in Zürich?
 - **Einkaufsvorteil durch Monoprodukt:** Nur wenige Zutaten in grossen Mengen nötig.

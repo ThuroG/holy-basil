@@ -42,11 +42,15 @@ Entwickelt nach dem dimensionalen **Scroll-Craft**-Standard:
 ### 2. Mobile QR-Bestell-App (`/order`)
 Optimiert für Smartphone-Browser bei direkter QR-Code-Nutzung vor Ort oder vorab online:
 - **Ein Screen, zwei Taps:** Card antippen, Bestellen antippen. Keine Vorauswahl, kein Popup. Wartezeit steht oben.
-- **Deklaration immer sichtbar:** 100 % vegane Saucenbasis als Badge, Fleischherkunft auf jeder Card, und in der fixen Leiste über dem Bestellbutton Herkunft, Allergene und Kreuzkontakt für genau diesen Warenkorb. «Allergene & Zutaten» klappt an Ort und Stelle auf.
+- **Deklaration kompakt & griffbereit:** 100 % vegane Saucenbasis als Badge, Fleischherkunft auf jeder Card, und in der fixen Leiste über dem Bestellbutton ein kompakter Auslöser für das **Deklarations-Modal** (Herkunft, Allergene, Kreuzkontakt & vollständige Allergen-Matrix), damit der Smartphone-Bildschirm frei bleibt.
 - **1 bis 10 Portionen pro Bestellung:** Schneller *Express-Modus* ("alle Boxen identisch") oder detailgenaue *Box-für-Box-Konfiguration*.
+- **Nährwert-Schätzungen (kcal & Makros):** Jedes wählbare Item (Gericht, Kai Dao, Holy Gains, Drinks 🍹) hinterlegt geschätzte Kalorien sowie Protein, Kohlenhydrate und Fett in Gramm. Der Warenkorb und das Abhol-Ticket summieren diese Werte automatisch als unverbindliche Schätzwerte auf.
 - **Feature-Toggle für Schärfegrade (`enableCustomSpiceLevels`):**
-  - Standardmässig auf `false`: Alle Boxen erhalten die perfekt ausbalancierte *Standardschärfe (leicht scharf 🌶️)* für maximale Wok-Kadenz.
-  - Dynamisch zuschaltbar für 4 Stufen (*Mild*, *Leicht scharf*, *Thai Spicy*, *Extra Hot*).
+  - Standardmässig auf `false`: Alle Boxen erhalten die perfekt ausbalancierte *Standardschärfe (1 🌶️ · เผ็ดนิดหน่อย)* für maximale Wok-Kadenz.
+  - Dynamisch zuschaltbar: **Pro Portion** wählbar zwischen **0** (`ไม่เผ็ด` · Nicht scharf), **1 🌶️** (`เผ็ดนิดหน่อย` · Leicht scharf) und **2 🌶️🌶️** (`เผ็ดมาก` · Scharf).
+- **Feature-Toggle für Extra Protein – „Holy Gains 💪“ (`enableHolyGains`):**
+  - Standardmässig auf `false`, im Admin-Cockpit jederzeit zuschaltbar.
+  - Ermöglicht pro Portion für **+ CHF 3.50** extra Fleisch (Chicken/Pork) bzw. extra Plant-Protein / Bio-Mince (bei Holy Vegan).
 - **Zahlungsarten:** **Barzahlung am Truck (`pending_cash`)**. TWINT und Karte sind noch nicht angebunden und laufen nur im Demo-Modus über einen Test-Provider (siehe [Betrieb & Sicherheit](#-betrieb--sicherheit)).
 - **Ticket bleibt erhalten:** Nach der Bestellung liegt das Ticket unter `/order/<id>` und überlebt Reload und gesperrtes Handy.
 - **Züri-Code Boarding-Pass:** Jede Bestellung erhält eine eindeutige Zürcher Postleitzahl mit Quartiersnamen (z. B. `8004 · LANGSTRASSE`).

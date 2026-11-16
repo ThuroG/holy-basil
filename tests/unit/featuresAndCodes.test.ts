@@ -2,10 +2,13 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   getFeatureFlags,
   setCustomSpiceLevelsEnabled,
+  setHolyGainsEnabled,
   resetFeatureFlags,
   MENU_DISHES,
   MENU_DRINKS,
   SPICE_LABELS,
+  HOLY_GAINS_PRICE_CHF,
+  calculateOrderNutrition,
 } from '../../src/config/features.js';
 import {
   allocateZueriCode,
@@ -21,28 +24,56 @@ describe('Feature Flags & Menu Config', () => {
     resetFeatureFlags();
   });
 
-  it('starts with custom spice levels disabled and standard spice set to leicht_scharf', () => {
+  it('starts with custom spice levels and holy gains disabled and standard spice set to leicht_scharf', () => {
     const flags = getFeatureFlags();
     expect(flags.enableCustomSpiceLevels).toBe(false);
+    expect(flags.enableHolyGains).toBe(false);
     expect(flags.defaultSpiceLevel).toBe('leicht_scharf');
     expect(flags.maxPortionsPerOrder).toBe(10);
     expect(flags.latencyThresholdMs).toBe(1000);
   });
 
-  it('toggles custom spice levels on and off cleanly', () => {
+  it('toggles custom spice levels and holy gains on and off cleanly', () => {
     const enabled = setCustomSpiceLevelsEnabled(true);
     expect(enabled.enableCustomSpiceLevels).toBe(true);
 
     const disabled = setCustomSpiceLevelsEnabled(false);
     expect(disabled.enableCustomSpiceLevels).toBe(false);
+
+    const gainsOn = setHolyGainsEnabled(true);
+    expect(gainsOn.enableHolyGains).toBe(true);
+
+    const gainsOff = setHolyGainsEnabled(false);
+    expect(gainsOff.enableHolyGains).toBe(false);
   });
 
-  it('defines all 3 Pad Krapao variants, drinks, and spice labels', () => {
+  it('defines all 3 Pad Krapao variants, drinks, Holy Gains price, and Thai spice labels', () => {
     expect(MENU_DISHES.vegan.priceChf).toBe(12);
     expect(MENU_DISHES.chicken.priceChf).toBe(15);
     expect(MENU_DISHES.pork_mix.priceChf).toBe(15);
     expect(MENU_DRINKS.thai_iced_tea.priceChf).toBe(4.5);
-    expect(SPICE_LABELS.leicht_scharf.name).toContain('Standardschärfe');
+    expect(HOLY_GAINS_PRICE_CHF).toBe(3.5);
+    expect(SPICE_LABELS.mild.thai).toBe('ไม่เผ็ด');
+    expect(SPICE_LABELS.leicht_scharf.thai).toBe('เผ็ดนิดหน่อย');
+    expect(SPICE_LABELS.original_thai_spicy.thai).toBe('เผ็ดมาก');
+  });
+
+  it('calculates estimated nutrition totals across portions, add-ons, and drinks', () => {
+    const totals = calculateOrderNutrition(
+      [
+        { variant: 'chicken', addKaiDao: true, holyGains: true },
+        { variant: 'vegan', addKaiDao: false, holyGains: true },
+      ],
+      [{ drinkId: 'thai_iced_tea', quantity: 1 }]
+    );
+    // chicken(620) + kai_dao(110) + holy_gains_meat(210) + vegan(540) + holy_gains_vegan(180) + thai_iced_tea(160)
+    expect(totals.caloriesKcal).toBe(1820);
+    // 38 + 7 + 28 + 28 + 20 + 2
+    expect(totals.proteinGrams).toBe(123);
+    // 60 + 1 + 1 + 68 + 10 + 28
+    expect(totals.carbsGrams).toBe(168);
+    // 24 + 9 + 8 + 16 + 6 + 5
+    expect(totals.fatGrams).toBe(68);
   });
 });
 

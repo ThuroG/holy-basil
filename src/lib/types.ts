@@ -36,11 +36,19 @@ export type OrderStatus =
   | 'completed'
   | 'cancelled';
 
+export interface NutritionInfo {
+  caloriesKcal: number;
+  proteinGrams: number;
+  carbsGrams: number;
+  fatGrams: number;
+}
+
 export interface OrderPortionItem {
   portionIndex: number; // 1..10
   variant: DishVariantId;
   spiceLevel: SpiceLevel;
   addKaiDao: boolean; // + CHF 2.50
+  holyGains?: boolean; // + CHF 3.50 (Extra Fleisch / Plant-Protein)
   /** Set when the cook started the wok batch that contains this portion. */
   firedAt?: string;
 }
@@ -147,6 +155,7 @@ export interface CreateOrderInput {
     variant: DishVariantId;
     spiceLevel?: SpiceLevel;
     addKaiDao?: boolean;
+    holyGains?: boolean;
   }>;
   drinks?: Array<{
     drinkId: DrinkId;
@@ -178,6 +187,7 @@ export interface WokProteinBatch {
 export interface WokDemandSummary {
   totalActivePortions: number;
   totalKaiDaoEggs: number;
+  totalHolyGains: number;
   activeOrderCount: number;
   customSpiceEnabled: boolean;
   batches: Record<DishVariantId, WokProteinBatch>;

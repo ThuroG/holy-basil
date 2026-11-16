@@ -1,5 +1,5 @@
 import { legalConfig, getLegalPlaceholders, NEWSLETTER_CONSENT } from '../config/legal.js';
-import { FONT_LINK, escHtml } from './shared.js';
+import { DESIGN_TOKENS_CSS, FONT_LINK, LOGO_STICKER_TRANSPARENT, escHtml } from './shared.js';
 
 /**
  * /impressum and /datenschutz. All company data comes from src/config/legal.ts.
@@ -17,13 +17,14 @@ function page(title: string, body: string): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HOLY BASIL · ${escHtml(title)}</title>
-  <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+  <link rel="icon" href="${LOGO_STICKER_TRANSPARENT}" type="image/svg+xml">
   ${FONT_LINK}
   <style>
+    ${DESIGN_TOKENS_CSS}
     * { box-sizing: border-box; }
     body {
-      margin: 0; background: #0A0C0A; color: #F5F7F5; line-height: 1.55;
-      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      margin: 0; background: var(--bg-primary); color: var(--text-primary); line-height: 1.55;
+      font-family: var(--font-body);
     }
     main { max-width: 720px; margin: 0 auto; padding: 1.5rem 1.1rem 4rem 1.1rem; }
     h1 { font-family: "Space Grotesk", system-ui, sans-serif; font-size: 1.7rem; margin: 1rem 0 0.5rem 0; }

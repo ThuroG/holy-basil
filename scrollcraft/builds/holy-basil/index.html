@@ -5,24 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HOLY BASIL ZÜRICH · Pad Krapao Streetfood & Foodtruck</title>
 <meta name="description" content="Authentisches Thai Pad Krapao in Zürich. Ein Gericht, 100% vegane Saucenbasis, heisser Wok, faire CHF 12 bis 15. Vorbestellen mit deinem Züri-Code.">
-<link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/fonts/fonts.css">
 <link rel="stylesheet" href="scrollcraft.css">
 <style>
   :root {
-    --sc-canvas:     #0A0C0A;
-    --sc-surface:    #141915;
-    --sc-ink:        #F5F7F5;
-    --sc-ink-soft:   #A3B1A5;
-    --sc-accent:     #52C45A;
-    --sc-accent-ink: #071209;
+    /* Unverhandelbares Design-System gemäss README_DESIGN.md */
+    --bg-primary:    #0A0A0A;
+    --bg-elevated:   #161816;
+    --bg-surface:    #1F2420;
+    --green-deep:    #1B4D2E;
+    --green-core:    #2E7D32;
+    --green-highlight: #52C45A;
+    --green-sunlight:  #69F0AE;
+    --halo-accent:   #FFD54F;
+    --chili-accent:  #E53935;
+    --text-primary:  #F5F7F5;
+    --text-secondary: #B8C4B9; /* Outdoor-optimiert (11.01:1 auf #0A0A0A, 9.97:1 auf #161816) */
+    --text-muted-indoor: #9EA79E;
+    --border-bold:   2.5px solid #52C45A;
+
+    /* ScrollCraft Mapping */
+    --sc-canvas:     var(--bg-primary);
+    --sc-surface:    var(--bg-elevated);
+    --sc-ink:        var(--text-primary);
+    --sc-ink-soft:   var(--text-secondary);
+    --sc-accent:     var(--green-highlight);
+    --sc-accent-ink: #061008;
     --sc-font-display: "Space Grotesk", system-ui, sans-serif;
-    --sc-font-text:    "Plus Jakarta Sans", system-ui, sans-serif;
-    --hb-gold:       #FFD54F;
-    --hb-deep-green: #1B4D2E;
-    --hb-core-green: #2E7D32;
-    --hb-chili:      #E53935;
-    --hb-mono:       "JetBrains Mono", monospace;
+    --sc-font-text:    "Plus Jakarta Sans", "Space Grotesk", system-ui, sans-serif;
+    --hb-gold:       var(--halo-accent);
+    --hb-deep-green: var(--green-deep);
+    --hb-core-green: var(--green-core);
+    --hb-chili:      var(--chili-accent);
+    --hb-mono:       "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --sc-ink: #FFFFFF;
+      --sc-ink-soft: #E2ECE3;
+      --sc-accent: #69F0AE;
+    }
   }
 
   * {
@@ -141,17 +167,21 @@
     text-decoration: none;
   }
 
-  /* ACT 1: DIMENSIONAL LAYERED HERO */
+  /* ACT 1: DIMENSIONAL LAYERED HERO (60FPS COMPOSITOR PIPELINE) */
   .hb-hero-stage {
     position: relative;
     overflow: hidden;
-    background: #0A0C0A;
+    background: var(--bg-primary);
+    contain: layout style paint;
   }
 
   .hb-plane {
     position: absolute;
     pointer-events: none;
     will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
   }
 
   /* Plane 1: Far Asphalt & Urban Street Grid */
@@ -207,7 +237,14 @@
     width: 100%;
     height: auto;
     max-width: none;
-    filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.85));
+    transform: translateZ(0);
+  }
+
+  .hb-hero-calligraphy {
+    display: block;
+    width: clamp(220px, 42vw, 340px);
+    height: auto;
+    margin: 0.35rem 0 0.5rem 0;
   }
 
   /* Plane 5: Foreground Herb & Chili Accents (dips in center to keep CTA clear) */
@@ -481,11 +518,50 @@
   }
 
   .hb-flap-display {
-    background: #141B16;
+    position: relative;
+    background: var(--bg-surface);
     border: 2px solid #2E7D32;
     border-radius: 16px;
     padding: 1.4rem;
     margin: 1rem 0;
+    perspective: 700px;
+    overflow: hidden;
+    contain: layout paint;
+  }
+
+  /* Mechanical Split-Flap Hinge Line */
+  .hb-flap-display::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: rgba(10, 10, 10, 0.72);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+
+  @keyframes splitFlapFlip {
+    0% {
+      transform: rotateX(-78deg) scaleY(0.92);
+      opacity: 0.35;
+    }
+    60% {
+      transform: rotateX(10deg) scaleY(1.02);
+      opacity: 1;
+    }
+    100% {
+      transform: rotateX(0deg) scaleY(1);
+      opacity: 1;
+    }
+  }
+
+  .hb-flap-display.is-flipping .hb-flap-code,
+  .hb-flap-display.is-flipping .hb-flap-spot {
+    animation: splitFlapFlip 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
   }
 
   .hb-flap-code {
@@ -495,6 +571,7 @@
     color: var(--hb-gold);
     letter-spacing: 0.04em;
     line-height: 1.05;
+    will-change: transform, opacity;
   }
 
   .hb-flap-spot {
@@ -502,12 +579,14 @@
     font-size: 1.3rem;
     color: var(--sc-ink);
     margin-top: 0.45rem;
+    will-change: transform, opacity;
   }
 
   .hb-flap-meta {
     font-family: var(--hb-mono);
     font-size: 0.86rem;
-    color: var(--sc-accent);
+    font-weight: 700;
+    color: var(--green-sunlight);
     margin-top: 0.35rem;
   }
 
@@ -644,11 +723,21 @@
       top: 10%;
       right: 4%;
     }
+    /* 60FPS Mobile GPU Optimization: disable expensive full-viewport SVG feTurbulence overlay & backdrop blur during scroll */
+    .sc-grain {
+      display: none !important;
+    }
+    .site-bar {
+      background: rgba(10, 10, 10, 0.96);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
     .hb-plane--subject {
       width: 220px;
       top: 8%;
       right: 4%;
-      opacity: 0.42;
+      opacity: 0.48;
+      transform: translate3d(0, 0, 0);
     }
     .hb-plane--front {
       display: none;
@@ -674,6 +763,7 @@
     }
     .hb-tour-stage {
       padding: 3.5rem 1rem 1rem 1rem;
+      contain: layout style;
     }
     .hb-flap-board,
     .hb-newsletter-card {
@@ -689,7 +779,7 @@
 
 <header class="site-bar">
   <a class="site-bar__brand" href="#top">
-    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil Logo">
+    <img src="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" alt="Holy Basil Logo">
     <span>HOLY BASIL</span>
   </a>
   <div class="site-bar__live">
@@ -705,7 +795,7 @@
 <main id="top">
 
   <!-- ACT 1 · RECOGNITION: Dimensional Layered Hero (pin + parallax + kinetic) -->
-  <section data-sc-act="pin" data-sc-span="2.3" data-sc-drift="#0A0C0A">
+  <section data-sc-act="pin" data-sc-span="2.3" data-sc-drift="#0A0A0A">
     <div data-sc-stage class="hb-hero-stage" id="heroStage" data-sc-verify-state="hero:0">
       <!-- Plane 1: Far Asphalt Grid -->
       <div class="hb-plane hb-plane--far" data-sc-parallax="-1.4" aria-hidden="true"></div>
@@ -718,9 +808,9 @@
         PAD KRAPAO<br>ZÜRICH
       </div>
 
-      <!-- Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker) -->
+      <!-- Plane 4: Focal Cutout Subject (Holy Basil v7 Stacked Sticker — Transparent Cutout) -->
       <div class="hb-plane hb-plane--subject" data-sc-parallax="-0.55">
-        <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" width="430" height="485" alt="Holy Basil Blatt mit goldenem Heiligenschein und Kalligraphie">
+        <img src="/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg" width="430" height="485" decoding="async" fetchpriority="high" alt="Holy Basil Blatt mit goldenem Heiligenschein und Kalligraphie">
       </div>
 
       <!-- Sibling Scrim for guaranteed > 4.5:1 contrast -->
@@ -739,6 +829,7 @@
       <div class="sc-copy sc-copy--lead" data-sc-cue="0 0.62 0">
         <div class="hb-hero-copy">
           <span class="hb-tag-pill">BANGKOK NIGHTMARKET ENERGY · ZÜRICH</span>
+          <img class="hb-hero-calligraphy" src="/assets/holy_basil_logo_v7_team_emblem_typography_only_transparent.svg" width="320" height="132" decoding="async" alt="Holy Basil Street Calligraphy Lockup">
           <h1 class="sc-display sc-display--xl" data-sc-kinetic="lines">Ein Gericht. Volle Wok-Hitze.</h1>
           <p class="sc-body" style="margin-top: 0.75rem;">
             Wir bringen Thailands wahres National-Streetfood nach Zürich: Echtes Pad Krapao mit heiligem Basilikum, Chilis und 100% veganer Umami-Basis für faire 12 bis 15 CHF.
@@ -791,7 +882,7 @@
       </div>
 
       <figure class="hb-emblem-card" data-sc-reveal="up" data-sc-reveal-at="0.10 0.55">
-        <img src="/assets/holy_basil_logo_v7_team_emblem.svg" width="340" height="364" alt="Holy Basil Team Emblem Zürich">
+        <img src="/assets/holy_basil_logo_v7_team_emblem_transparent.svg" width="340" height="364" loading="lazy" decoding="async" alt="Holy Basil Team Emblem Zürich">
         <div class="hb-price-strip">
           <div class="hb-price-cell">
             <strong>CHF 12</strong>
@@ -1063,15 +1154,28 @@
     });
   }
 
+  const flapDisplay = document.querySelector(".hb-flap-display");
+  let lastHeroBucket = -1;
+  let lastTourBucket = -1;
+  let scrollTicking = false;
+
   function renderTourStop(idx, progressBucket) {
     const safeIdx = Math.max(0, Math.min(TOUR_STOPS.length - 1, idx));
     const s = TOUR_STOPS[safeIdx];
-    if (tourStage) {
+    if (tourStage && progressBucket !== lastTourBucket) {
+      lastTourBucket = progressBucket;
       tourStage.setAttribute("data-sc-verify-state", "flap:" + s.plz + ":" + progressBucket);
     }
     // Only touch the text when the stop changes: no screen-reader chatter on every scroll event.
     if (safeIdx === activeIdx) return;
     activeIdx = safeIdx;
+    if (flapDisplay) {
+      flapDisplay.classList.remove("is-flipping");
+      // Trigger mechanical split-flap animation without blocking scroll
+      requestAnimationFrame(() => {
+        flapDisplay.classList.add("is-flipping");
+      });
+    }
     if (flapCode) flapCode.textContent = s.plz + " · " + s.quarter;
     if (flapSpot) flapSpot.textContent = s.spot;
     if (flapMeta) flapMeta.textContent = s.meta;
@@ -1093,15 +1197,27 @@
   }
 
   function syncScrollVerifyStates() {
+    scrollTicking = false;
     if (heroSection && heroStage) {
       const hp = parseFloat(heroSection.style.getPropertyValue("--sc-p") || "0");
-      heroStage.setAttribute("data-sc-verify-state", "hero:" + Math.round(hp * 20));
+      const heroBucket = Math.round(hp * 20);
+      if (heroBucket !== lastHeroBucket) {
+        lastHeroBucket = heroBucket;
+        heroStage.setAttribute("data-sc-verify-state", "hero:" + heroBucket);
+      }
     }
     if (tourSection && Date.now() > manualOverrideUntil) {
       const tp = parseFloat(tourSection.style.getPropertyValue("--sc-p") || "0");
       const bucket = Math.round(tp * 20);
       const nextIdx = Math.min(TOUR_STOPS.length - 1, Math.floor(tp * TOUR_STOPS.length));
       renderTourStop(nextIdx, bucket);
+    }
+  }
+
+  function onScrollTick() {
+    if (!scrollTicking) {
+      scrollTicking = true;
+      requestAnimationFrame(syncScrollVerifyStates);
     }
   }
 
@@ -1133,7 +1249,7 @@
 
   renderHoodPills();
   renderTourStop(0, 0);
-  window.addEventListener("scroll", syncScrollVerifyStates, { passive: true });
+  window.addEventListener("scroll", onScrollTick, { passive: true });
   syncScrollVerifyStates();
   loadTourStops();
 

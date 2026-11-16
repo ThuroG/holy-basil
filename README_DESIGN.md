@@ -108,9 +108,43 @@ Die Typografie verbindet **Hip-Hop-Plakativität** mit **Schweizer Lesbarkeit** 
 - Schwarze oder ungebleichte Kraftpapier-Boxen mit einem grossen, grünen Graffiti-Stempel oder Sticker (Logo + „100% Vegan Sauce Base").
 - Sticker-Packs für Kunden (z. B. „8004 Crew x Holy Basil", Basilikumblatt mit Halo).
 
+### Mobile Order UI Patterns (`/order`)
+- **Kompakter Checkout-Footer & Deklarations-Modal:** Um auf Smartphones den Bestellbereich nicht zu verdecken, liegt die ausführliche Herkunfts-, Allergen- und Kreuzkontakt-Deklaration in einem zugänglichen **Pop-up Modal / Bottom Sheet** (`#declarationModal`). In der fixierten Checkout-Leiste verbleibt nur ein einzeiliger Trigger (`ℹ️ Fleischherkunft & Allergene · Details ↗`).
+- **Holy Gains 💪 Add-on:** Gestaltet mit gestrichelter/leuchtender Neon-Herb-Kontur (`#52C45A`) als Gegenstück zur goldenen Kai-Dao-Karte (`#FFD54F`). Dynamische Beschriftung für Fleischgerichte und *Holy Vegan* (Extra Plant-Protein).
+- **Schärfegrad-Skala in Thai-Schrift:** Pro Portion einstellbare Stufen mit Chili-Icons und originaler Thai-Schrift (`0 · ไม่เผ็ด`, `1 🌶️ · เผ็ดนิดหน่อย`, `2 🌶️🌶️ · เผ็ดมาก`).
+- **Nährwert-Transparenz:** Kalorien und Makros (Protein, KH, Fett) in `JetBrains Mono` (`#52C45A`) direkt auf den Variant-Cards und als summierte Schätzung vor dem Bestellabschluss.
+- **Drinks-Bereich:** Gekennzeichnet mit `🍹 Drinks dazu` für maximale Plattform- und Browser-Kompatibilität.
+- **Züri-Code Boarding-Pass Ticket (`#ticketCardBox`):** Physische Boarding-Pass-Geometrie mit ausgestanzten Kerben (`::before`/`::after`), Abriss-Perforation (`.ticket-perf`), animiertem Wok-Heat-Progress-Balken im Status `IN_WOK` (`is-cooking`) und mehrstufiger Übergangs-Choreografie auf `READY_FOR_PICKUP` (`is-ready` / `is-transitioning-ready`): 3D-Split-Flap-Flip des PLZ-/Quartier-Codes (`@keyframes ticketFlapIn`), Dual-Shockwave-Ringe (`.ticket-shockwave`), Street-Art-Stempel (`#ticketReadyStamp`, `@keyframes stampSlam`), Haptik-Feedback (`navigator.vibrate`) und Web-Audio-Glocken-Chime.
+
 ---
 
-## 6. Prompt-Vorlagen für KI-Bildgeneratoren (Image Agents)
+## 6. Outdoor-Sonnenlicht-Kontrast (WCAG 2.1 Audit) & Mobile Performance
+
+Da der Foodtruck im Freien steht (10'000–50'000 Lux direktes Sonnenlicht auf Smartphone-Displays), gelten verschärfte Kontrast- und Rendering-Regeln (`src/views/shared.ts`):
+
+| Vordergrund-Token | Hex | Auf `#0A0A0A` | Auf `#161816` | Auf `#1F2420` | WCAG-Einstufung & Outdoor-Regel |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `--text-primary` | `#F5F7F5` | **18.37 : 1** | **16.63 : 1** | **14.78 : 1** | **AAA** (Optimal bei Sonne) |
+| `--gold-halo` | `#FFD54F` | **13.88 : 1** | **12.57 : 1** | **11.17 : 1** | **AAA** (Primärer Züri-Code-Fokus) |
+| `--green-neon` (Basis) | `#52C45A` | **8.86 : 1** | **8.03 : 1** | **7.13 : 1** | **AAA** im Schatten; für Micro-Copy `< 14px` im Sonnenlicht auf `--green-sunlight` anheben |
+| `--green-sunlight` | `#69F0AE` | **12.62 : 1** | **11.42 : 1** | **10.15 : 1** | **AAA+ Outdoor-Boost** für Nährwerte, Preise & Status-Pills (`font-weight: 700`) |
+| `--text-secondary` (Alt) | `#9EA79E` | **7.99 : 1** | **7.24 : 1** | **6.43 : 1** | Fällt auf `#1F2420` unter AAA (7:1) und verblasst bei Blendung |
+| `--text-secondary` (Neu) | `#B8C4B9` | **11.01 : 1** | **9.97 : 1** | **8.86 : 1** | **AAA Outdoor-Standard** (Im `☀️ Sonne`-Modus / `prefers-contrast: more` auf `#D8E2D9` = **14.8 : 1**) |
+| `--red-chili` | `#E53935` | **4.36 : 1** | **3.94 : 1** | **3.50 : 1** | **Nicht für Fliesstext auf Dunkel!** Nur für Rahmen/Badges; Fehler-/Warn-Text nutzt `#FF8A80` (**9.9 : 1**) bzw. `#FFCDD2` (**14.5 : 1**) |
+
+### Transparente Marken-Assets (Kein schwarzer Kasten auf Cards/Hero-Planes)
+Auf allen Oberflächen ausserhalb von reinem `#0A0A0A` (z. B. `#161816`, `#1F2420`, Hero-Parallax-Planes, Topbars) müssen zwingend die freigestellten SVG-Assets ohne Hintergrund-`<rect>` verwendet werden:
+- `/assets/holy_basil_logo_v7_team_stacked_sticker_transparent.svg` (`LOGO_STICKER_TRANSPARENT`)
+- `/assets/holy_basil_logo_v7_team_emblem_transparent.svg` (`LOGO_EMBLEM_TRANSPARENT`)
+- `/assets/holy_basil_logo_v7_team_emblem_typography_only_transparent.svg` (`LOGO_TYPO_TRANSPARENT`)
+
+### 60fps Scroll-Craft & Self-Hosted Font-Architektur (`/`)
+- **Zero External Font Requests:** `Space Grotesk` und `JetBrains Mono` werden lokal aus `/fonts/*.woff2` mit `<link rel="preload" as="font" type="font/woff2" crossorigin>` geladen (kein Google-Fonts-CDN, 100% CSP-/DSG-konform).
+- **Mobile GPU-Pipeline (`< 760px`):** Vollflächige SVG-`feTurbulence`-Grain-Filter (`.sc-grain`) und `backdrop-filter: blur()` sind auf Mobile deaktiviert; Hero-Planes nutzen ausschliesslich `transform: translate3d(...)` und `opacity` mit `contain: layout style paint` und `requestAnimationFrame`-gedrosseltem State-Sync.
+
+---
+
+## 7. Prompt-Vorlagen für KI-Bildgeneratoren (Image Agents)
 
 Falls ein Agent das Logo oder Moodboards generieren soll, kann folgender Basis-Prompt verwendet werden:
 

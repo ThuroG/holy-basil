@@ -349,18 +349,18 @@ describe('Order page: one screen, no preselection, declaration above the button'
     expect(page).toMatch(/id="submitOrderBtn" disabled/);
   });
 
-  it('shows the vegan sauce base, the origin on every meat card and the allergen block inline', () => {
+  it('shows the vegan sauce base, the origin on every meat card and the allergen modal trigger', () => {
     const page = html();
     expect(page).toContain(complianceConfig.texts.sauceBadge.replace('&', '&amp;'));
     expect(page).toContain('Fleischherkunft: Poulet: Schweiz');
     expect(page).toContain('Fleischherkunft: Schwein: Schweiz');
     expect(page).toContain('Fleischherkunft: Rind: Schweiz');
-    // Allergens open inline in the checkout bar: a <details> block, no modal
-    expect(page).toMatch(/<details class="alg">\s*<summary>Allergene &amp; Zutaten<\/summary>/);
-    expect(page).not.toMatch(/modal/i);
-    // The declaration block comes before the pay button inside the same bar
+    // Compact trigger pill in the checkout bar, full declaration inside the modal
+    expect(page).toContain('id="openDeclModalBtn"');
+    expect(page).toContain('id="declarationModal"');
+    expect(page).toContain('🍹 Drinks dazu');
     const bar = page.slice(page.indexOf('id="checkoutBar"'));
-    expect(bar.indexOf('id="declBlock"')).toBeLessThan(bar.indexOf('id="submitOrderBtn"'));
+    expect(bar.indexOf('id="openDeclModalBtn"')).toBeLessThan(bar.indexOf('id="submitOrderBtn"'));
     for (const label of Object.values(complianceConfig.allergenLabels)) {
       expect(page).toContain(label);
     }

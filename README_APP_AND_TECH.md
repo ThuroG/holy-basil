@@ -62,7 +62,7 @@ flowchart TD
 
 > **Umsetzung (Stand heute):** `/order` ist **ein Screen**. Ziel: Erstkunden bestellen in unter 15 Sekunden mit zwei Taps (Card antippen, Bestellen antippen).
 > - **Keine Vorauswahl.** Der Tap auf die Card ist eine bewusste Entscheidung. Ausnahme: ein Link wie `/order?variant=vegan` von der Landingpage.
-> - **Fixe Checkout-Leiste am unteren Rand:** Deklaration (Herkunft, Allergene, Kreuzkontakt) und Bestellbutton stehen immer zusammen auf dem Bildschirm. Der Button ist gesperrt, bis eine Variante gewählt ist.
+> - **Fixe Checkout-Leiste mit Deklarations-Modal:** Ein kompakter Trigger in der fixen Leiste zeigt die aktuelle Herkunft / Allergene und öffnet bei Bedarf das vollständige **Deklarations-Modal** (inkl. Allergen-Matrix und Wok-Hinweisen), sodass auf Smartphones der gesamte Bestellbereich sichtbar bleibt. Der Button ist gesperrt, bis eine Variante gewählt ist.
 > - **Alles Weitere ist optional und im Fluss:** Kai Dao (1 Tap), Portionen (Stepper), Drinks und Wunsch-Code (aufklappbar). Kein Popup, kein Bottom-Sheet.
 > - **Wartezeit** steht vor dem Bestellen oben auf der Seite. Hat die Crew die Annahme pausiert, ist der Button gesperrt.
 
@@ -128,8 +128,20 @@ Für **Phase 2 (Weihnachtsessen, Teamevents, Firmen-Lunches)** kann die App in e
   2. **Individueller Box-Konfigurator:** Jede Box (#1 bis #10) kann separat mit Variante (`Vegan`, `Chicken`, `Pork/Mix`) und `Kai Dao` Spiegelei konfiguriert werden.
 
 ### B. Feature Toggle für Schärfegrade (`enableCustomSpiceLevels`)
-- **Initialer Start (`false` – Standard):** Um die Wok-Geschwindigkeit beim Start maximal hochzuhalten, werden alle Portionen in der **Holy Basil Standardschärfe („Leicht scharf 🌶️")** zubereitet.
-- **Aktiviert (`true`):** Über das Admin-Dashboard (`/admin`) oder die API (`/api/features`) kann die individuelle Schärfeauswahl (`Mild`, `Leicht scharf`, `Original Thai Spicy 🔥`, `Bangkok Extra Hot 🔥🔥🔥`) jederzeit per 1-Klick freigeschaltet werden.
+- **Initialer Start (`false` – Standard):** Um die Wok-Geschwindigkeit beim Start maximal hochzuhalten, werden alle Portionen in der **Holy Basil Standardschärfe (`1 🌶️ · เผ็ดนิดหน่อย`)** zubereitet.
+- **Aktiviert (`true`):** Über das Admin-Dashboard (`/admin`) oder die API (`/api/features`) kann die **individuelle Schärfeauswahl pro Portion** freigeschaltet werden:
+  - `0` · **ไม่เผ็ด** *(Mai Phet · Nicht scharf)*
+  - `1 🌶️` · **เผ็ดนิดหน่อย** *(Phet Nid Noy · Leicht scharf – Hausstandard)*
+  - `2 🌶️🌶️` · **เผ็ดมาก** *(Phet Mak · Scharf)*
+
+### B2. Feature Toggle für Extra Protein – „Holy Gains 💪“ (`enableHolyGains`)
+- **Initialer Start (`false` – Standard):** Es werden Standard-Portionsgrössen serviert.
+- **Aktiviert (`true`):** Kunden können pro Portion für **+ CHF 3.50** Extra Protein hinzubuchen (bei Fleischgerichten extra Schweizer Poulet/Schwein-Rind-Mince, bei *Holy Vegan* extra Bio-Soja- & Pilz-Mince).
+- Die Aktivierung wird in `settings.json` persistiert und im Wok-Cockpit (`totalHolyGains`) sowie auf den Schöpfer-Tickets ausgewiesen.
+
+### B3. Nährwert- & Mengenangaben (`NUTRITION_ESTIMATES`)
+- Jedes auswählbare Item (Basis-Varianten, *Kai Dao*, *Holy Gains*, Drinks 🍹) hinterlegt in `src/config/features.ts` Schätzwerte für **Gesamtkalorien (kcal), Protein (g), Kohlenhydrate (g) und Fett (g)**.
+- Der Bestellkonfigurator und das Abhol-Ticket summieren diese Werte live für die gesamte Bestellung auf und kennzeichnen sie ausdrücklich als **unverbindliche Schätzwerte** (handgemachte Wok-Zubereitung).
 
 ### C. Barzahlung (Cash Flow mit `PENDING_CASH`)
 - Wählt ein Kunde **Barzahlung am Truck**, erhält die Bestellung sofort einen reservierten Züri-Code im Status `pending_cash`.

@@ -1,4 +1,4 @@
-import { FONT_LINK, LEGAL_LINKS_HTML } from './shared.js';
+import { DESIGN_TOKENS_CSS, FONT_LINK, LEGAL_LINKS_HTML, LOGO_STICKER_TRANSPARENT } from './shared.js';
 
 export function renderBoardPageHtml(): string {
   return `<!doctype html>
@@ -7,18 +7,17 @@ export function renderBoardPageHtml(): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HOLY BASIL · Public Pickup Board (Züri-Codes)</title>
-  <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+  <link rel="icon" href="${LOGO_STICKER_TRANSPARENT}" type="image/svg+xml">
   ${FONT_LINK}
   <style>
+    ${DESIGN_TOKENS_CSS}
     :root {
-      --bg: #080A08;
-      --surface: #121813;
-      --green-neon: #52C45A;
+      --bg: var(--bg-primary);
+      --surface: var(--bg-surface);
+      --green-neon: var(--green-sunlight);
       --gold: #FFD54F;
-      --ink: #F5F7F5;
-      --muted: #8FA092;
-      --font-display: "Space Grotesk", system-ui, sans-serif;
-      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+      --ink: var(--text-primary);
+      --muted: var(--text-secondary);
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -128,7 +127,7 @@ export function renderBoardPageHtml(): string {
 
   <header class="topbar">
     <a class="brand" href="/">
-      <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil">
+      <img src="${LOGO_STICKER_TRANSPARENT}" alt="Holy Basil">
       <span>HOLY BASIL · ZÜRI-CODE PICKUP</span>
     </a>
     <div class="top-info">

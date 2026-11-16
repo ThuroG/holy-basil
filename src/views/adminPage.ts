@@ -1,4 +1,4 @@
-import { FONT_LINK } from './shared.js';
+import { DESIGN_TOKENS_CSS, FONT_LINK, LOGO_STICKER_TRANSPARENT } from './shared.js';
 
 export function renderAdminPageHtml(): string {
   return `<!doctype html>
@@ -8,23 +8,21 @@ export function renderAdminPageHtml(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>HOLY BASIL · Foodtruck Operations, KDS & Admin</title>
-  <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+  <link rel="icon" href="${LOGO_STICKER_TRANSPARENT}" type="image/svg+xml">
   ${FONT_LINK}
   <style>
+    ${DESIGN_TOKENS_CSS}
     :root {
-      --bg: #0A0C0A;
-      --surface: #121814;
-      --surface-2: #1A231C;
+      --bg: var(--bg-primary);
+      --surface: var(--bg-surface);
+      --surface-2: var(--bg-elevated);
       --green-deep: #1B4D2E;
       --green-core: #2E7D32;
-      --green-neon: #52C45A;
+      --green-neon: var(--green-sunlight);
       --gold: #FFD54F;
       --chili: #E53935;
-      --ink: #F5F7F5;
-      --muted: #9FB0A2;
-      --font-display: "Space Grotesk", system-ui, sans-serif;
-      --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
-      --font-mono: "JetBrains Mono", monospace;
+      --ink: var(--text-primary);
+      --muted: var(--text-secondary);
     }
     * { box-sizing: border-box; }
     body {
@@ -286,7 +284,7 @@ export function renderAdminPageHtml(): string {
 
   <header class="header">
     <a class="brand" href="/">
-      <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="Holy Basil">
+      <img src="${LOGO_STICKER_TRANSPARENT}" alt="Holy Basil">
       <span>HOLY BASIL · FOODTRUCK OPERATIONS &amp; ADMIN</span>
     </a>
     <div class="nav-pills">
@@ -395,6 +393,16 @@ export function renderAdminPageHtml(): string {
           </button>
         </div>
 
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #0B100C; padding: 1rem; border-radius: 12px; border: 1.5px solid rgba(82, 196, 90, 0.35); margin-top: 0.65rem;">
+          <div>
+            <div style="font-weight: 700;">Holy Gains 💪 (+ CHF 3.50 Extra Protein)</div>
+            <div style="font-size: 0.8rem; color: var(--muted);" id="holyGainsToggleStatusText"></div>
+          </div>
+          <button type="button" class="tab-btn active" id="btnToggleHolyGainsFeature">
+            Umschalten
+          </button>
+        </div>
+
         <div style="margin-top: 1rem; font-weight: 700;">Truck-Standort heute</div>
         <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">
           Steuert «Heute live» auf der Landingpage und die deklarierte Fleischherkunft.
@@ -435,7 +443,12 @@ export function renderAdminPageHtml(): string {
     const WOK_LABELS = { chicken: "🍗 HOLY CHICKEN", vegan: "🌱 HOLY VEGAN", pork_mix: "🥩 PORK / MIX" };
     const WOK_ORDER = ["chicken", "vegan", "pork_mix"];
     const DRINK_LABELS = { thai_iced_tea: "🧋 Thai Iced Tea", coconut_water: "🥥 Kokoswasser", zueri_mate: "⚡ Züri Mate" };
-    const SPICE_TEXT = { mild: "mild", leicht_scharf: "leicht scharf", original_thai_spicy: "Thai Spicy", extra_hot: "Extra Hot" };
+    const SPICE_TEXT = {
+      mild: "0 · ไม่เผ็ด (Nicht scharf)",
+      leicht_scharf: "1 🌶️ · เผ็ดนิดหน่อย",
+      original_thai_spicy: "2 🌶️🌶️ · เผ็ดมาก",
+      extra_hot: "3 🔥🔥🔥 · Extra Hot"
+    };
     const REFUND_REASONS = {
       PAID_AFTER_CANCEL: "Online bezahlt, nachdem die Bestellung storniert war",
       DOUBLE_PAYMENT: "Doppelt bezahlt: bar an der Kasse und online",
@@ -446,6 +459,7 @@ export function renderAdminPageHtml(): string {
     const LATE_MIN = 10;
 
     let currentCustomSpice = false;
+    let currentHolyGains = false;
     let ordersPaused = false;
     let kasseFilter = "";
     let clockOffset = 0;        // server time minus tablet time, so ages are right on any tablet
@@ -534,10 +548,10 @@ export function renderAdminPageHtml(): string {
 
     function formatSpiceBreakdown(batch) {
       const parts = [];
-      if (batch.bySpice.mild) parts.push(batch.bySpice.mild + "x Mild");
-      if (batch.bySpice.leicht_scharf) parts.push(batch.bySpice.leicht_scharf + "x Leicht scharf");
-      if (batch.bySpice.original_thai_spicy) parts.push(batch.bySpice.original_thai_spicy + "x Thai Spicy 🔥");
-      if (batch.bySpice.extra_hot) parts.push(batch.bySpice.extra_hot + "x Extra Hot 🔥🔥");
+      if (batch.bySpice.mild) parts.push(batch.bySpice.mild + "x ไม่เผ็ด");
+      if (batch.bySpice.leicht_scharf) parts.push(batch.bySpice.leicht_scharf + "x 🌶️ เผ็ดนิดหน่อย");
+      if (batch.bySpice.original_thai_spicy) parts.push(batch.bySpice.original_thai_spicy + "x 🌶️🌶️ เผ็ดมาก");
+      if (batch.bySpice.extra_hot) parts.push(batch.bySpice.extra_hot + "x 🔥🔥🔥 Extra Hot");
       return parts.join(" · ");
     }
 
@@ -563,7 +577,7 @@ export function renderAdminPageHtml(): string {
       '<div class="wok-pan-card wok-pan-card--egg">' +
         '<div class="wok-pan-label">🍳 KAI DAO EIER</div>' +
         '<div class="wok-pan-count">' + esc(wok.totalKaiDaoEggs) + '</div>' +
-        '<div class="wok-pan-sub">für alle offenen Portionen</div>' +
+        '<div class="wok-pan-sub">💪 Holy Gains: ' + esc(wok.totalHolyGains || 0) + '</div>' +
       '</div>';
     }
 
@@ -572,6 +586,7 @@ export function renderAdminPageHtml(): string {
         '<div style="font-size: 0.85rem; margin-top: 0.25rem;">• Box ' + esc(p.portionIndex) + ': <strong>' +
         esc(VARIANT_LABELS[p.variant] || p.variant) + '</strong>' +
         (p.addKaiDao ? '<span style="color:var(--gold);font-weight:700;"> + Kai Dao 🍳</span>' : '') +
+        (p.holyGains ? '<span style="color:var(--green-neon);font-weight:700;"> + Holy Gains 💪</span>' : '') +
         ' <span style="color:var(--muted);font-size:0.76rem;">(' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + ')</span>' +
         (showWokState
           ? (p.firedAt ? ' <span class="box-state box-state--fire">🔥 im Wok</span>' : ' <span class="box-state box-state--wait">⏳ wartet</span>')
@@ -730,8 +745,8 @@ export function renderAdminPageHtml(): string {
         document.getElementById("demoTools").style.display = ordData.demoPayments ? "inline-flex" : "none";
         document.getElementById("demoBanner").style.display = ordData.demoPayments ? "block" : "none";
         setText("spiceToggleStatusText", currentCustomSpice
-          ? "Aktuell: AKTIV (Gäste wählen Mild / Leicht scharf / Thai Spicy / Extra Hot)"
-          : "Aktuell: AUS (nur Standardschärfe für maximalen Wok-Speed)");
+          ? "Aktuell: AKTIV (0: ไม่เผ็ด / 1: เผ็ดนิดหน่อย / 2: เผ็ดมาก)"
+          : "Aktuell: AUS (nur Standardschärfe เผ็ดนิดหน่อย für maximalen Wok-Speed)");
         setText("connectionState", "");
       } catch (err) {
         setText("connectionState", "⚠️ Keine Verbindung zum Server. Anzeige ist evtl. veraltet.");
@@ -742,6 +757,10 @@ export function renderAdminPageHtml(): string {
     async function refreshSlow() {
       try {
         const [health, locData] = await Promise.all([api("/api/health"), api("/api/locations")]);
+        currentHolyGains = Boolean(health.features.enableHolyGains);
+        setText("holyGainsToggleStatusText", currentHolyGains
+          ? "Aktuell: AKTIV (+ CHF 3.50 pro Portion wählbar)"
+          : "Aktuell: AUS (Standard-Portionsgrösse)");
         ordersPaused = Boolean(health.features.ordersPaused);
         setText("btnTogglePause", ordersPaused ? "▶ Annahme fortsetzen" : "⏸ Annahme pausieren");
         document.getElementById("pausedBanner").style.display = ordersPaused ? "block" : "none";
@@ -820,6 +839,13 @@ export function renderAdminPageHtml(): string {
 
     document.getElementById("btnToggleSpiceFeature").addEventListener("click", () => {
       runAction("spice", () => api("/api/features", "PATCH", { enableCustomSpiceLevels: !currentCustomSpice }));
+    });
+
+    document.getElementById("btnToggleHolyGainsFeature").addEventListener("click", () => {
+      runAction("holyGains", async () => {
+        await api("/api/features", "PATCH", { enableHolyGains: !currentHolyGains });
+        await refreshSlow();
+      });
     });
 
     document.getElementById("btnTogglePause").addEventListener("click", () => {

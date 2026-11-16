@@ -48,6 +48,7 @@ export function getWokDemandSummary(
 
   let totalActivePortions = 0;
   let totalKaiDaoEggs = 0;
+  let totalHolyGains = 0;
   let activeOrderCount = 0;
 
   for (const order of orders) {
@@ -85,6 +86,9 @@ export function getWokDemandSummary(
       if (portion.addKaiDao) {
         totalKaiDaoEggs += 1;
       }
+      if (portion.holyGains) {
+        totalHolyGains += 1;
+      }
     }
   }
 
@@ -115,6 +119,7 @@ export function getWokDemandSummary(
   return {
     totalActivePortions,
     totalKaiDaoEggs,
+    totalHolyGains,
     activeOrderCount,
     customSpiceEnabled: flags.enableCustomSpiceLevels,
     batches,

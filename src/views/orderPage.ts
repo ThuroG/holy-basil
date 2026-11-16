@@ -1,4 +1,11 @@
-import { MENU_DISHES, MENU_DRINKS, KAI_DAO_PRICE_CHF, getFeatureFlags } from '../config/features.js';
+import {
+  MENU_DISHES,
+  MENU_DRINKS,
+  KAI_DAO_PRICE_CHF,
+  HOLY_GAINS_PRICE_CHF,
+  NUTRITION_ESTIMATES,
+  getFeatureFlags,
+} from '../config/features.js';
 import {
   ALLERGEN_IDS,
   buildCheckoutDeclaration,
@@ -9,7 +16,14 @@ import {
 } from '../config/compliance.js';
 import { ZUERI_CODE_POOL } from '../lib/zueriCodes.js';
 import { DishVariantId, DrinkId } from '../lib/types.js';
-import { FONT_LINK, LEGAL_LINKS_HTML, escHtml, scriptJson } from './shared.js';
+import {
+  DESIGN_TOKENS_CSS,
+  FONT_LINK,
+  LEGAL_LINKS_HTML,
+  LOGO_STICKER_TRANSPARENT,
+  escHtml,
+  scriptJson,
+} from './shared.js';
 
 function chf(value: number): string {
   return value.toFixed(2);
@@ -128,6 +142,10 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     dishes: Object.fromEntries(VARIANT_ORDER.map((v) => [v, MENU_DISHES[v].priceChf])),
     drinks: Object.fromEntries(Object.values(MENU_DRINKS).map((d) => [d.id, d.priceChf])),
     kaiDao: KAI_DAO_PRICE_CHF,
+    holyGains: HOLY_GAINS_PRICE_CHF,
+    nutrition: NUTRITION_ESTIMATES,
+    enableHolyGains: flags.enableHolyGains,
+    enableCustomSpiceLevels: flags.enableCustomSpiceLevels,
     maxPortions: flags.maxPortionsPerOrder,
     variantOrder: VARIANT_ORDER,
     drinkOrder: DRINK_ORDER,
@@ -142,6 +160,7 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
   const cards = VARIANT_ORDER.map((v) => {
     const dish = MENU_DISHES[v];
     const item = menu.items[v];
+    const nut = NUTRITION_ESTIMATES[v];
     const origin = item.blocked
       ? `<div class="variant-origin variant-origin--missing">${escHtml(menu.texts.originMissing)}</div>`
       : item.originLines.map((l) => `<div class="variant-origin">${escHtml(l)}</div>`).join('');
@@ -150,6 +169,7 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
             <div>
               <div class="variant-name">${VARIANT_ICON[v]} ${escHtml(dish.name)}</div>
               <div class="variant-sub">${escHtml(dish.tagline)}</div>
+              <div class="variant-nut">🔥 ca. ${nut.caloriesKcal} kcal · ${nut.proteinGrams}g Protein · ${nut.carbsGrams}g KH · ${nut.fatGrams}g Fett</div>
               ${origin}
             </div>
             <div class="variant-price">CHF ${chf(dish.priceChf)}</div>
@@ -166,24 +186,22 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>HOLY BASIL · Bestellen & Züri-Code Ticket</title>
-  <link rel="icon" href="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" type="image/svg+xml">
+  <link rel="icon" href="${LOGO_STICKER_TRANSPARENT}" type="image/svg+xml">
   ${FONT_LINK}
   <style>
+    ${DESIGN_TOKENS_CSS}
     :root {
-      --bg: #0A0C0A;
-      --surface: #131914;
-      --surface-2: #1A231C;
+      --bg: var(--bg-primary);
+      --surface: var(--bg-surface);
+      --surface-2: var(--bg-elevated);
       --green-deep: #1B4D2E;
       --green-core: #2E7D32;
-      --green-neon: #52C45A;
+      --green-neon: var(--green-sunlight);
       --gold: #FFD54F;
       --chili: #E53935;
-      --ink: #F5F7F5;
-      --muted: #9FB0A2;
-      --font-display: "Space Grotesk", system-ui, sans-serif;
-      --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
-      --font-mono: "JetBrains Mono", ui-monospace, monospace;
-      --footer-h: 13rem;
+      --ink: var(--text-primary);
+      --muted: var(--text-secondary);
+      --footer-h: 7.5rem;
     }
     * { box-sizing: border-box; }
     body {
@@ -195,12 +213,13 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     }
     a { color: var(--muted); }
     .topbar {
-      background: #0D120E;
-      border-bottom: 1.5px solid rgba(82, 196, 90, 0.3);
+      background: var(--bg-primary);
+      border-bottom: 1.5px solid rgba(82, 196, 90, 0.38);
       padding: 0.5rem 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 0.5rem;
     }
     .topbar__brand {
       display: flex;
@@ -212,13 +231,31 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       font-weight: 800;
       font-size: 1rem;
     }
-    .topbar__brand img { width: 30px; height: 30px; }
+    .topbar__brand img { width: 32px; height: 32px; display: block; }
+    .topbar__actions { display: flex; align-items: center; gap: 0.4rem; }
+    .sunlight-btn {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--ink);
+      background: var(--surface-2);
+      border: 1.5px solid rgba(255, 213, 79, 0.45);
+      padding: 0.28rem 0.55rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .sunlight-btn[aria-pressed="true"] {
+      background: var(--gold);
+      color: #0A0A0A;
+      border-color: var(--gold);
+    }
     .pill-link {
       font-family: var(--font-mono);
       font-size: 0.72rem;
+      font-weight: 700;
       color: var(--ink);
       background: var(--surface-2);
-      border: 1px solid rgba(82, 196, 90, 0.4);
+      border: 1.5px solid rgba(82, 196, 90, 0.48);
       padding: 0.3rem 0.6rem;
       border-radius: 8px;
       text-decoration: none;
@@ -285,6 +322,7 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     .variant-btn:disabled { opacity: 0.55; cursor: not-allowed; }
     .variant-name { font-family: var(--font-display); font-size: 1.02rem; font-weight: 800; }
     .variant-sub { font-size: 0.76rem; color: var(--muted); margin-top: 0.1rem; }
+    .variant-nut { font-family: var(--font-mono); font-size: 0.7rem; color: var(--green-neon); margin-top: 0.16rem; }
     .variant-origin { font-size: 0.74rem; color: var(--ink); margin-top: 0.1rem; }
     .variant-origin--missing { color: #FFCDD2; }
     .variant-price {
@@ -316,6 +354,36 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     }
     .kaidao-toggle.checked { border-style: solid; background: rgba(255, 213, 79, 0.22); }
     .kaidao-sub { font-size: 0.72rem; font-weight: 500; color: var(--muted); margin-top: 0.1rem; }
+    .gains-toggle {
+      margin-top: 0.5rem;
+      width: 100%;
+      min-height: 52px;
+      padding: 0.55rem 0.85rem;
+      border-radius: 12px;
+      border: 2px dashed var(--green-neon);
+      background: rgba(82, 196, 90, 0.08);
+      color: var(--ink);
+      font-family: inherit;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .gains-toggle.checked { border-style: solid; background: rgba(82, 196, 90, 0.22); }
+    .nutrition-summary {
+      margin-top: 0.55rem;
+      background: var(--surface);
+      border: 1px solid rgba(82, 196, 90, 0.3);
+      border-radius: 12px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.84rem;
+    }
+    .nutrition-vals { font-family: var(--font-mono); font-weight: 700; color: var(--green-neon); margin-top: 0.2rem; }
+    .nutrition-note { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
     .row {
       margin-top: 0.5rem;
       display: flex;
@@ -435,6 +503,61 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     .alg-table th, .alg-table td { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0.18rem 0.3rem; text-align: center; }
     .alg-table th[scope="row"] { text-align: left; font-weight: 600; white-space: nowrap; }
     .ing { margin-top: 0.35rem; }
+    .decl-pill {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      background: #131914;
+      border: 1px solid rgba(82, 196, 90, 0.35);
+      border-radius: 10px;
+      padding: 0.42rem 0.7rem;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.76rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    .decl-pill.blocked { border-color: var(--chili); color: #FFCDD2; background: rgba(229, 57, 53, 0.14); }
+    .decl-pill-action { color: var(--green-neon); font-weight: 700; flex-shrink: 0; }
+    .hb-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      background: rgba(0, 0, 0, 0.78);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0.75rem;
+    }
+    .hb-modal-backdrop[hidden] { display: none; }
+    @media (min-width: 600px) { .hb-modal-backdrop { align-items: center; } }
+    .hb-modal {
+      width: 100%;
+      max-width: 560px;
+      max-height: 85vh;
+      background: #101712;
+      border: 2px solid var(--green-neon);
+      border-radius: 18px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+    }
+    .hb-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; }
+    .hb-modal-head h2 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; }
+    .hb-modal-close {
+      background: #1A231C;
+      border: 1px solid rgba(82, 196, 90, 0.4);
+      color: var(--ink);
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .hb-modal-body { overflow-y: auto; flex: 1; padding-right: 0.2rem; font-size: 0.8rem; }
     .pay-grid { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
     .pay-btn {
       flex: 1;
@@ -465,25 +588,133 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     .submit-btn:disabled { background: #2A352C; color: var(--muted); cursor: not-allowed; }
     .order-error { color: #FF8A80; font-size: 0.82rem; text-align: center; min-height: 0; }
 
-    /* LIVE ZÜRI-CODE BOARDING PASS TICKET */
+    /* LIVE ZÜRI-CODE BOARDING PASS TICKET & MICRO-INTERACTIONS (IN_WOK -> READY_FOR_PICKUP) */
     .ticket-card {
-      background: #101712;
+      position: relative;
+      overflow: hidden;
+      background: var(--surface);
       border: 3px solid var(--green-neon);
       border-radius: 24px;
-      padding: 1.25rem;
+      padding: 1.35rem 1.25rem;
       text-align: center;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      transition: background-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 420ms cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+      contain: layout paint;
     }
+    /* Die-cut Boarding Pass Notches */
+    .ticket-card::before,
+    .ticket-card::after {
+      content: "";
+      position: absolute;
+      top: 178px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 3px solid var(--green-neon);
+      z-index: 3;
+      pointer-events: none;
+      transition: border-color 420ms ease;
+    }
+    .ticket-card::before { left: -15px; }
+    .ticket-card::after { right: -15px; }
+    .ticket-card.is-ready::before,
+    .ticket-card.is-ready::after {
+      border-color: var(--gold);
+    }
+
+    /* Perforated Tear Line */
+    .ticket-perf {
+      position: relative;
+      margin: 0.95rem -0.4rem 0.85rem -0.4rem;
+      border-top: 2px dashed rgba(82, 196, 90, 0.38);
+      transition: border-color 420ms ease;
+    }
+    .ticket-card.is-ready .ticket-perf {
+      border-top-color: rgba(255, 213, 79, 0.65);
+    }
+
+    /* Wok Heat Progress Shimmer (active during IN_WOK / PLATING) */
+    .ticket-heat-bar {
+      height: 4px;
+      width: 100%;
+      border-radius: 999px;
+      margin-top: 0.65rem;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 260ms ease;
+    }
+    .ticket-card.is-cooking .ticket-heat-bar {
+      opacity: 1;
+    }
+    .ticket-heat-bar__fill {
+      height: 100%;
+      width: 45%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green-neon), var(--gold), #FF7043);
+      animation: wokHeatSweep 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      will-change: transform;
+    }
+    @keyframes wokHeatSweep {
+      0% { transform: translateX(-110%); }
+      100% { transform: translateX(240%); }
+    }
+
+    /* READY_FOR_PICKUP State & Transition Choreography */
     .ticket-card.is-ready {
       background: #132A18;
       border-color: var(--gold);
       animation: pulseGlow 1.6s infinite alternate;
     }
-    @keyframes pulseGlow {
-      from { box-shadow: 0 0 15px rgba(82, 196, 90, 0.4); }
-      to { box-shadow: 0 0 40px rgba(255, 213, 79, 0.85); }
+    .ticket-card.is-transitioning-ready {
+      animation: ticketReadyPop 620ms cubic-bezier(0.18, 1.25, 0.32, 1);
     }
-    @media (prefers-reduced-motion: reduce) { .ticket-card.is-ready { animation: none; } }
+    @keyframes ticketReadyPop {
+      0% { transform: scale(0.96); }
+      45% { transform: scale(1.025); }
+      100% { transform: scale(1); }
+    }
+    @keyframes pulseGlow {
+      from { box-shadow: 0 0 16px rgba(82, 196, 90, 0.45); }
+      to { box-shadow: 0 0 42px rgba(255, 213, 79, 0.9); }
+    }
+
+    /* Shockwave Ripple Rings on IN_WOK -> READY transition */
+    .ticket-shockwave {
+      position: absolute;
+      top: 96px;
+      left: 50%;
+      width: 140px;
+      height: 140px;
+      margin-left: -70px;
+      margin-top: -70px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .ticket-card.is-transitioning-ready .ticket-shockwave--1 {
+      animation: shockwaveExpand 820ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .ticket-card.is-transitioning-ready .ticket-shockwave--2 {
+      border-color: var(--green-neon);
+      animation: shockwaveExpand 980ms 110ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes shockwaveExpand {
+      0% { transform: scale(0.35); opacity: 0.95; }
+      100% { transform: scale(3.6); opacity: 0; }
+    }
+
+    /* 3D Split-Flap Code Display on Ticket */
+    .ticket-flap-stage {
+      perspective: 700px;
+      position: relative;
+      z-index: 2;
+    }
     .ticket-plz {
       font-family: var(--font-mono);
       font-size: 4rem;
@@ -491,25 +722,110 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       color: var(--gold);
       line-height: 1;
       margin: 0.4rem 0 0.15rem 0;
+      backface-visibility: hidden;
+      will-change: transform;
     }
     .ticket-quarter {
       font-family: var(--font-display);
       font-size: 1.65rem;
       font-weight: 800;
       letter-spacing: 0.05em;
+      backface-visibility: hidden;
+      will-change: transform;
     }
-    .status-steps { margin: 1.1rem 0; text-align: left; display: grid; gap: 0.5rem; }
+    .ticket-card.is-transitioning-ready .ticket-plz {
+      animation: ticketFlapIn 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ticket-card.is-transitioning-ready .ticket-quarter {
+      animation: ticketFlapIn 480ms 60ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+    @keyframes ticketFlapIn {
+      0% { transform: rotateX(-85deg) scale(0.92); opacity: 0.25; }
+      65% { transform: rotateX(12deg) scale(1.03); opacity: 1; }
+      100% { transform: rotateX(0deg) scale(1); opacity: 1; }
+    }
+
+    /* Street-Art Stamp Badge ("ABHOLBEREIT AM FENSTER") */
+    .ticket-stamp {
+      display: none;
+      margin: 0.55rem auto 0.2rem auto;
+      padding: 0.28rem 0.85rem;
+      border: 2.5px solid var(--gold);
+      border-radius: 8px;
+      background: rgba(255, 213, 79, 0.16);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: rotate(-2deg);
+    }
+    .ticket-card.is-ready .ticket-stamp {
+      display: inline-block;
+      animation: stampSlam 440ms cubic-bezier(0.18, 1.3, 0.32, 1) forwards;
+    }
+    @keyframes stampSlam {
+      0% { transform: scale(2.1) rotate(-8deg); opacity: 0; }
+      70% { transform: scale(0.94) rotate(-1.5deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+    }
+
+    .status-steps { margin: 1.1rem 0; text-align: left; display: grid; gap: 0.5rem; position: relative; z-index: 2; }
     .status-step {
       padding: 0.65rem 0.9rem;
       border-radius: 12px;
       background: #0B100C;
-      border: 1.5px solid rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.14);
       font-size: 0.88rem;
       color: var(--muted);
+      transition: transform 240ms ease, background-color 240ms ease, border-color 240ms ease, color 240ms ease;
     }
-    .status-step.active { background: var(--green-deep); border-color: var(--green-neon); color: var(--ink); font-weight: 700; }
+    .status-step.is-done {
+      background: rgba(27, 77, 46, 0.38);
+      border-color: rgba(82, 196, 90, 0.55);
+      color: var(--ink);
+    }
+    .status-step.active {
+      background: var(--green-deep);
+      border-color: var(--green-neon);
+      color: var(--ink);
+      font-weight: 700;
+      transform: translateX(3px);
+    }
+    .ticket-card.is-ready #stepReady.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #0A0A0A;
+      font-weight: 800;
+      box-shadow: 0 6px 20px rgba(255, 213, 79, 0.38);
+    }
+    .ticket-bell {
+      display: inline-block;
+      transform-origin: top center;
+    }
+    .ticket-card.is-ready .ticket-bell {
+      animation: bellSwing 0.9s ease-in-out infinite alternate;
+    }
+    @keyframes bellSwing {
+      0% { transform: rotate(-16deg) scale(1.08); }
+      100% { transform: rotate(16deg) scale(1.08); }
+    }
     .status-step.cash-wait { background: rgba(255, 213, 79, 0.16); border-color: var(--gold); color: var(--gold); font-weight: 700; }
     .status-step.error-wait { background: rgba(229, 57, 53, 0.2); border-color: var(--chili); color: #FFCDD2; font-weight: 700; }
+    @media (prefers-reduced-motion: reduce) {
+      .ticket-card.is-ready,
+      .ticket-card.is-transitioning-ready,
+      .ticket-heat-bar__fill,
+      .ticket-card.is-transitioning-ready .ticket-shockwave--1,
+      .ticket-card.is-transitioning-ready .ticket-shockwave--2,
+      .ticket-card.is-transitioning-ready .ticket-plz,
+      .ticket-card.is-transitioning-ready .ticket-quarter,
+      .ticket-card.is-ready .ticket-stamp,
+      .ticket-card.is-ready .ticket-bell {
+        animation: none !important;
+      }
+    }
     .ticket-block { background: #0B100C; border-radius: 14px; padding: 0.85rem; text-align: left; font-size: 0.86rem; margin-top: 0.6rem; }
     .ticket-pay-link {
       display: block;
@@ -529,10 +845,13 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
 
   <header class="topbar">
     <a class="topbar__brand" href="/">
-      <img src="/assets/holy_basil_logo_v7_team_stacked_sticker.svg" alt="">
+      <img src="${LOGO_STICKER_TRANSPARENT}" alt="Holy Basil Logo">
       <span>HOLY BASIL</span>
     </a>
-    <a class="pill-link" href="/board">Pickup Board</a>
+    <div class="topbar__actions">
+      <button type="button" class="sunlight-btn" id="sunlightToggleBtn" aria-pressed="false" title="Maximaler Outdoor-Sonnenlicht-Kontrast">☀️ Sonne</button>
+      <a class="pill-link" href="/board">Pickup Board</a>
+    </div>
   </header>
 
   <main class="container">
@@ -553,10 +872,25 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
         <button type="button" class="kaidao-toggle" id="expressKaiDaoBtn" aria-pressed="false">
           <span>
             <span>🍳 + Kai Dao (Thai-Spiegelei)</span>
-            <span class="kaidao-sub" id="kaiDaoSub" style="display:block;">${escHtml(menu.eggLine)}</span>
+            <span class="kaidao-sub" id="kaiDaoSub" style="display:block;">${escHtml(menu.eggLine)} · + ca. ${NUTRITION_ESTIMATES.kai_dao.caloriesKcal} kcal · +${NUTRITION_ESTIMATES.kai_dao.proteinGrams}g Protein · +${NUTRITION_ESTIMATES.kai_dao.fatGrams}g Fett</span>
           </span>
           <span style="font-family: var(--font-mono); color: var(--gold); flex-shrink: 0;">+ ${chf(KAI_DAO_PRICE_CHF)}</span>
         </button>
+        <button type="button" class="gains-toggle" id="expressHolyGainsBtn" aria-pressed="false" style="display: none;">
+          <span>
+            <span id="expressHolyGainsLabel">💪 + Holy Gains (Extra Fleisch / Plant-Protein)</span>
+            <span class="kaidao-sub" id="expressHolyGainsSub" style="display:block;">+ ca. 200 kcal · +20–28g Protein</span>
+          </span>
+          <span style="font-family: var(--font-mono); color: var(--green-neon); flex-shrink: 0;">+ ${chf(HOLY_GAINS_PRICE_CHF)}</span>
+        </button>
+        <div id="expressSpiceContainer" style="display: none; margin-top: 0.5rem;">
+          <label for="expressSpiceSelect" style="font-size: 0.82rem; font-weight: 700;">Schärfegrad (für diese Auswahl)</label>
+          <select id="expressSpiceSelect" class="spice-select">
+            <option value="mild">0 · ไม่เผ็ด (Nicht scharf)</option>
+            <option value="leicht_scharf" selected>1 🌶️ · เผ็ดนิดหน่อย (Leicht scharf · Standard)</option>
+            <option value="original_thai_spicy">2 🌶️🌶️ · เผ็ดมาก (Scharf)</option>
+          </select>
+        </div>
       </div>
 
       <div class="row">
@@ -576,20 +910,10 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       <!-- Box-by-box configuration (2..10 portions) -->
       <div id="customBuilder" style="display: none;"></div>
 
-      <div id="customSpiceContainer" style="display: none; margin-top: 0.5rem;">
-        <label for="customSpiceSelect" style="font-size: 0.82rem; font-weight: 700;">Schärfegrad</label>
-        <select id="customSpiceSelect" class="spice-select">
-          <option value="leicht_scharf">🌶️ Standardschärfe (leicht scharf)</option>
-          <option value="mild">🌱 Mild (ohne frische Chilis)</option>
-          <option value="original_thai_spicy">🔥🔥 Original Thai Spicy</option>
-          <option value="extra_hot">🔥🔥🔥 Bangkok Extra Hot</option>
-        </select>
-      </div>
-
       <details class="more" id="drinksDetails">
-        <summary><span>🧋 Drinks dazu</span><span id="drinksSummary" style="color: var(--gold);"></span></summary>
+        <summary><span>🍹 Drinks dazu</span><span id="drinksSummary" style="color: var(--gold);"></span></summary>
         <div class="drink-row">
-          <div>Thai Iced Tea · CHF ${chf(MENU_DRINKS.thai_iced_tea.priceChf)}</div>
+          <div>Thai Iced Tea · CHF ${chf(MENU_DRINKS.thai_iced_tea.priceChf)} <span style="font-size: 0.74rem; color: var(--muted);">(ca. ${NUTRITION_ESTIMATES.thai_iced_tea.caloriesKcal} kcal)</span></div>
           <div class="stepper-controls">
             <button type="button" class="step-btn drink-dec" data-drink="thai_iced_tea" aria-label="Ein Thai Iced Tea weniger">−</button>
             <span class="step-count" id="drink_thai_iced_tea">0</span>
@@ -597,7 +921,7 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
           </div>
         </div>
         <div class="drink-row">
-          <div>Kokoswasser · CHF ${chf(MENU_DRINKS.coconut_water.priceChf)}</div>
+          <div>Kokoswasser · CHF ${chf(MENU_DRINKS.coconut_water.priceChf)} <span style="font-size: 0.74rem; color: var(--muted);">(ca. ${NUTRITION_ESTIMATES.coconut_water.caloriesKcal} kcal)</span></div>
           <div class="stepper-controls">
             <button type="button" class="step-btn drink-dec" data-drink="coconut_water" aria-label="Ein Kokoswasser weniger">−</button>
             <span class="step-count" id="drink_coconut_water">0</span>
@@ -614,30 +938,57 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
         </select>
       </details>
 
+      <div class="nutrition-summary" id="nutritionSummaryBox" style="display: none;">
+        <div style="font-weight: 700;">Nährwerte (Gesamt-Schätzung)</div>
+        <div class="nutrition-vals" id="nutritionValsText"></div>
+        <div class="nutrition-note">Hinweis: Alle Angaben sind unverbindliche Schätzwerte (handgemachte Streetfood-Zubereitung im Wok).</div>
+      </div>
+
       <div class="page-foot">${LEGAL_LINKS_HTML}</div>
 
       <div class="checkout-bar" id="checkoutBar">
         <div class="checkout-inner">
-          <div class="decl" id="declBlock"></div>
-          <details class="alg">
-            <summary>${escHtml(menu.texts.detailsTitle)}</summary>
-            <div class="alg-body">${renderAllergenDetails(menu)}
-            </div>
-          </details>
+          <button type="button" class="decl-pill" id="openDeclModalBtn" aria-haspopup="dialog">
+            <span id="declPillText">ℹ️ Fleischherkunft &amp; Allergene</span>
+            <span class="decl-pill-action">Details ↗</span>
+          </button>
           <div class="pay-grid" id="paymentGrid" style="display: none;"></div>
           <button type="button" class="submit-btn" id="submitOrderBtn" disabled>Variante wählen</button>
           <div class="order-error" id="orderErrorMsg" role="alert"></div>
+        </div>
+      </div>
+
+      <!-- Pop-Up Modal for Meat Origin, Allergens & Compliance Notes -->
+      <div class="hb-modal-backdrop" id="declarationModal" hidden role="dialog" aria-modal="true" aria-labelledby="declModalTitle">
+        <div class="hb-modal">
+          <div class="hb-modal-head">
+            <h2 id="declModalTitle">Herkunft, Allergene &amp; Hinweise</h2>
+            <button type="button" class="hb-modal-close" id="closeDeclModalBtn" aria-label="Schliessen">✕</button>
+          </div>
+          <div class="hb-modal-body">
+            <div class="decl" id="declBlock"></div>
+            <div class="alg-body" style="max-height: none; margin-top: 0.75rem;">${renderAllergenDetails(menu)}
+            </div>
+          </div>
+          <button type="button" class="submit-btn" id="closeDeclModalFooterBtn" style="margin-top: 0.75rem; min-height: 44px;">Verstanden</button>
         </div>
       </div>
     </div>
 
     <!-- LIVE ZÜRI-CODE BOARDING PASS TICKET VIEW -->
     <div id="liveTicketView" style="display: none;">
-      <div class="ticket-card" id="ticketCardBox">
-        <span class="badge">DEIN ABHOL-TICKET</span>
-        <div class="ticket-plz" id="ticketPlz"></div>
-        <div class="ticket-quarter" id="ticketQuarter"></div>
+      <div class="ticket-card" id="ticketCardBox" data-ticket-status="idle">
+        <div class="ticket-shockwave ticket-shockwave--1" aria-hidden="true"></div>
+        <div class="ticket-shockwave ticket-shockwave--2" aria-hidden="true"></div>
+        <span class="badge" id="ticketHeaderBadge">DEIN ZÜRI-CODE BOARDING PASS</span>
+        <div class="ticket-flap-stage">
+          <div class="ticket-plz" id="ticketPlz"></div>
+          <div class="ticket-quarter" id="ticketQuarter"></div>
+        </div>
+        <div class="ticket-stamp" id="ticketReadyStamp">READY FOR PICKUP · AUSGABE OFFEN</div>
         <div style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); margin-top: 0.35rem;" id="ticketMeta"></div>
+        <div class="ticket-heat-bar" id="ticketHeatBar" aria-hidden="true"><div class="ticket-heat-bar__fill"></div></div>
+        <div class="ticket-perf" aria-hidden="true"></div>
 
         <div id="ticketConnection" style="color: #FF8A80; font-size: 0.8rem; min-height: 1rem; margin-top: 0.3rem;"></div>
         <div id="ticketAlertBanner" role="status" style="margin-top: 0.6rem; padding: 0.85rem; border-radius: 12px; display: none;"></div>
@@ -646,7 +997,7 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
           <div class="status-step" id="stepCash">1. Zahlung</div>
           <div class="status-step" id="stepWok">2. Frisch im heissen Wok 🔥</div>
           <div class="status-step" id="stepPlating">3. Schöpfen &amp; Kontrolle 🍱</div>
-          <div class="status-step" id="stepReady">4. ABHOLBEREIT AM TRUCK 🔔</div>
+          <div class="status-step" id="stepReady">4. ABHOLBEREIT AM TRUCK <span class="ticket-bell">🔔</span></div>
         </div>
 
         <div class="ticket-block" id="ticketItemsList"></div>
@@ -664,10 +1015,15 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
   <script>
     // Prices, names and every declaration line come from the server config: one source of truth.
     const PAGE = ${pageData};
-    const PRICES = Object.assign({}, PAGE.dishes, { kaiDao: PAGE.kaiDao });
+    const PRICES = Object.assign({}, PAGE.dishes, { kaiDao: PAGE.kaiDao, holyGains: PAGE.holyGains });
     const NAMES = { vegan: "Holy Vegan", chicken: "Holy Chicken", pork_mix: "Holy Pork / Mix" };
     const DRINK_NAMES = { thai_iced_tea: "Thai Iced Tea", coconut_water: "Kokoswasser", zueri_mate: "Züri Mate" };
-    const SPICE_TEXT = { mild: "mild", leicht_scharf: "leicht scharf", original_thai_spicy: "Thai Spicy", extra_hot: "Extra Hot" };
+    const SPICE_TEXT = {
+      mild: "0 · ไม่เผ็ด (Nicht scharf)",
+      leicht_scharf: "1 🌶️ · เผ็ดนิดหน่อย",
+      original_thai_spicy: "2 🌶️🌶️ · เผ็ดมาก",
+      extra_hot: "3 🔥🔥🔥 · Extra Hot"
+    };
     const PAY_LABELS = { cash: "💵 Bar am Truck", twint: "📱 TWINT", card: "💳 Karte" };
     const STORAGE_KEY = "hb_active_order";
     const POLL_MS = 3000;
@@ -676,11 +1032,14 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     let builderMode = "express"; // 'express' | 'custom'
     let expressVariant = null;   // no preselection: the guest picks the card on purpose
     let expressKaiDao = false;
-    let customPortions = [{ variant: null, addKaiDao: false }];
+    let expressHolyGains = false;
+    let expressSpice = "leicht_scharf";
+    let customPortions = [{ variant: null, addKaiDao: false, holyGains: false, spiceLevel: "leicht_scharf" }];
     let drinks = { thai_iced_tea: 0, coconut_water: 0 };
     let paymentMethods = ["cash"];
     let paymentMethod = "cash";
-    let customSpiceEnabled = false;
+    let customSpiceEnabled = Boolean(PAGE.enableCustomSpiceLevels);
+    let holyGainsEnabled = Boolean(PAGE.enableHolyGains);
     let ordersPaused = false;
     let activeOrderId = null;
     let pollTimer = null;
@@ -720,9 +1079,19 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
 
     function currentPortions() {
       if (builderMode === "express") {
-        return Array.from({ length: portionCount }, () => ({ variant: expressVariant, addKaiDao: expressKaiDao }));
+        return Array.from({ length: portionCount }, () => ({
+          variant: expressVariant,
+          addKaiDao: expressKaiDao,
+          holyGains: holyGainsEnabled && expressHolyGains,
+          spiceLevel: customSpiceEnabled ? expressSpice : "leicht_scharf"
+        }));
       }
-      return customPortions;
+      return customPortions.map((p) => ({
+        variant: p.variant,
+        addKaiDao: p.addKaiDao,
+        holyGains: holyGainsEnabled && p.holyGains,
+        spiceLevel: customSpiceEnabled ? p.spiceLevel : "leicht_scharf"
+      }));
     }
 
     function cartComplete() {
@@ -748,6 +1117,7 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
         const json = await res.json();
         if (!json.success) return;
         customSpiceEnabled = Boolean(json.data.features.enableCustomSpiceLevels);
+        holyGainsEnabled = Boolean(json.data.features.enableHolyGains);
         if (Array.isArray(json.data.paymentMethods) && json.data.paymentMethods.length) {
           paymentMethods = json.data.paymentMethods;
           if (!paymentMethods.includes(paymentMethod)) paymentMethod = paymentMethods[0];
@@ -764,7 +1134,12 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
 
     function syncCustomPortionsArray() {
       while (customPortions.length < portionCount) {
-        customPortions.push({ variant: expressVariant, addKaiDao: expressKaiDao });
+        customPortions.push({
+          variant: expressVariant,
+          addKaiDao: expressKaiDao,
+          holyGains: expressHolyGains,
+          spiceLevel: expressSpice
+        });
       }
       if (customPortions.length > portionCount) {
         customPortions = customPortions.slice(0, portionCount);
@@ -774,10 +1149,56 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     function computeTotal() {
       let sum = 0;
       currentPortions().forEach((p) => {
-        if (p.variant) sum += PRICES[p.variant] + (p.addKaiDao ? PRICES.kaiDao : 0);
+        if (p.variant) {
+          sum += PRICES[p.variant] + (p.addKaiDao ? PRICES.kaiDao : 0) + (p.holyGains ? PRICES.holyGains : 0);
+        }
       });
       Object.keys(drinks).forEach((d) => { sum += drinks[d] * (PAGE.drinks[d] || 0); });
       return sum;
+    }
+
+    function computePortionNutrition(p, allowGains) {
+      const nut = { kcal: 0, p: 0, c: 0, f: 0 };
+      if (!p || !p.variant) return nut;
+      const add = (item) => {
+        if (!item) return;
+        nut.kcal += item.caloriesKcal;
+        nut.p += item.proteinGrams;
+        nut.c += item.carbsGrams;
+        nut.f += item.fatGrams;
+      };
+      add(PAGE.nutrition[p.variant]);
+      if (p.addKaiDao) add(PAGE.nutrition.kai_dao);
+      if (allowGains && p.holyGains) {
+        add(p.variant === "vegan" ? PAGE.nutrition.holy_gains_vegan : PAGE.nutrition.holy_gains_meat);
+      }
+      return nut;
+    }
+
+    function formatNutLine(n) {
+      return "ca. " + n.kcal + " kcal · " + n.p + "g P · " + n.c + "g KH · " + n.f + "g F";
+    }
+
+    function computeNutrition() {
+      const nut = { kcal: 0, p: 0, c: 0, f: 0 };
+      const add = (item, mult) => {
+        if (!item || !mult) return;
+        nut.kcal += item.caloriesKcal * mult;
+        nut.p += item.proteinGrams * mult;
+        nut.c += item.carbsGrams * mult;
+        nut.f += item.fatGrams * mult;
+      };
+      currentPortions().forEach((p) => {
+        const pn = computePortionNutrition(p, true);
+        nut.kcal += pn.kcal;
+        nut.p += pn.p;
+        nut.c += pn.c;
+        nut.f += pn.f;
+      });
+      Object.keys(drinks).forEach((d) => {
+        if (drinks[d] > 0) add(PAGE.nutrition[d], drinks[d]);
+      });
+      return nut;
     }
 
     function renderCustomBuilder() {
@@ -789,9 +1210,14 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       }
       $("expressBuilder").style.display = "none";
       container.style.display = "block";
-      container.innerHTML = customPortions.map((p, idx) =>
-        '<div class="portion-box-card">' +
-          '<div style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--gold); margin-bottom: 0.4rem;">BOX ' + (idx + 1) + ' VON ' + portionCount + '</div>' +
+      container.innerHTML = customPortions.map((p, idx) => {
+        const gainsText = p.variant === "vegan" ? "💪 + Holy Gains (Extra Plant-Protein)" : "💪 + Holy Gains (Extra Fleisch)";
+        const boxNut = computePortionNutrition(p, holyGainsEnabled);
+        return '<div class="portion-box-card">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">' +
+            '<span style="font-family: var(--font-mono); font-size: 0.76rem; color: var(--gold);">BOX ' + (idx + 1) + ' VON ' + portionCount + '</span>' +
+            (boxNut.kcal > 0 ? '<span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--green-neon);">🔥 ' + formatNutLine(boxNut) + '</span>' : '') +
+          '</div>' +
           '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem;">' +
             PAGE.variantOrder.map((v) =>
               '<button type="button" class="mode-btn ' + (p.variant === v ? 'active' : '') + '" data-cidx="' + idx + '" data-cvar="' + v + '"' +
@@ -802,10 +1228,26 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
           '</div>' +
           '<label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.84rem; cursor: pointer;">' +
             '<input type="checkbox" ' + (p.addKaiDao ? "checked" : "") + ' data-cidx="' + idx + '" class="custom-kaidao-cb" style="width: 22px; height: 22px;">' +
-            '<span>🍳 + Kai Dao (+ CHF ' + chf(PRICES.kaiDao) + ')</span>' +
+            '<span>🍳 + Kai Dao (+ CHF ' + chf(PRICES.kaiDao) + ' · ca. ' + PAGE.nutrition.kai_dao.caloriesKcal + ' kcal, +' + PAGE.nutrition.kai_dao.proteinGrams + 'g P)</span>' +
           '</label>' +
-        '</div>'
-      ).join("");
+          (holyGainsEnabled
+            ? '<label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.4rem; font-size: 0.84rem; cursor: pointer; color: var(--green-neon);">' +
+                '<input type="checkbox" ' + (p.holyGains ? "checked" : "") + ' data-cidx="' + idx + '" class="custom-gains-cb" style="width: 22px; height: 22px;">' +
+                '<span>' + gainsText + ' (+ CHF ' + chf(PRICES.holyGains) + ')</span>' +
+              '</label>'
+            : '') +
+          (customSpiceEnabled
+            ? '<div style="margin-top: 0.5rem;">' +
+                '<label style="font-size: 0.76rem; color: var(--muted); display: block;">Schärfegrad Box ' + (idx + 1) + '</label>' +
+                '<select class="spice-select custom-spice-sel" data-cidx="' + idx + '">' +
+                  '<option value="mild"' + (p.spiceLevel === "mild" ? " selected" : "") + '>0 · ไม่เผ็ด (Nicht scharf)</option>' +
+                  '<option value="leicht_scharf"' + (!p.spiceLevel || p.spiceLevel === "leicht_scharf" ? " selected" : "") + '>1 🌶️ · เผ็ดนิดหน่อย (Leicht scharf · Standard)</option>' +
+                  '<option value="original_thai_spicy"' + (p.spiceLevel === "original_thai_spicy" ? " selected" : "") + '>2 🌶️🌶️ · เผ็ดมาก (Scharf)</option>' +
+                '</select>' +
+              '</div>'
+            : '') +
+        '</div>';
+      }).join("");
     }
 
     // Event delegation: listeners survive every re-render of the box list.
@@ -816,18 +1258,35 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       renderUI();
     });
     $("customBuilder").addEventListener("change", (event) => {
-      const cb = event.target.closest(".custom-kaidao-cb");
-      if (!cb) return;
-      customPortions[Number(cb.getAttribute("data-cidx"))].addKaiDao = cb.checked;
-      renderUI();
+      const kd = event.target.closest(".custom-kaidao-cb");
+      if (kd) {
+        customPortions[Number(kd.getAttribute("data-cidx"))].addKaiDao = kd.checked;
+        renderUI();
+        return;
+      }
+      const hg = event.target.closest(".custom-gains-cb");
+      if (hg) {
+        customPortions[Number(hg.getAttribute("data-cidx"))].holyGains = hg.checked;
+        renderUI();
+        return;
+      }
+      const sp = event.target.closest(".custom-spice-sel");
+      if (sp) {
+        customPortions[Number(sp.getAttribute("data-cidx"))].spiceLevel = sp.value;
+        renderUI();
+      }
     });
 
     function renderDeclaration() {
       const decl = currentDeclaration();
       const block = $("declBlock");
+      const pill = $("openDeclModalBtn");
+      const pillText = $("declPillText");
       if (!decl) {
         // Nothing chosen yet: the general allergen notice stands in for the cart declaration.
         block.innerHTML = '<div class="decl-line--note">' + esc(PAGE.texts.allergenShort) + '</div>';
+        pill.classList.remove("blocked");
+        pillText.textContent = "ℹ️ Fleischherkunft, Allergene & Hinweise";
         return false;
       }
       block.innerHTML =
@@ -836,6 +1295,9 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
           const line = PAGE.decl.lines[i];
           return '<div class="decl-line--' + line.k + '">' + esc(line.t) + '</div>';
         }).join("");
+      pill.classList.toggle("blocked", decl.b);
+      const firstLine = decl.b ? PAGE.texts.originMissing : (PAGE.decl.lines[decl.l[0]] && PAGE.decl.lines[decl.l[0]].t) || "Allergene & Herkunft";
+      pillText.textContent = (decl.b ? "⚠️ " : "ℹ️ ") + firstLine;
       return decl.b;
     }
 
@@ -858,14 +1320,52 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       $("expressKaiDaoBtn").classList.toggle("checked", expressKaiDao);
       $("expressKaiDaoBtn").setAttribute("aria-pressed", String(expressKaiDao));
 
+      const hgBtn = $("expressHolyGainsBtn");
+      hgBtn.style.display = holyGainsEnabled ? "flex" : "none";
+      hgBtn.classList.toggle("checked", expressHolyGains);
+      hgBtn.setAttribute("aria-pressed", String(expressHolyGains));
+      $("expressHolyGainsLabel").textContent = expressVariant === "vegan"
+        ? "💪 + Holy Gains (Extra Plant-Protein)"
+        : "💪 + Holy Gains (Extra Fleisch)";
+      $("expressHolyGainsSub").textContent = expressVariant === "vegan"
+        ? "+ ca. 180 kcal · +20g Protein (Bio-Soja- & Pilz-Mince)"
+        : "+ ca. 210 kcal · +28g Protein (Extra Fleisch)";
+
+      $("expressSpiceContainer").style.display = customSpiceEnabled ? "block" : "none";
+
       renderCustomBuilder();
 
-      $("customSpiceContainer").style.display = customSpiceEnabled ? "block" : "none";
       $("drink_thai_iced_tea").textContent = String(drinks.thai_iced_tea);
       $("drink_coconut_water").textContent = String(drinks.coconut_water);
       const drinkCount = drinks.thai_iced_tea + drinks.coconut_water;
       $("drinksSummary").textContent = drinkCount > 0 ? drinkCount + " gewählt" : "";
       $("plzSummary").textContent = $("prefPlzSelect").value;
+
+      const nut = computeNutrition();
+      const nutBox = $("nutritionSummaryBox");
+      if (nut.kcal > 0) {
+        nutBox.style.display = "block";
+        const portions = currentPortions();
+        let nutHtml = "";
+        if (portions.length > 1) {
+          if (builderMode === "express" && portions[0].variant) {
+            const single = computePortionNutrition(portions[0], holyGainsEnabled);
+            nutHtml += '<div style="font-size:0.78rem;color:var(--ink);margin-bottom:0.25rem;">Pro Portion: ' + esc(formatNutLine(single)) + '</div>';
+          } else {
+            const boxLines = portions.map((p, idx) => {
+              const bn = computePortionNutrition(p, holyGainsEnabled);
+              return bn.kcal > 0
+                ? '<div style="font-size:0.76rem;color:var(--ink);">Box ' + (idx + 1) + ' (' + esc(NAMES[p.variant]) + '): ' + esc(formatNutLine(bn)) + '</div>'
+                : '';
+            }).filter(Boolean).join("");
+            if (boxLines) nutHtml += '<div style="margin-bottom:0.3rem;">' + boxLines + '</div>';
+          }
+        }
+        nutHtml += "<div>🔥 Gesamt: ca. " + nut.kcal + " kcal · " + nut.p + "g Protein · " + nut.c + "g KH · " + nut.f + "g Fett</div>";
+        $("nutritionValsText").innerHTML = nutHtml;
+      } else {
+        nutBox.style.display = "none";
+      }
 
       const payGrid = $("paymentGrid");
       if (paymentMethods.length > 1) {
@@ -910,6 +1410,24 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     }
     if (window.ResizeObserver) new ResizeObserver(syncFooterHeight).observe($("checkoutBar"));
 
+    function openDeclModal() {
+      $("declarationModal").hidden = false;
+      document.body.style.overflow = "hidden";
+    }
+    function closeDeclModal() {
+      $("declarationModal").hidden = true;
+      document.body.style.overflow = "";
+    }
+    $("openDeclModalBtn").addEventListener("click", openDeclModal);
+    $("closeDeclModalBtn").addEventListener("click", closeDeclModal);
+    $("closeDeclModalFooterBtn").addEventListener("click", closeDeclModal);
+    $("declarationModal").addEventListener("click", (e) => {
+      if (e.target === $("declarationModal")) closeDeclModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !$("declarationModal").hidden) closeDeclModal();
+    });
+
     $("btnDecPortion").addEventListener("click", () => {
       if (portionCount > 1) { portionCount--; renderUI(); }
     });
@@ -930,6 +1448,15 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
     $("expressKaiDaoBtn").addEventListener("click", () => {
       expressKaiDao = !expressKaiDao;
       renderUI();
+    });
+
+    $("expressHolyGainsBtn").addEventListener("click", () => {
+      expressHolyGains = !expressHolyGains;
+      renderUI();
+    });
+
+    $("expressSpiceSelect").addEventListener("change", (e) => {
+      expressSpice = e.target.value;
     });
 
     document.querySelectorAll(".drink-inc").forEach((b) => {
@@ -959,12 +1486,12 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       if (submitting || !cartComplete()) return;
       const errEl = $("orderErrorMsg");
       errEl.textContent = "";
-      const selectedSpice = customSpiceEnabled ? $("customSpiceSelect").value : "leicht_scharf";
 
       const portionsPayload = currentPortions().map((p) => ({
         variant: p.variant,
-        spiceLevel: selectedSpice,
-        addKaiDao: p.addKaiDao
+        spiceLevel: p.spiceLevel || "leicht_scharf",
+        addKaiDao: Boolean(p.addKaiDao),
+        ...(holyGainsEnabled && p.holyGains ? { holyGains: true } : {})
       }));
       const drinksPayload = Object.entries(drinks)
         .filter(([, q]) => q > 0)
@@ -1067,6 +1594,50 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       }
     }
 
+    // Synthesize a clean two-tone street-bell chime when transitioning from IN_WOK to READY_FOR_PICKUP
+    function playPickupChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        [587.33, 880].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+          gain.gain.setValueAtTime(0.001, now + idx * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.14 + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.14 + 0.42);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.45);
+        });
+      } catch {}
+    }
+
+    // Outdoor Sunlight Contrast Mode Toggle (persisted in localStorage)
+    const sunlightBtn = $("sunlightToggleBtn");
+    if (sunlightBtn) {
+      const applySunlight = (on) => {
+        if (on) {
+          document.documentElement.setAttribute("data-sunlight", "high");
+        } else {
+          document.documentElement.removeAttribute("data-sunlight");
+        }
+        sunlightBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      };
+      try {
+        if (localStorage.getItem("hb_sunlight_mode") === "high") applySunlight(true);
+      } catch {}
+      sunlightBtn.addEventListener("click", () => {
+        const next = document.documentElement.getAttribute("data-sunlight") !== "high";
+        applySunlight(next);
+        try { localStorage.setItem("hb_sunlight_mode", next ? "high" : "normal"); } catch {}
+      });
+    }
+
     function renderTicketState(order, queue) {
       const code = esc(order.zueriCode.formatted);
       const total = "CHF " + chf(order.totalChf);
@@ -1076,9 +1647,30 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
         order.totalPortions + (order.totalPortions === 1 ? " Portion" : " Portionen") + " · " + total + " · " +
         (order.paymentMethod === "cash" ? "BAR" : String(order.paymentMethod).toUpperCase());
 
-      $("ticketCardBox").classList.toggle("is-ready", order.status === "ready");
-      if (order.status === "ready" && lastStatus !== "ready" && navigator.vibrate) {
-        try { navigator.vibrate([200, 100, 200]); } catch {}
+      const cardBox = $("ticketCardBox");
+      const isCooking = order.status === "received" || order.status === "in_wok" || order.status === "plating";
+      const isReady = order.status === "ready";
+      cardBox.setAttribute("data-ticket-status", order.status);
+      cardBox.classList.toggle("is-cooking", isCooking);
+      cardBox.classList.toggle("is-ready", isReady);
+
+      const headerBadge = $("ticketHeaderBadge");
+      if (headerBadge) {
+        headerBadge.textContent = isReady
+          ? "🔔 READY FOR PICKUP · AUSGABE"
+          : isCooking
+            ? "🔥 LIVE IM WOK · BOARDING PASS"
+            : "DEIN ZÜRI-CODE BOARDING PASS";
+      }
+
+      if (isReady && lastStatus !== "ready") {
+        cardBox.classList.remove("is-transitioning-ready");
+        void cardBox.offsetWidth;
+        cardBox.classList.add("is-transitioning-ready");
+        if (navigator.vibrate) {
+          try { navigator.vibrate([220, 90, 260, 90, 320]); } catch {}
+        }
+        playPickupChime();
       }
       lastStatus = order.status;
 
@@ -1110,19 +1702,49 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       } else if (order.status === "payment_error_fallback") {
         steps.cash.classList.add("error-wait");
       } else if (order.status === "received" || order.status === "in_wok") {
+        steps.cash.classList.add("is-done");
         steps.wok.classList.add("active");
       } else if (order.status === "plating") {
+        steps.cash.classList.add("is-done");
+        steps.wok.classList.add("is-done");
         steps.plating.classList.add("active");
       } else if (order.status === "ready" || order.status === "completed") {
+        steps.cash.classList.add("is-done");
+        steps.wok.classList.add("is-done");
+        steps.plating.classList.add("is-done");
         steps.ready.classList.add("active");
       }
 
-      const itemsHtml = order.portions.map((p) =>
-        '<div>• Box ' + esc(p.portionIndex) + ': <strong>' + esc(NAMES[p.variant] || p.variant) + '</strong>' +
-        (p.addKaiDao ? " + Kai Dao 🍳" : "") + ' · <em>' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + '</em></div>'
-      ).join("") + (order.drinks.length
+      const ticketNut = { kcal: 0, p: 0, c: 0, f: 0 };
+      const addTicketNut = (item, mult) => {
+        if (!item || !mult) return;
+        ticketNut.kcal += item.caloriesKcal * mult;
+        ticketNut.p += item.proteinGrams * mult;
+        ticketNut.c += item.carbsGrams * mult;
+        ticketNut.f += item.fatGrams * mult;
+      };
+      order.portions.forEach((p) => {
+        addTicketNut(PAGE.nutrition[p.variant], 1);
+        if (p.addKaiDao) addTicketNut(PAGE.nutrition.kai_dao, 1);
+        if (p.holyGains) addTicketNut(p.variant === "vegan" ? PAGE.nutrition.holy_gains_vegan : PAGE.nutrition.holy_gains_meat, 1);
+      });
+      (order.drinks || []).forEach((d) => addTicketNut(PAGE.nutrition[d.drinkId], d.quantity));
+
+      const itemsHtml = order.portions.map((p) => {
+        const bn = computePortionNutrition(p, true);
+        return '<div>• Box ' + esc(p.portionIndex) + ': <strong>' + esc(NAMES[p.variant] || p.variant) + '</strong>' +
+          (p.addKaiDao ? " + Kai Dao 🍳" : "") +
+          (p.holyGains ? " + Holy Gains 💪" : "") +
+          ' · <em>' + esc(SPICE_TEXT[p.spiceLevel] || p.spiceLevel) + '</em>' +
+          (bn.kcal > 0 ? '<div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--muted);margin-left:0.85rem;">↳ ' + esc(formatNutLine(bn)) + '</div>' : '') +
+        '</div>';
+      }).join("") + (order.drinks.length
         ? "<div style='margin-top:0.4rem;color:var(--gold);'>Drinks: " + order.drinks.map((d) => esc(d.quantity) + "x " + esc(DRINK_NAMES[d.drinkId] || d.drinkId)).join(", ") + "</div>"
-        : "");
+        : "") +
+        '<div style="margin-top:0.5rem;padding-top:0.4rem;border-top:1px solid rgba(255,255,255,0.1);font-family:var(--font-mono);font-size:0.74rem;color:var(--green-neon);">' +
+          '🔥 Gesamt-Schätzwert: ca. ' + ticketNut.kcal + ' kcal · ' + ticketNut.p + 'g P · ' + ticketNut.c + 'g KH · ' + ticketNut.f + 'g F' +
+        '</div>' +
+        '<div style="font-size:0.68rem;color:var(--muted);">Unverbindliche Schätzwerte (Wok-Zubereitung).</div>';
       if ($("ticketItemsList").dataset.html !== itemsHtml) {
         $("ticketItemsList").dataset.html = itemsHtml;
         $("ticketItemsList").innerHTML = itemsHtml;

@@ -13,6 +13,7 @@ import {
   getBoardEntries,
   toPublicOrder,
   setCustomSpiceLevelsAndPersist,
+  setHolyGainsAndPersist,
   setOrdersPausedAndPersist,
   getOrdersTodayCount,
   getQueueInfo,
@@ -44,6 +45,8 @@ import {
   MENU_DISHES,
   MENU_DRINKS,
   KAI_DAO_PRICE_CHF,
+  HOLY_GAINS_PRICE_CHF,
+  NUTRITION_ESTIMATES,
   SPICE_LABELS,
 } from '../config/features.js';
 import { complianceConfig } from '../config/compliance.js';
@@ -178,6 +181,8 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
               dishes: MENU_DISHES,
               drinks: MENU_DRINKS,
               kaiDaoPriceChf: KAI_DAO_PRICE_CHF,
+              holyGainsPriceChf: HOLY_GAINS_PRICE_CHF,
+              nutritionEstimates: NUTRITION_ESTIMATES,
               spiceLabels: SPICE_LABELS,
             },
           },
@@ -187,23 +192,30 @@ export async function handleApiRequest(req: ApiRequestInput): Promise<ApiResult>
       }
       if (method === 'PATCH' || method === 'POST') {
         if (!isCrew) return crewRequired();
-        const payload = body as { enableCustomSpiceLevels?: unknown; ordersPaused?: unknown };
+        const payload = body as {
+          enableCustomSpiceLevels?: unknown;
+          enableHolyGains?: unknown;
+          ordersPaused?: unknown;
+        };
         const hasSpice = typeof payload.enableCustomSpiceLevels === 'boolean';
+        const hasHolyGains = typeof payload.enableHolyGains === 'boolean';
         const hasPause = typeof payload.ordersPaused === 'boolean';
         if (
-          (!hasSpice && !hasPause) ||
+          (!hasSpice && !hasHolyGains && !hasPause) ||
           (payload.enableCustomSpiceLevels !== undefined && !hasSpice) ||
+          (payload.enableHolyGains !== undefined && !hasHolyGains) ||
           (payload.ordersPaused !== undefined && !hasPause)
         ) {
           return createErrorResponse(
             400,
             'INVALID_FEATURE_TOGGLE_PAYLOAD',
-            'Feld enableCustomSpiceLevels oder ordersPaused (boolean) ist erforderlich.',
+            'Feld enableCustomSpiceLevels, enableHolyGains oder ordersPaused (boolean) ist erforderlich.',
             startTime,
             { correlationId }
           );
         }
         if (hasSpice) setCustomSpiceLevelsAndPersist(payload.enableCustomSpiceLevels as boolean);
+        if (hasHolyGains) setHolyGainsAndPersist(payload.enableHolyGains as boolean);
         if (hasPause) setOrdersPausedAndPersist(payload.ordersPaused as boolean);
         return createSuccessResponse({ features: getFeatureFlags() }, startTime, correlationId);
       }

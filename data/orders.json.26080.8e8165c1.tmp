@@ -1,0 +1,284 @@
+[
+  {
+    "id": "ord_75f9ac3595791c75cd155b61",
+    "zueriCode": {
+      "plz": "8048",
+      "quarter": "ALTSTETTEN",
+      "formatted": "8048 · ALTSTETTEN"
+    },
+    "portions": [
+      {
+        "portionIndex": 1,
+        "variant": "vegan",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true,
+        "firedAt": "2026-11-15T11:59:32.507Z"
+      },
+      {
+        "portionIndex": 2,
+        "variant": "chicken",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": false,
+        "firedAt": "2026-11-15T11:59:34.043Z"
+      },
+      {
+        "portionIndex": 3,
+        "variant": "pork_mix",
+        "spiceLevel": "original_thai_spicy",
+        "addKaiDao": true,
+        "firedAt": "2026-11-15T11:59:34.683Z"
+      }
+    ],
+    "drinks": [],
+    "totalPortions": 3,
+    "totalChf": 47,
+    "paymentMethod": "cash",
+    "paymentStatus": "paid",
+    "status": "ready",
+    "idempotencyKey": "ord_0bc74070-1b1c-4a64-a3d4-f41d9471872f",
+    "correlationId": "ord_mwhs6pq7_adbd5936",
+    "manualResolutionNote": "An Kasse bestätigt",
+    "createdAt": "2026-11-15T11:58:32.382Z",
+    "updatedAt": "2026-11-15T12:01:28.147Z",
+    "stopId": "loc_1",
+    "declaration": {
+      "version": "2026-11-15.1",
+      "lines": [
+        "Fleischherkunft: Poulet: Schweiz",
+        "Fleischherkunft: Schwein: Schweiz",
+        "Fleischherkunft: Rind: Schweiz",
+        "Kai Dao: Eier aus Freilandhaltung, Herkunft: Schweiz",
+        "Enthält: Gluten (Weizen, Hafer), Ei, Soja",
+        "Kann Spuren enthalten: Sesam",
+        "Hinweis: Alle Gerichte werden im selben Wok-Betrieb zubereitet. Trotz sorgfältiger Trennung können Spuren von Ei, Soja, Gluten oder Sesam nicht vollständig ausgeschlossen werden.",
+        "Holy Vegan wird mit eigenem Wok und Besteck und rein pflanzlichen Saucen zubereitet. Kreuzkontakt mit tierischen Produkten in der Küche kann nicht vollständig ausgeschlossen werden.",
+        "Holy Vegan mit Kai Dao ist vegetarisch, nicht vegan."
+      ]
+    },
+    "paidAt": "2026-11-15T11:59:10.864Z",
+    "previousStatus": "plating",
+    "platedAt": "2026-11-15T11:59:40.062Z",
+    "readyAt": "2026-11-15T12:01:28.147Z"
+  },
+  {
+    "id": "ord_2696b450718d14eb3bc8491e",
+    "zueriCode": {
+      "plz": "8041",
+      "quarter": "LEIMBACH",
+      "formatted": "8041 · LEIMBACH"
+    },
+    "portions": [
+      {
+        "portionIndex": 1,
+        "variant": "chicken",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true
+      },
+      {
+        "portionIndex": 2,
+        "variant": "vegan",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": false
+      }
+    ],
+    "drinks": [
+      {
+        "drinkId": "thai_iced_tea",
+        "quantity": 2
+      }
+    ],
+    "totalPortions": 2,
+    "totalChf": 38.5,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending_cash",
+    "status": "cancelled",
+    "correlationId": "ord_mwhndprx_c6429e4f",
+    "manualResolutionNote": "Automatisch storniert: nicht bezahlt",
+    "createdAt": "2026-11-15T09:44:00.957Z",
+    "updatedAt": "2026-11-15T10:04:30.491Z",
+    "stopId": "loc_1",
+    "declaration": {
+      "version": "2026-11-15.1",
+      "lines": [
+        "Fleischherkunft: Poulet: Schweiz",
+        "Kai Dao: Eier aus Freilandhaltung, Herkunft: Schweiz",
+        "Enthält: Gluten (Weizen, Hafer), Ei, Soja",
+        "Kann Spuren enthalten: Sesam",
+        "Hinweis: Alle Gerichte werden im selben Wok-Betrieb zubereitet. Trotz sorgfältiger Trennung können Spuren von Ei, Soja, Gluten oder Sesam nicht vollständig ausgeschlossen werden.",
+        "Holy Vegan wird mit eigenem Wok und Besteck und rein pflanzlichen Saucen zubereitet. Kreuzkontakt mit tierischen Produkten in der Küche kann nicht vollständig ausgeschlossen werden."
+      ]
+    },
+    "cancelledAt": "2026-11-15T10:04:30.491Z"
+  },
+  {
+    "id": "ord_982668e743a3ff55b3aff46e",
+    "zueriCode": {
+      "plz": "8400",
+      "quarter": "WINTI",
+      "slang": "WINTERTHUR",
+      "formatted": "8400 · WINTI"
+    },
+    "portions": [
+      {
+        "portionIndex": 1,
+        "variant": "vegan",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": false,
+        "firedAt": "2026-11-15T09:45:29.072Z"
+      },
+      {
+        "portionIndex": 2,
+        "variant": "chicken",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true,
+        "firedAt": "2026-11-15T09:44:23.243Z"
+      },
+      {
+        "portionIndex": 3,
+        "variant": "chicken",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true,
+        "firedAt": "2026-11-15T09:44:23.243Z"
+      }
+    ],
+    "drinks": [],
+    "totalPortions": 3,
+    "totalChf": 47,
+    "paymentMethod": "cash",
+    "paymentStatus": "paid",
+    "status": "completed",
+    "idempotencyKey": "ord_dc89aea4-b9f8-4b5e-b43d-46900042526f",
+    "correlationId": "ord_mwhncsn7_de83b804",
+    "manualResolutionNote": "An Kasse bestätigt",
+    "createdAt": "2026-11-15T09:43:18.019Z",
+    "updatedAt": "2026-11-15T12:01:27.136Z",
+    "stopId": "loc_1",
+    "declaration": {
+      "version": "2026-11-15.1",
+      "lines": [
+        "Fleischherkunft: Poulet: Schweiz",
+        "Kai Dao: Eier aus Freilandhaltung, Herkunft: Schweiz",
+        "Enthält: Gluten (Weizen, Hafer), Ei, Soja",
+        "Kann Spuren enthalten: Sesam",
+        "Hinweis: Alle Gerichte werden im selben Wok-Betrieb zubereitet. Trotz sorgfältiger Trennung können Spuren von Ei, Soja, Gluten oder Sesam nicht vollständig ausgeschlossen werden.",
+        "Holy Vegan wird mit eigenem Wok und Besteck und rein pflanzlichen Saucen zubereitet. Kreuzkontakt mit tierischen Produkten in der Küche kann nicht vollständig ausgeschlossen werden."
+      ]
+    },
+    "paidAt": "2026-11-15T09:43:48.157Z",
+    "previousStatus": "ready",
+    "platedAt": "2026-11-15T11:59:39.250Z",
+    "readyAt": "2026-11-15T12:01:22.982Z",
+    "completedAt": "2026-11-15T12:01:27.136Z"
+  },
+  {
+    "id": "ord_1e1d8e9989aafc00afde96e3",
+    "zueriCode": {
+      "plz": "8050",
+      "quarter": "OERLIKON",
+      "slang": "CHREIS 11",
+      "formatted": "8050 · OERLIKON"
+    },
+    "portions": [
+      {
+        "portionIndex": 1,
+        "variant": "pork_mix",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true
+      }
+    ],
+    "drinks": [
+      {
+        "drinkId": "coconut_water",
+        "quantity": 1
+      }
+    ],
+    "totalPortions": 1,
+    "totalChf": 21.5,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending_cash",
+    "status": "cancelled",
+    "correlationId": "ord_mwhnahcw_ae385894",
+    "customerNote": "Demo-Bestellung (Bar offen)",
+    "manualResolutionNote": "Automatisch storniert: nicht bezahlt",
+    "createdAt": "2026-11-15T09:41:30.080Z",
+    "updatedAt": "2026-11-15T10:01:30.445Z",
+    "stopId": "loc_1",
+    "declaration": {
+      "version": "2026-11-15.1",
+      "lines": [
+        "Fleischherkunft: Schwein: Schweiz",
+        "Fleischherkunft: Rind: Schweiz",
+        "Kai Dao: Eier aus Freilandhaltung, Herkunft: Schweiz",
+        "Enthält: Gluten (Weizen, Hafer), Ei, Soja",
+        "Kann Spuren enthalten: Sesam",
+        "Hinweis: Alle Gerichte werden im selben Wok-Betrieb zubereitet. Trotz sorgfältiger Trennung können Spuren von Ei, Soja, Gluten oder Sesam nicht vollständig ausgeschlossen werden."
+      ]
+    },
+    "cancelledAt": "2026-11-15T10:01:30.445Z"
+  },
+  {
+    "id": "ord_f2c719d9513c15e0622b7bc3",
+    "zueriCode": {
+      "plz": "8004",
+      "quarter": "LANGSTRASSE",
+      "slang": "CHREIS CHEIB",
+      "formatted": "8004 · LANGSTRASSE"
+    },
+    "portions": [
+      {
+        "portionIndex": 1,
+        "variant": "chicken",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true,
+        "firedAt": "2026-11-15T09:41:56.375Z"
+      },
+      {
+        "portionIndex": 2,
+        "variant": "chicken",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": true,
+        "firedAt": "2026-11-15T09:41:56.375Z"
+      },
+      {
+        "portionIndex": 3,
+        "variant": "vegan",
+        "spiceLevel": "leicht_scharf",
+        "addKaiDao": false,
+        "firedAt": "2026-11-15T09:42:29.845Z"
+      }
+    ],
+    "drinks": [
+      {
+        "drinkId": "thai_iced_tea",
+        "quantity": 2
+      }
+    ],
+    "totalPortions": 3,
+    "totalChf": 56,
+    "paymentMethod": "cash",
+    "paymentStatus": "paid",
+    "status": "completed",
+    "correlationId": "ord_mwhnahcr_1905ed3a",
+    "customerNote": "Demo-Bestellung (bezahlt)",
+    "manualResolutionNote": "Demo",
+    "createdAt": "2026-11-15T09:41:30.075Z",
+    "updatedAt": "2026-11-15T12:01:20.109Z",
+    "stopId": "loc_1",
+    "declaration": {
+      "version": "2026-11-15.1",
+      "lines": [
+        "Fleischherkunft: Poulet: Schweiz",
+        "Kai Dao: Eier aus Freilandhaltung, Herkunft: Schweiz",
+        "Enthält: Gluten (Weizen, Hafer), Ei, Soja",
+        "Kann Spuren enthalten: Sesam",
+        "Hinweis: Alle Gerichte werden im selben Wok-Betrieb zubereitet. Trotz sorgfältiger Trennung können Spuren von Ei, Soja, Gluten oder Sesam nicht vollständig ausgeschlossen werden.",
+        "Holy Vegan wird mit eigenem Wok und Besteck und rein pflanzlichen Saucen zubereitet. Kreuzkontakt mit tierischen Produkten in der Küche kann nicht vollständig ausgeschlossen werden."
+      ]
+    },
+    "paidAt": "2026-11-15T09:41:30.077Z",
+    "previousStatus": "ready",
+    "platedAt": "2026-11-15T09:42:34.198Z",
+    "readyAt": "2026-11-15T09:42:43.968Z",
+    "completedAt": "2026-11-15T12:01:20.109Z"
+  }
+]

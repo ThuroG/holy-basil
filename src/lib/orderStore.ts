@@ -18,11 +18,13 @@ import {
   getFeatureFlags,
   getAvailablePaymentMethods,
   setCustomSpiceLevelsEnabled,
+  setHolyGainsEnabled,
   setOrdersPaused,
   isSpiceLevel,
   MENU_DISHES,
   MENU_DRINKS,
   KAI_DAO_PRICE_CHF,
+  HOLY_GAINS_PRICE_CHF,
 } from '../config/features.js';
 import { buildCheckoutDeclaration } from '../config/compliance.js';
 import { defaultTruckLocations } from '../config/tourStops.js';
@@ -104,6 +106,7 @@ function persistSettings(): void {
   writeJsonAtomic('settings', {
     liveLocationId,
     enableCustomSpiceLevels: flags.enableCustomSpiceLevels,
+    enableHolyGains: flags.enableHolyGains,
     ordersPaused: flags.ordersPaused,
   });
 }
@@ -119,6 +122,7 @@ export function loadStoreFromDisk(): { orders: number; subscribers: number; inqu
   const settings = readJson<{
     liveLocationId?: string | null;
     enableCustomSpiceLevels?: boolean;
+    enableHolyGains?: boolean;
     ordersPaused?: boolean;
   }>('settings', {});
 
@@ -146,6 +150,9 @@ export function loadStoreFromDisk(): { orders: number; subscribers: number; inqu
     if (typeof settings.enableCustomSpiceLevels === 'boolean') {
       setCustomSpiceLevelsEnabled(settings.enableCustomSpiceLevels);
     }
+    if (typeof settings.enableHolyGains === 'boolean') {
+      setHolyGainsEnabled(settings.enableHolyGains);
+    }
     if (typeof settings.ordersPaused === 'boolean') {
       setOrdersPaused(settings.ordersPaused);
     }
@@ -165,6 +172,13 @@ export function setCustomSpiceLevelsAndPersist(enabled: boolean) {
   return flags;
 }
 
+/** Stores the Holy Gains toggle so it survives a restart. */
+export function setHolyGainsAndPersist(enabled: boolean) {
+  const flags = setHolyGainsEnabled(enabled);
+  persistSettings();
+  return flags;
+}
+
 /** Crew switch «Annahme pausieren». Survives a restart. */
 export function setOrdersPausedAndPersist(paused: boolean) {
   const flags = setOrdersPaused(paused);
@@ -179,7 +193,7 @@ function cleanNote(value: unknown): string | undefined {
 }
 
 export function calculateOrderTotal(
-  portions: ReadonlyArray<{ variant: keyof typeof MENU_DISHES; addKaiDao?: boolean }>,
+  portions: ReadonlyArray<{ variant: keyof typeof MENU_DISHES; addKaiDao?: boolean; holyGains?: boolean }>,
   drinks: ReadonlyArray<{ drinkId: keyof typeof MENU_DRINKS; quantity: number }> = []
 ): number {
   let total = 0;
@@ -194,6 +208,9 @@ export function calculateOrderTotal(
     total += dish.priceChf;
     if (p.addKaiDao) {
       total += KAI_DAO_PRICE_CHF;
+    }
+    if (p.holyGains) {
+      total += HOLY_GAINS_PRICE_CHF;
     }
   }
 
@@ -297,6 +314,7 @@ async function createOrderInternal(
       variant: p.variant,
       spiceLevel,
       addKaiDao: p.addKaiDao === true,
+      ...(flags.enableHolyGains && p.holyGains === true ? { holyGains: true } : {}),
     };
   });
 
@@ -449,6 +467,7 @@ export function toPublicOrder(order: Order): PublicOrderView {
       variant: p.variant,
       spiceLevel: p.spiceLevel,
       addKaiDao: p.addKaiDao,
+      ...(p.holyGains ? { holyGains: true } : {}),
     })),
     drinks: order.drinks,
     totalPortions: order.totalPortions,
