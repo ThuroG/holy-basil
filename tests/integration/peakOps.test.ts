@@ -342,6 +342,21 @@ describe('Order page: one screen, no preselection, declaration above the button'
 
   const html = () => renderOrderPageHtml('loc_1');
 
+  it('asks for portion count before showing dish choices', () => {
+    const page = html();
+    const amountQuestion = page.indexOf('<h1 class="page-title">Wie viele Portionen möchtest du?</h1>');
+    const portionStepper = page.indexOf('id="btnDecPortion"');
+    const groupModeSwitch = page.indexOf('id="groupModeSwitch"');
+    const dishQuestion = page.indexOf('<h2 class="page-title page-title--section">Wähle dein Pad Krapao</h2>');
+    const dishChoices = page.indexOf('id="expressVariantGrid"');
+
+    expect(amountQuestion).toBeGreaterThanOrEqual(0);
+    expect(amountQuestion).toBeLessThan(portionStepper);
+    expect(portionStepper).toBeLessThan(groupModeSwitch);
+    expect(groupModeSwitch).toBeLessThan(dishQuestion);
+    expect(dishQuestion).toBeLessThan(dishChoices);
+  });
+
   it('preselects no variant and starts with a disabled button', () => {
     const page = html();
     expect(page).not.toMatch(/class="variant-btn selected"/);

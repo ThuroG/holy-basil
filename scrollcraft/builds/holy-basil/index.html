@@ -80,24 +80,24 @@
   .site-bar__brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.55rem;
     text-decoration: none;
   }
 
   .site-bar__brand-icon {
     display: block;
     flex: 0 0 auto;
-    width: 42px;
-    height: 46px;
+    width: clamp(50px, 4vw, 58px);
+    height: clamp(56px, 4.5vw, 64px);
     object-fit: contain;
   }
 
   .site-bar__brand-wordmark {
     display: block;
-    flex: 0 1 132px;
-    width: 132px;
+    flex: 0 0 clamp(160px, 14vw, 190px);
+    width: clamp(160px, 14vw, 190px);
     height: auto;
-    max-height: 54px;
+    max-height: 64px;
     object-fit: contain;
   }
 
@@ -766,19 +766,19 @@
     }
     .site-bar__brand {
       white-space: nowrap;
-      gap: 0.35rem;
+      gap: 0.45rem;
     }
     .site-bar__brand-icon {
-      width: 36px;
-      height: 40px;
+      width: 46px;
+      height: 52px;
     }
     .site-bar__brand-wordmark {
-      flex-basis: 110px;
-      width: 110px;
-      max-height: 46px;
+      flex-basis: 150px;
+      width: 150px;
+      max-height: 52px;
     }
     .site-bar .hb-cta {
-      padding: 0.5rem 0.95rem;
+      padding: 0.5rem 0.7rem;
       font-size: 0.84rem;
       white-space: nowrap;
     }
@@ -869,6 +869,28 @@
     .hb-flap-board,
     .hb-newsletter-card {
       padding: 1.15rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .site-bar {
+      padding-inline: 0.75rem;
+    }
+    .site-bar__brand {
+      gap: 0.125rem;
+    }
+    .site-bar__brand-icon {
+      width: 34px;
+      height: 40px;
+    }
+    .site-bar__brand-wordmark {
+      flex-basis: 88px;
+      width: 88px;
+      max-height: 36px;
+    }
+    .site-bar .hb-cta {
+      padding-inline: 0.25rem;
+      font-size: 0.65rem;
     }
   }
 </style>

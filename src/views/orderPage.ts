@@ -292,11 +292,13 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       border: 1.5px solid var(--chili);
       color: #FFCDD2;
     }
-    h1.page-title {
+    h1.page-title,
+    h2.page-title {
       font-family: var(--font-display);
       font-size: 1.15rem;
       margin: 0 0 0.55rem 0;
     }
+    .page-title--section { margin-top: 1rem; }
     .variant-grid { display: grid; gap: 0.5rem; }
     .variant-btn {
       width: 100%;
@@ -863,7 +865,23 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
       </div>
       <div class="notice" id="pausedNotice" hidden>Wir nehmen gerade keine neuen Bestellungen an. Bitte in ein paar Minuten nochmals versuchen.</div>
 
-      <h1 class="page-title">Wähle dein Pad Krapao</h1>
+      <h1 class="page-title">Wie viele Portionen möchtest du?</h1>
+
+      <div class="row">
+        <span>Portionen</span>
+        <div class="stepper-controls">
+          <button type="button" class="step-btn" id="btnDecPortion" aria-label="Eine Portion weniger">−</button>
+          <span class="step-count" id="portionCountDisplay" aria-live="polite">1</span>
+          <button type="button" class="step-btn" id="btnIncPortion" aria-label="Eine Portion mehr">+</button>
+        </div>
+      </div>
+
+      <div class="mode-switch" id="groupModeSwitch" style="display: none;">
+        <button type="button" class="mode-btn active" id="modeExpressBtn">Alle gleich</button>
+        <button type="button" class="mode-btn" id="modeCustomBtn">Jede Box einzeln</button>
+      </div>
+
+      <h2 class="page-title page-title--section">Wähle dein Pad Krapao</h2>
 
       <!-- Express: one configuration for all portions -->
       <div id="expressBuilder">
@@ -891,20 +909,6 @@ export function renderOrderPageHtml(stopId: string | null = null): string {
             <option value="original_thai_spicy">2 🌶️🌶️ · เผ็ดมาก (Scharf)</option>
           </select>
         </div>
-      </div>
-
-      <div class="row">
-        <span>Portionen</span>
-        <div class="stepper-controls">
-          <button type="button" class="step-btn" id="btnDecPortion" aria-label="Eine Portion weniger">−</button>
-          <span class="step-count" id="portionCountDisplay" aria-live="polite">1</span>
-          <button type="button" class="step-btn" id="btnIncPortion" aria-label="Eine Portion mehr">+</button>
-        </div>
-      </div>
-
-      <div class="mode-switch" id="groupModeSwitch" style="display: none;">
-        <button type="button" class="mode-btn active" id="modeExpressBtn">Alle gleich</button>
-        <button type="button" class="mode-btn" id="modeCustomBtn">Jede Box einzeln</button>
       </div>
 
       <!-- Box-by-box configuration (2..10 portions) -->

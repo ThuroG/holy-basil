@@ -13,6 +13,8 @@ export const LOGO_EMBLEM_TRANSPARENT =
   '/assets/holy_basil_logo_v7_team_emblem_transparent.svg';
 export const LOGO_TYPO_TRANSPARENT =
   '/assets/holy_basil_logo_v7_team_emblem_typography_only_transparent.svg';
+export const LOGO_TYPO_TAGLINE_TRANSPARENT =
+  '/assets/holy_basil_logo_v7_team_emblem_typography_with_tagline_transparent.svg';
 
 /**
  * Unverhandelbares Design-System gemäss README_DESIGN.md + Outdoor Sunlight Contrast Tuning.
